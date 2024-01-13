@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "aba"
+  ],
+  "key": {
+    "a": {
+      "item": "minecraft:chest"
+    },
+    "b": {
+      "item": "minecraft:bundle"
+    }
+  },
+  "result": {
+    "item": "minecraft:shulker_box"
+  }
+}
