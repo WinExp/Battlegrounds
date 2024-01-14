@@ -16,6 +16,7 @@
   "battlegrounds.command.reload.success": "Reloaded configs.",
 
   "battlegrounds.command.randomtp.feedback": "Trying to randomly teleport...",
+  "battlegrounds.command.randomtp.delay.feedback": "Random Teleportation is on cooldown with %d seconds remaining.",
 
   "battlegrounds.vote.timeout.broadcast": "Voting terminated due to timeout.",
   "battlegrounds.vote.manual.broadcast": "Voting is terminated by the administrator.",
@@ -30,6 +31,8 @@
   "battlegrounds.game.start.broadcast": "The game is about to start and will restart the server in %d seconds.",
   "battlegrounds.game.server.stop": "The server is restarting to reset the map",
   "battlegrounds.game.join.broadcast": "%s joined the game! (%d/%d)",
+  "battlegrounds.game.join.spectator.broadcast": "%s added to the game! (Spectator)",
+  "battlegrounds.game.already.broadcast": "All players have joined the server and are about to start the game!",
 
   "enchantment.battlegrounds.smelting": "Smelting"
 }

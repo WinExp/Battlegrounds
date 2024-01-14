@@ -16,6 +16,7 @@
   "battlegrounds.command.reload.success": "已重载配置文件",
 
   "battlegrounds.command.randomtp.feedback": "正在尝试随机传送...",
+  "battlegrounds.command.randomtp.delay.feedback": "随机传送正在冷却，剩余 %d 秒。",
 
   "battlegrounds.vote.timeout.broadcast": "由于超时，投票终止。",
   "battlegrounds.vote.manual.broadcast": "投票被管理员终止。",
@@ -30,6 +31,8 @@
   "battlegrounds.game.start.broadcast": "游戏即将开始，将在 %d 秒内重启服务器。",
   "battlegrounds.game.server.stop": "服务器正在重启以重置地图",
   "battlegrounds.game.join.broadcast": "%s 加入了游戏！(%d/%d)",
+  "battlegrounds.game.join.spectator.broadcast": "%s 加入了游戏！(旁观者)",
+  "battlegrounds.game.already.broadcast": "所有玩家都已加入游戏，即将开始游戏！",
 
   "enchantment.battlegrounds.smelting": "自动冶炼"
 }

@@ -25,6 +25,9 @@ public class WorldHelper {
         return (int) border.getCenterZ();
     }
 
+    public void setBorderSize(int size){
+        border.setSize(size);
+    }
     public void setBorderSize(int size, long timeMillis){
         border.interpolateSize(border.getSize(), size, timeMillis);
     }

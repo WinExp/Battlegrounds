@@ -1,13 +1,12 @@
 package com.github.winexp.battlegrounds.helper;
 
 import com.github.winexp.battlegrounds.Battlegrounds;
-import com.github.winexp.battlegrounds.events.server.ServerTickCallback;
 import com.github.winexp.battlegrounds.events.vote.PlayerVotedCallback;
 import com.github.winexp.battlegrounds.events.vote.VoteCompletedCallback;
+import com.github.winexp.battlegrounds.helper.task.Task;
+import com.github.winexp.battlegrounds.helper.task.TaskLater;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.ActionResult;
 
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -16,26 +15,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class VoteHelper{
     private boolean voting = false;
     private HashMap<GameProfile, Boolean> voteMap = new HashMap<>();
-    private long timeout;
-    private long cooldown;
+    private TaskLater timeoutTask = TaskLater.NONE_TASK;
+    private TaskLater cooldownTask = TaskLater.NONE_TASK;
 
-    public VoteHelper(){
-        ServerTickCallback.EVENT.register(this::onTick);
-    }
+    public VoteHelper() { }
 
-    public long getCooldown() {
-        return cooldown;
-    }
-
-    private ActionResult onTick(MinecraftServer server){
-        if (timeout > 0) timeout--;
-        if (cooldown > 0) cooldown--;
-        if (voting && timeout <= 0){
-            stopVote(VoteCompletedCallback.Reason.TIMEOUT);
-        }
-
-        return ActionResult.PASS;
-    }
+    public long getCooldown() { return cooldownTask.getDelay(); }
 
     private boolean checkVoteCompleted(){
         if (!voting) throw new RuntimeException("此实例没有正在进行的投票");
@@ -89,21 +74,25 @@ public class VoteHelper{
     }
 
     public void startVote(ServerPlayerEntity[] players){
-        if (cooldown > 0) throw new RuntimeException("此实例正在冷却");
+        if (cooldownTask.getDelay() > 0) throw new RuntimeException("此实例正在冷却");
         if (voting) throw new RuntimeException("此实例正在进行投票");
         voting = true;
         voteMap.clear();
         for (ServerPlayerEntity player : players){
             voteMap.put(player.getGameProfile(), false);
         }
-        timeout = Battlegrounds.config.voteTimeoutTicks;
-        cooldown = Battlegrounds.config.voteCooldownTicks;
+        timeoutTask = new TaskLater(() -> stopVote(VoteCompletedCallback.Reason.TIMEOUT),
+                Battlegrounds.config.voteTimeoutTicks);
+        Battlegrounds.taskScheduler.runTask(timeoutTask);
     }
 
     public void stopVote(VoteCompletedCallback.Reason reason){
-        if (!voting) throw new RuntimeException("此实例没有正在进行的投票");
+        if (!voting) return;
         VoteCompletedCallback.EVENT.invoker().interact(this, reason);
         voting = false;
-        cooldown = Battlegrounds.config.voteCooldownTicks;
+        timeoutTask.cancel();
+        cooldownTask.cancel();
+        cooldownTask = new TaskLater(Task.NONE_RUNNABLE, Battlegrounds.config.voteCooldownTicks);
+        Battlegrounds.taskScheduler.runTask(cooldownTask);
     }
 }

@@ -46,6 +46,7 @@ public class BattlegroundsCommand {
         var cStop = CommandManager.literal("stop").requires(source ->
                 source.hasPermissionLevel(4)).executes(context -> {
                     voter.stopVote(VoteCompletedCallback.Reason.MANUAL);
+                    Battlegrounds.stopTask.cancel();
 
                     return 1;
         });
@@ -78,21 +79,14 @@ public class BattlegroundsCommand {
         });
 
         var cReload = CommandManager.literal("reload").executes(context -> {
-            Battlegrounds.saveAndLoadConfigs();
+            Battlegrounds.loadConfigs();
             context.getSource().sendFeedback(() -> TextUtil.translatableWithColor(
                     "battlegrounds.command.reload.success", TextUtil.GREEN), false);
 
             return 1;
         });
 
-        var cBorder = CommandManager.literal("border").executes(context -> {
-            var helper = new WorldHelper(Battlegrounds.server.getOverworld());
-            helper.setBorderSize(1000, 60000);
-
-            return 1;
-        });
-
-        var cNode = dispatcher.register(cRoot.then(cBorder).then(cHelp).then(cStart).then(cStop).then(cAccept).then(cDeny).then(cReload));
+        var cNode = dispatcher.register(cRoot.then(cHelp).then(cStart).then(cStop).then(cAccept).then(cDeny).then(cReload));
 
         // 命令缩写
         var cRoot_redir = CommandManager.literal("bg").executes(BattlegroundsCommand::help).redirect(cNode);
