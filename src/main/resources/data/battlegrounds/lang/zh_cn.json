@@ -33,6 +33,11 @@
   "battlegrounds.game.join.broadcast": "%s 加入了游戏！(%d/%d)",
   "battlegrounds.game.join.spectator.broadcast": "%s 加入了游戏！(旁观者)",
   "battlegrounds.game.already.broadcast": "所有玩家都已加入游戏，即将开始游戏！",
+  "battlegrounds.game.deathmatch.already.broadcast": "死亡竞赛将在 %d 分钟后开始！",
+  "battlegrounds.game.deathmatch.start.broadcast": "您已进入死亡竞赛模式！",
+  "battlegrounds.game.pvp.enable.broadcast": "PVP 已启用！",
+  "battlegrounds.game.border.reduce.broadcast": "正在缩小竞技场！",
+  "battlegrounds.game.end.broadcast": "游戏结束！%s 是最后的赢家！",
 
   "enchantment.battlegrounds.smelting": "自动冶炼"
 }

@@ -7,17 +7,21 @@ import com.github.winexp.battlegrounds.configs.GameProgress;
 import com.github.winexp.battlegrounds.configs.RootConfig;
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.events.player.PlayerDamagedCallback;
+import com.github.winexp.battlegrounds.events.player.PlayerDeathCallback;
 import com.github.winexp.battlegrounds.events.player.PlayerJoinedGameCallback;
 import com.github.winexp.battlegrounds.events.server.ServerLoadedCallback;
 import com.github.winexp.battlegrounds.events.server.ServerSavingCallback;
-import com.github.winexp.battlegrounds.events.server.ServerTickCallback;
 import com.github.winexp.battlegrounds.events.vote.PlayerVotedCallback;
 import com.github.winexp.battlegrounds.events.vote.VoteCompletedCallback;
+import com.github.winexp.battlegrounds.helper.GameHelper;
+import com.github.winexp.battlegrounds.helper.VoteHelper;
 import com.github.winexp.battlegrounds.helper.task.RunnableCancelledException;
 import com.github.winexp.battlegrounds.helper.task.TaskScheduler;
 import com.github.winexp.battlegrounds.helper.task.TaskTimer;
-import com.github.winexp.battlegrounds.util.*;
-import com.github.winexp.battlegrounds.helper.VoteHelper;
+import com.github.winexp.battlegrounds.util.ConfigUtil;
+import com.github.winexp.battlegrounds.util.FileUtil;
+import com.github.winexp.battlegrounds.util.PlayerUtil;
+import com.github.winexp.battlegrounds.util.TextUtil;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.api.ModInitializer;
@@ -27,21 +31,24 @@ import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.enchantment.EnchantmentLevelEntry;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.EnchantedBookItem;
-import net.minecraft.item.ItemGroups;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.network.ClientConnection;
-import net.minecraft.registry.*;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.*;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ConnectedClientData;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.WorldSavePath;
 import net.minecraft.world.GameMode;
-import org.apache.logging.log4j.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.nio.file.Path;
@@ -58,6 +65,7 @@ public class Battlegrounds implements ModInitializer {
     public static Cache cache;
     public static TaskTimer stopTask = TaskTimer.NONE_TASK;
     public static TaskTimer startTask = TaskTimer.NONE_TASK;
+    public static GameHelper gameHelper = new GameHelper();
 
     private ActionResult onServerLoaded(MinecraftServer server){
         Battlegrounds.server = server;
@@ -67,8 +75,27 @@ public class Battlegrounds implements ModInitializer {
 
         if (cache.resetWorld){
             cache.resetWorld = false;
-            GameUtil.setInitialProgress();
+            GameHelper.setInitialProgress();
         }
+        GameHelper.setKeepInventory(!progress.deathmatch);
+        return ActionResult.PASS;
+    }
+
+    private ActionResult onPlayerDeath(DamageSource source, ServerPlayerEntity player){
+        if (progress.deathmatch){
+            player.changeGameMode(GameMode.SPECTATOR);
+            if (GameHelper.getInGamePlayers() == 1){
+                gameHelper.stopGame();
+                for (ServerPlayerEntity p1 : server.getPlayerManager().getPlayerList()){
+                    p1.changeGameMode(GameMode.ADVENTURE);
+                    p1.getInventory().clear();
+                }
+                ServerPlayerEntity p = GameHelper.getFirstPlayer();
+                server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
+                        "battlegrounds.game.end.broadcast", TextUtil.GOLD, p.getName()), false);
+            }
+        }
+
         return ActionResult.PASS;
     }
 
@@ -113,7 +140,7 @@ public class Battlegrounds implements ModInitializer {
                         num--;
                     }
                     else{
-                        GameUtil.stopServer(TextUtil.translatableWithColor(
+                        GameHelper.stopServer(TextUtil.translatableWithColor(
                                 "battlegrounds.game.server.stop", TextUtil.GREEN));
                         throw new RunnableCancelledException();
                     }
@@ -166,6 +193,12 @@ public class Battlegrounds implements ModInitializer {
         }
     }
 
+    public static void reload(){
+        loadConfigs();
+        gameHelper.reduceTask.cancel();
+        taskScheduler.runTask(gameHelper.reduceTask);
+    }
+
     private void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment){
         if (environment.dedicated){
             BattlegroundsCommand.register(dispatcher);
@@ -182,37 +215,41 @@ public class Battlegrounds implements ModInitializer {
     }
 
     private ActionResult onPlayerJoin(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData clientData, CallbackInfoReturnable<Text> cir){
-        if (progress.gaming){
+        if (!progress.started){
             if (!progress.players.contains(player.getGameProfile().getId().toString())){
                 player.changeGameMode(GameMode.SPECTATOR);
-                return ActionResult.PASS;
+                cir.setReturnValue(TextUtil.translatableWithColor("battlegrounds.game.join.spectator.broadcast",
+                        TextUtil.DARK_GRAY, player.getName()));
             }
-            cir.setReturnValue(TextUtil.translatableWithColor("battlegrounds.game.join.broadcast", TextUtil.GREEN,
-                    player.getName(), GameUtil.getInGamePlayers() + 1, progress.players.size()));
-            if (server.getPlayerManager().getPlayerList().size() + 1 == progress.players.size()){
-                server.getPlayerManager().broadcast(TextUtil.translatableWithColor("battlegrounds.game.already.broadcast",
-                        TextUtil.GREEN), false);
-                startTask = new TaskTimer(new Runnable() {
-                    private int num = config.gameStartDelaySeconds;
+            else{
+                cir.setReturnValue(TextUtil.translatableWithColor("battlegrounds.game.join.broadcast",
+                        TextUtil.GREEN, player.getName(), GameHelper.getInGamePlayers() + 1, progress.players.size()));
+                if (server.getPlayerManager().getPlayerList().size() + 1 == progress.players.size()){
+                    server.getPlayerManager().broadcast(TextUtil.translatableWithColor("battlegrounds.game.already.broadcast",
+                            TextUtil.GREEN), false);
+                    startTask = new TaskTimer(new Runnable() {
+                        private int num = config.gameStartDelaySeconds;
 
-                    @Override
-                    public void run() {
-                        if (num > 0){
-                            for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()){
-                                PlayerUtil.sendTitle(player, TextUtil.withColor(
-                                        Text.literal(String.valueOf(num)), TextUtil.GREEN));
-                                player.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HAT.value(), SoundCategory.NEUTRAL, 0.7f, 1.0f);
+                        @Override
+                        public void run() {
+                            if (num > 0){
+                                for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()){
+                                    PlayerUtil.sendTitle(player, TextUtil.withColor(
+                                            Text.literal(String.valueOf(num)), TextUtil.GREEN));
+                                    player.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HAT.value(), SoundCategory.NEUTRAL, 0.7f, 1.0f);
+                                }
+
+                                num--;
                             }
-
-                            num--;
+                            else{
+                                progress.started = true;
+                                gameHelper.startGame();
+                                throw new RunnableCancelledException();
+                            }
                         }
-                        else{
-                            GameUtil.startGame();
-                            throw new RunnableCancelledException();
-                        }
-                    }
-                }, 0, 20);
-                taskScheduler.runTask(startTask);
+                    }, 0, 20);
+                    taskScheduler.runTask(startTask);
+                }
             }
         }
 
@@ -240,6 +277,7 @@ public class Battlegrounds implements ModInitializer {
         VoteCompletedCallback.EVENT.register(this::onVoteStop);
         PlayerDamagedCallback.EVENT.register(this::onPlayerDamaged);
         PlayerJoinedGameCallback.EVENT.register(this::onPlayerJoin);
+        PlayerDeathCallback.EVENT.register(this::onPlayerDeath);
 
         // 注册附魔
         registerEnchantments();
@@ -257,7 +295,7 @@ public class Battlegrounds implements ModInitializer {
                 logger.error("无法重置地图：savePath 不能为 null");
             }
             else{
-                GameUtil.resetWorlds();
+                GameHelper.resetWorlds();
             }
         }
     }

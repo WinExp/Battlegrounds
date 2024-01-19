@@ -3,7 +3,6 @@ package com.github.winexp.battlegrounds.commands;
 import com.github.winexp.battlegrounds.Battlegrounds;
 import com.github.winexp.battlegrounds.events.vote.VoteCompletedCallback;
 import com.github.winexp.battlegrounds.helper.VoteHelper;
-import com.github.winexp.battlegrounds.helper.WorldHelper;
 import com.github.winexp.battlegrounds.util.TextFactory;
 import com.github.winexp.battlegrounds.util.TextUtil;
 import com.mojang.brigadier.CommandDispatcher;
@@ -79,7 +78,7 @@ public class BattlegroundsCommand {
         });
 
         var cReload = CommandManager.literal("reload").executes(context -> {
-            Battlegrounds.loadConfigs();
+            Battlegrounds.reload();
             context.getSource().sendFeedback(() -> TextUtil.translatableWithColor(
                     "battlegrounds.command.reload.success", TextUtil.GREEN), false);
 

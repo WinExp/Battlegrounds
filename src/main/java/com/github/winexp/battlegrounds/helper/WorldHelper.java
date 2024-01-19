@@ -5,8 +5,8 @@ import net.minecraft.world.border.WorldBorder;
 import org.jetbrains.annotations.NotNull;
 
 public class WorldHelper {
-    private World world;
-    private WorldBorder border;
+    private final World world;
+    private final WorldBorder border;
 
     public WorldHelper(@NotNull World world){
         this.world = world;
