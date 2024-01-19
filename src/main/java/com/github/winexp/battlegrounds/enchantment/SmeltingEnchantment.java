@@ -1,6 +1,7 @@
 package com.github.winexp.battlegrounds.enchantment;
 
 import net.minecraft.enchantment.*;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EquipmentSlot;
 
 public class SmeltingEnchantment extends Enchantment {
@@ -10,6 +11,11 @@ public class SmeltingEnchantment extends Enchantment {
 
     protected SmeltingEnchantment(Rarity rarity, EnchantmentTarget target, EquipmentSlot... slots){
         super(rarity, target, slots);
+    }
+
+    @Override
+    protected boolean canAccept(Enchantment other){
+        return super.canAccept(other) && other != Enchantments.SILK_TOUCH;
     }
 
     @Override

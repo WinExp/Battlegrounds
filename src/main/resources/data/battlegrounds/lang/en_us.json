@@ -31,8 +31,13 @@
   "battlegrounds.game.start.broadcast": "The game is about to start and will restart the server in %d seconds.",
   "battlegrounds.game.server.stop": "The server is restarting to reset the map",
   "battlegrounds.game.join.broadcast": "%s joined the game! (%d/%d)",
-  "battlegrounds.game.join.spectator.broadcast": "%s added to the game! (Spectator)",
+  "battlegrounds.game.join.spectator.broadcast": "%s joined to the game! (Spectator)",
   "battlegrounds.game.already.broadcast": "All players have joined the server and are about to start the game!",
+  "battlegrounds.game.deathmatch.already.broadcast": "The Deathmatch will begin in %d minutes!",
+  "battlegrounds.game.deathmatch.start.broadcast": "You are in Deathmatch mode!",
+  "battlegrounds.game.pvp.enable.broadcast": "PVP has been enabled!",
+  "battlegrounds.game.border.reduce.broadcast": "The arena is shrinking!",
+  "battlegrounds.game.end.broadcast": "Game over! %s is the final winner!",
 
-  "enchantment.battlegrounds.smelting": "Smelting"
+  "battlegrounds.border.bar": "%d seconds to next lap"
 }

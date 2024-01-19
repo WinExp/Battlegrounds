@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class VoteHelper{
     private boolean voting = false;
-    private HashMap<GameProfile, Boolean> voteMap = new HashMap<>();
+    private final HashMap<GameProfile, Boolean> voteMap = new HashMap<>();
     private TaskLater timeoutTask = TaskLater.NONE_TASK;
     private TaskLater cooldownTask = TaskLater.NONE_TASK;
 

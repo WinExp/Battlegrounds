@@ -1,19 +1,16 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
+    "aaa",
     "aba",
-    "bcb",
-    "aba"
+    "aaa"
   ],
   "key": {
     "a": {
       "item": "minecraft:gold_ingot"
     },
     "b": {
-      "item": "minecraft:golden_apple"
-    },
-    "c": {
-      "item": "minecraft:emerald_block"
+      "item": "minecraft:ghast_tear"
     }
   },
   "result": {

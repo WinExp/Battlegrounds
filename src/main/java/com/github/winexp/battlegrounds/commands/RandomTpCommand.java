@@ -1,8 +1,7 @@
 package com.github.winexp.battlegrounds.commands;
 
 import com.github.winexp.battlegrounds.Battlegrounds;
-import com.github.winexp.battlegrounds.helper.task.Task;
-import com.github.winexp.battlegrounds.helper.task.TaskLater;
+import com.github.winexp.battlegrounds.helper.task.TaskTimer;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
 import com.github.winexp.battlegrounds.util.TextUtil;
 import com.mojang.brigadier.CommandDispatcher;
@@ -10,8 +9,13 @@ import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.UUID;
+
 public class RandomTpCommand {
-    private static TaskLater cooldownTask = TaskLater.NONE_TASK;
+    private final static HashMap<UUID, Long> cooldownTimers = new HashMap<>();
+    private static TaskTimer coolDownUpdateTask = TaskTimer.NONE_TASK;
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher){
         var cRoot = CommandManager.literal("randomtp").requires(ServerCommandSource::isExecutedByPlayer)
@@ -26,17 +30,31 @@ public class RandomTpCommand {
     }
 
     private static int randomtp(CommandContext<ServerCommandSource> context){
-        ServerCommandSource source = context.getSource();
-        if (cooldownTask.getDelay() > 0){
-            source.sendFeedback(() -> TextUtil.translatableWithColor("battlegrounds.command.randomtp.delay.feedback",
-                    TextUtil.RED, cooldownTask.getDelay() / 20), false);
-            return 1;
+        if (coolDownUpdateTask == TaskTimer.NONE_TASK){
+            coolDownUpdateTask = new TaskTimer(() -> {
+                cooldownTimers.forEach((uuid, ticks) -> {
+                    if (ticks <= 0) return;
+                    cooldownTimers.put(uuid, ticks - 1);
+                });
+            }, 0, 1);
         }
-        source.sendFeedback(() -> TextUtil.translatableWithColor("battlegrounds.command.randomtp.feedback",
-                TextUtil.GOLD), false);
-        PlayerUtil.randomTeleport(Battlegrounds.server.getOverworld(), source.getPlayer());
-        cooldownTask = new TaskLater(Task.NONE_RUNNABLE, Battlegrounds.config.randomTpCooldownTicks);
-        Battlegrounds.taskScheduler.runTask(cooldownTask);
+        Battlegrounds.taskScheduler.runTask(coolDownUpdateTask);
+
+        ServerCommandSource source = context.getSource();
+        assert source.getPlayer() != null;
+        UUID uuid = source.getPlayer().getGameProfile().getId();
+        if (!cooldownTimers.containsKey(uuid)) cooldownTimers.put(uuid, 0L);
+        Long cooldown = cooldownTimers.get(uuid);
+        if (cooldown > 0){
+            source.sendFeedback(() -> TextUtil.translatableWithColor("battlegrounds.command.randomtp.delay.feedback",
+                    TextUtil.RED, cooldown / 20), false);
+        }
+        else{
+            source.sendFeedback(() -> TextUtil.translatableWithColor("battlegrounds.command.randomtp.feedback",
+                    TextUtil.GOLD), false);
+            PlayerUtil.randomTeleport(Battlegrounds.server.getOverworld(), Objects.requireNonNull(source.getPlayer()));
+            cooldownTimers.put(uuid, Battlegrounds.config.randomTpCooldownTicks);
+        }
 
         return 1;
     }

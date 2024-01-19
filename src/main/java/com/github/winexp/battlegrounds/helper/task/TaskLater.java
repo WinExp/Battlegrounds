@@ -1,7 +1,7 @@
 package com.github.winexp.battlegrounds.helper.task;
 
 public class TaskLater extends Task{
-    public final static TaskLater NONE_TASK = new TaskLater(Task.NONE_RUNNABLE, 0);
+    public final static TaskLater NONE_TASK = new TaskLater(Task.NONE_RUNNABLE, -1);
     private long delay;
 
     public long getDelay() { return delay; }

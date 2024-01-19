@@ -3,7 +3,6 @@ package com.github.winexp.battlegrounds.commands;
 import com.github.winexp.battlegrounds.Battlegrounds;
 import com.github.winexp.battlegrounds.events.vote.VoteCompletedCallback;
 import com.github.winexp.battlegrounds.helper.VoteHelper;
-import com.github.winexp.battlegrounds.helper.WorldHelper;
 import com.github.winexp.battlegrounds.util.TextFactory;
 import com.github.winexp.battlegrounds.util.TextUtil;
 import com.mojang.brigadier.CommandDispatcher;
@@ -46,7 +45,9 @@ public class BattlegroundsCommand {
         var cStop = CommandManager.literal("stop").requires(source ->
                 source.hasPermissionLevel(4)).executes(context -> {
                     voter.stopVote(VoteCompletedCallback.Reason.MANUAL);
-                    Battlegrounds.stopTask.cancel();
+                    Battlegrounds.taskScheduler.stopAllTask();
+                    Battlegrounds.gameHelper.stopGame();
+                    Battlegrounds.logger.info("已停止队列中所有任务");
 
                     return 1;
         });
@@ -79,7 +80,7 @@ public class BattlegroundsCommand {
         });
 
         var cReload = CommandManager.literal("reload").executes(context -> {
-            Battlegrounds.loadConfigs();
+            Battlegrounds.reload();
             context.getSource().sendFeedback(() -> TextUtil.translatableWithColor(
                     "battlegrounds.command.reload.success", TextUtil.GREEN), false);
 

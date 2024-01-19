@@ -6,9 +6,15 @@ public class RootConfig {
     public long randomTpCooldownTicks = 600;
     public int serverCloseDelaySeconds = 10;
     public int gameStartDelaySeconds = 10;
+    public int pvpModeBeginBorderNum = 2;
     public BorderConfig border = new BorderConfig();
 
     public static class BorderConfig{
-        public int initialBorderSize = 1000;
+        public int initialSize = 5000;
+        public long resizeTimeTicks = 4800;
+        public int resizeDelayTicks = 2400;
+        public int resizeBlocks = 500;
+        public int resizeNum = 3;
+        public int finalSize = 500;
     }
 }

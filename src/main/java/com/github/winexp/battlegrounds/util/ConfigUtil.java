@@ -3,7 +3,6 @@ package com.github.winexp.battlegrounds.util;
 import com.github.winexp.battlegrounds.Battlegrounds;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.apache.logging.log4j.Level;
 
 import java.nio.file.Path;
 
@@ -15,9 +14,6 @@ public class ConfigUtil {
     public static void saveConfig(Path path, String configName, Object config){
         if (config == null){
             return;
-        }
-        if (!isConfigExists(path, configName)){
-            throw new RuntimeException("配置已存在");
         }
         buildConfig(path, configName, config);
     }

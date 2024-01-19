@@ -19,6 +19,10 @@ public class TaskScheduler {
             if (task.isCancelled()) tasks.remove(task);
             try{
                 if (task instanceof TaskLater later){
+                    if (later.getDelay() < 0){
+                        tasks.remove(task);
+                        continue;
+                    }
                     later.decreaseDelay();
                     if (later.getDelay() <= 0){
                         TaskTriggerCallback.EVENT.invoker().interact(task);
@@ -48,6 +52,10 @@ public class TaskScheduler {
     }
 
     public void runTask(Task task){
+        if (tasks.contains(task)) return;
         tasks.add(task);
+    }
+    public void stopAllTask(){
+        tasks.clear();
     }
 }

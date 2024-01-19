@@ -22,6 +22,7 @@
   "mixins": [
     "battlegrounds.mixins.json"
   ],
+  "accessWidener" : "battlegrounds.accesswidener",
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": "*",
