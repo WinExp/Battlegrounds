@@ -1,8 +1,11 @@
 package com.github.winexp.battlegrounds.mixins;
 
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
+import com.github.winexp.battlegrounds.enchantment.VitalityEnchantment;
 import com.github.winexp.battlegrounds.events.player.PlayerDamagedCallback;
 import com.github.winexp.battlegrounds.events.player.PlayerDeathCallback;
+import com.github.winexp.battlegrounds.item.Items;
+import com.github.winexp.battlegrounds.item.tool.PVPProSwordItem;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.damage.DamageSource;
@@ -10,7 +13,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -38,10 +42,15 @@ public class ServerPlayerEntityMixin {
 
         // 生机勃勃 附魔 状态效果
         ItemStack stack = player.getEquippedStack(EquipmentSlot.CHEST);
-        if (stack == null || stack.isEmpty()) return;
         int level = EnchantmentHelper.getLevel(Enchantments.VITALITY, stack);
         if (level > 0){
-            Enchantments.VITALITY.giveEffects((ServerPlayerEntity) (Object) this, level);
+            VitalityEnchantment.giveEffects((ServerPlayerEntity) (Object) this, level);
+        }
+
+        // PVP 大佬
+        stack = player.getEquippedStack(EquipmentSlot.MAINHAND);
+        if (stack.getItem() == Items.PVP_PRO_SWORD){
+            PVPProSwordItem.addEffects(player);
         }
     }
 }

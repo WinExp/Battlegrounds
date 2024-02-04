@@ -2,7 +2,6 @@ package com.github.winexp.battlegrounds;
 
 import com.github.winexp.battlegrounds.commands.BattlegroundsCommand;
 import com.github.winexp.battlegrounds.commands.RandomTpCommand;
-import com.github.winexp.battlegrounds.configs.Cache;
 import com.github.winexp.battlegrounds.configs.GameProgress;
 import com.github.winexp.battlegrounds.configs.RootConfig;
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
@@ -17,28 +16,22 @@ import com.github.winexp.battlegrounds.events.vote.PlayerVotedCallback;
 import com.github.winexp.battlegrounds.events.vote.VoteCompletedCallback;
 import com.github.winexp.battlegrounds.helper.GameHelper;
 import com.github.winexp.battlegrounds.helper.VoteHelper;
-import com.github.winexp.battlegrounds.helper.task.RunnableCancelledException;
+import com.github.winexp.battlegrounds.helper.task.TaskCountdown;
 import com.github.winexp.battlegrounds.helper.task.TaskScheduler;
-import com.github.winexp.battlegrounds.helper.task.TaskTimer;
+import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.util.ConfigUtil;
-import com.github.winexp.battlegrounds.util.FileUtil;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
 import com.github.winexp.battlegrounds.util.TextUtil;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.enchantment.EnchantmentLevelEntry;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.EnchantedBookItem;
-import net.minecraft.item.ItemGroups;
-import net.minecraft.item.ItemStack;
+import net.minecraft.entity.projectile.FireworkRocketEntity;
 import net.minecraft.network.ClientConnection;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -48,14 +41,12 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.world.GameMode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.nio.file.Path;
 import java.util.Arrays;
 
 import static com.github.winexp.battlegrounds.util.Environment.*;
@@ -66,28 +57,36 @@ public class Battlegrounds implements ModInitializer {
     public static MinecraftServer server;
     public static RootConfig config;
     public static GameProgress progress;
-    public static Cache cache;
-    public static TaskTimer stopTask = TaskTimer.NONE_TASK;
-    public static TaskTimer startTask = TaskTimer.NONE_TASK;
+    public static TaskCountdown stopTask = TaskCountdown.NONE_TASK;
+    public static TaskCountdown startTask = TaskCountdown.NONE_TASK;
     public static GameHelper gameHelper = new GameHelper();
 
     private ActionResult onServerLoaded(MinecraftServer server){
         Battlegrounds.server = server;
+        gameHelper.setServer(server);
         taskScheduler = new TaskScheduler();
         loadConfigs();
         saveConfigs();
 
-        if (cache.resetWorld){
-            cache.resetWorld = false;
-            GameHelper.setInitialProgress();
-            progress.progress = GameProgress.Progress.WAIT_PLAYER;
+        if (progress.progress.isResetWorld()){
+            if (server.getSavePath(WorldSavePath.ROOT) == null){
+                logger.error("无法重置地图：savePath 不能为 null");
+            }
+            else{
+                gameHelper.resetWorlds();
+            }
         }
 
         return ActionResult.PASS;
     }
 
     private ActionResult onWorldLoaded(MinecraftServer server){
-        GameHelper.setKeepInventory(progress.progress != GameProgress.Progress.DEATHMATCH);
+        if (progress.progress.isResetWorld()){
+            progress.progress = GameProgress.Progress.WAIT_PLAYER;
+            gameHelper.setInitialProgress();
+        }
+
+        gameHelper.setKeepInventory(progress.progress != GameProgress.Progress.DEATHMATCH);
         if (progress.resizeLapTimer <= 0
                 && progress.progress != GameProgress.Progress.DEATHMATCH) Battlegrounds.progress.resizeLapTimer = Battlegrounds.config.border.resizeDelayTicks;
         if (progress.progress.isStarted()){
@@ -100,15 +99,21 @@ public class Battlegrounds implements ModInitializer {
     private ActionResult onPlayerDeath(DamageSource source, ServerPlayerEntity player){
         if (progress.progress == GameProgress.Progress.DEATHMATCH){
             player.changeGameMode(GameMode.SPECTATOR);
-            if (GameHelper.getInGamePlayers() == 1){
-                gameHelper.stopGame();
+            if (gameHelper.getInGamePlayers() == 1){
                 for (ServerPlayerEntity p1 : server.getPlayerManager().getPlayerList()){
                     p1.changeGameMode(GameMode.ADVENTURE);
                     p1.getInventory().clear();
                 }
-                ServerPlayerEntity p = GameHelper.getFirstPlayer();
+                ServerPlayerEntity p = gameHelper.getFirstPlayer();
                 server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
                         "battlegrounds.game.end.broadcast", TextUtil.GOLD, p.getName()), false);
+
+                FireworkRocketEntity firework = EntityType.FIREWORK_ROCKET.create(server.getOverworld());
+                if (firework != null) {
+                    firework.refreshPositionAfterTeleport(p.getPos());
+                }
+
+                gameHelper.stopGame();
             }
         }
 
@@ -141,31 +146,22 @@ public class Battlegrounds implements ModInitializer {
         else if (reason == VoteCompletedCallback.Reason.ACCEPT){
             server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
                     "battlegrounds.game.start.broadcast", TextUtil.GREEN, config.serverCloseDelaySeconds), false);
-            stopTask = new TaskTimer(new Runnable() {
-                private int num = config.serverCloseDelaySeconds;
-
-                @Override
-                public void run() {
-                    if (num > 0){
+            stopTask = new TaskCountdown(
+                    () -> {
                         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()){
                             PlayerUtil.sendTitle(player, TextUtil.withColor(
-                                    Text.literal(String.valueOf(num)), TextUtil.GREEN));
+                                    Text.literal(String.valueOf(stopTask.getCount())), TextUtil.GREEN));
                             player.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HAT.value(), SoundCategory.NEUTRAL, 0.7f, 1.0f);
                         }
-
-                        num--;
-                    }
-                    else{
-                        GameHelper.stopServer(TextUtil.translatableWithColor(
-                                "battlegrounds.game.server.stop", TextUtil.GREEN));
-                        throw new RunnableCancelledException();
-                    }
-                }
-            }, 0, 20);
+                    },
+                    () -> gameHelper.stopServer(TextUtil.translatableWithColor(
+                            "battlegrounds.game.server.stop", TextUtil.GREEN)),
+                    0, 20, config.serverCloseDelaySeconds
+            );
             taskScheduler.runTask(stopTask);
             progress.players = Arrays.stream(voter.getProfiles()).map((GameProfile profile) ->
                     profile.getId().toString()).toList();
-            cache.resetWorld = true;
+            progress.progress = GameProgress.Progress.RESET_WORLD;
         }
 
         return ActionResult.PASS;
@@ -184,40 +180,27 @@ public class Battlegrounds implements ModInitializer {
         return ActionResult.PASS;
     }
 
-    public static Path getSavePath(){
-        if (cache.savePath == null || !FileUtil.isDirectoryExists(Path.of(cache.savePath))){
-            if (server != null){
-                cache.savePath = server.getSavePath(WorldSavePath.ROOT).toString();
-            }
-        }
-        if (cache.savePath == null) return null;
-        return Path.of(cache.savePath);
-    }
-
     public static void saveConfigs(){
         ConfigUtil.saveConfig(CONFIG_PATH, "config", config);
         if (server != null){
-            cache.savePath = server.getSavePath(WorldSavePath.ROOT).toString();
-        }
-        ConfigUtil.saveConfig(GAME_PATH, "bg_cache", cache);
-        if (server != null){
             if (gameHelper.reduceTask.getDelay() >= 0) progress.resizeLapTimer = gameHelper.reduceTask.getDelay();
-            ConfigUtil.saveConfig(getSavePath(), "bg_progress", progress);
+            ConfigUtil.saveConfig(server.getSavePath(WorldSavePath.ROOT), "bg_progress", progress);
         }
     }
 
     public static void loadConfigs(){
         config = ConfigUtil.createOrLoadConfig(CONFIG_PATH, "config", RootConfig.class);
-        cache = ConfigUtil.createOrLoadConfig(GAME_PATH, "bg_cache", Cache.class);
         if (server != null) {
-            progress = ConfigUtil.createOrLoadConfig(getSavePath(), "bg_progress", GameProgress.class);
+            progress = ConfigUtil.createOrLoadConfig(server.getSavePath(WorldSavePath.ROOT), "bg_progress", GameProgress.class);
         }
     }
 
     public static void reload(){
         loadConfigs();
         gameHelper.reduceTask.cancel();
-        gameHelper.runTasks();
+        if (progress.progress.isStarted() && progress.progress != GameProgress.Progress.DEATHMATCH){
+            gameHelper.runTasks();
+        }
     }
 
     private void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment){
@@ -230,19 +213,6 @@ public class Battlegrounds implements ModInitializer {
         }
     }
 
-    private void registerEnchantments(){
-        Registry.register(Registries.ENCHANTMENT, new Identifier("battlegrounds", "smelting"),
-                Enchantments.SMELTING);
-        Registry.register(Registries.ENCHANTMENT, new Identifier("battlegrounds", "channeling_pro"),
-                Enchantments.CHANNELING_PRO);
-        Registry.register(Registries.ENCHANTMENT, new Identifier("battlegrounds", "steves_pain"),
-                Enchantments.STEVES_PAIN);
-        Registry.register(Registries.ENCHANTMENT, new Identifier("battlegrounds", "vitality"),
-                Enchantments.VITALITY);
-        Registry.register(Registries.ENCHANTMENT, new Identifier("battlegrounds", "leaching"),
-                Enchantments.LEACHING);
-    }
-
     private ActionResult onPlayerJoin(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData clientData, CallbackInfoReturnable<Text> cir){
         if (progress.progress.isPreparing()){
             if (!progress.players.contains(player.getGameProfile().getId().toString())){
@@ -252,31 +222,21 @@ public class Battlegrounds implements ModInitializer {
             }
             else{
                 cir.setReturnValue(TextUtil.translatableWithColor("battlegrounds.game.join.broadcast",
-                        TextUtil.GREEN, player.getName(), GameHelper.getInGamePlayers() + 1, progress.players.size()));
+                        TextUtil.GREEN, player.getName(), gameHelper.getInGamePlayers() + 1, progress.players.size()));
                 if (server.getPlayerManager().getPlayerList().size() + 1 == progress.players.size()){
                     server.getPlayerManager().broadcast(TextUtil.translatableWithColor("battlegrounds.game.already.broadcast",
                             TextUtil.GREEN), false);
-                    startTask = new TaskTimer(new Runnable() {
-                        private int num = config.gameStartDelaySeconds;
-
-                        @Override
-                        public void run() {
-                            if (num > 0){
-                                for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()){
-                                    PlayerUtil.sendTitle(player, TextUtil.withColor(
-                                            Text.literal(String.valueOf(num)), TextUtil.GREEN));
-                                    player.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HAT.value(), SoundCategory.NEUTRAL, 0.7f, 1.0f);
+                    startTask = new TaskCountdown(
+                            () -> {
+                                for (ServerPlayerEntity player1 : server.getPlayerManager().getPlayerList()){
+                                    PlayerUtil.sendTitle(player1, TextUtil.withColor(
+                                            Text.literal(String.valueOf(startTask.getCount())), TextUtil.GREEN));
+                                    player1.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HAT.value(), SoundCategory.NEUTRAL, 0.7f, 1.0f);
                                 }
-
-                                num--;
-                            }
-                            else{
-                                progress.progress = GameProgress.Progress.DEVELOP;
-                                gameHelper.startGame();
-                                throw new RunnableCancelledException();
-                            }
-                        }
-                    }, 0, 20);
+                            },
+                            () -> gameHelper.startGame(),
+                            0, 20, config.gameStartDelaySeconds
+                    );
                     taskScheduler.runTask(startTask);
                 }
             }
@@ -314,38 +274,19 @@ public class Battlegrounds implements ModInitializer {
         PlayerDeathCallback.EVENT.register(this::onPlayerDeath);
 
         // 注册实体
-        EntityTypes.load();
+        EntityTypes.registerEntities();
+
+        // 注册物品
+        Items.registerItems();
 
         // 注册附魔
-        registerEnchantments();
+        Enchantments.registerEnchantments();
 
         // 注册物品组
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register(content -> {
-            ItemStack smelting_book = EnchantedBookItem.forEnchantment(
-                    new EnchantmentLevelEntry(Enchantments.SMELTING, 1));
-            content.add(smelting_book);
-            ItemStack channeling_pro_book = EnchantedBookItem.forEnchantment(
-                    new EnchantmentLevelEntry(Enchantments.CHANNELING_PRO, 1));
-            content.add(channeling_pro_book);
-            ItemStack steves_pain_book = EnchantedBookItem.forEnchantment(
-                    new EnchantmentLevelEntry(Enchantments.STEVES_PAIN, 1));
-            content.add(steves_pain_book);
-            ItemStack vitality_book = EnchantedBookItem.forEnchantment(
-                    new EnchantmentLevelEntry(Enchantments.VITALITY, 3));
-            content.add(vitality_book);
-            ItemStack leaching_book = EnchantedBookItem.forEnchantment(
-                    new EnchantmentLevelEntry(Enchantments.LEACHING, 1));
-            content.add(leaching_book);
-        });
+        Items.registerItemGroup();
+        Enchantments.registerItemGroup();
 
-        // 重置地图
-        if (cache.resetWorld){
-            if (getSavePath() == null){
-                logger.error("无法重置地图：savePath 不能为 null");
-            }
-            else{
-                GameHelper.resetWorlds();
-            }
-        }
+        // 添加配方
+        Items.addRecipes();
     }
 }

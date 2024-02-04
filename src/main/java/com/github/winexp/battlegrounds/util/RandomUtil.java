@@ -22,7 +22,7 @@ public class RandomUtil {
         int centerX = helper.getBorderCenterX();
         int centerZ = helper.getBorderCenterZ();
         int size = helper.getBorderSize() - 20;
-        if (size > 50000000) size = 50000000;
+        if (size > 5000000) size = 5000000;
         Random random = world.random;
         int x = random.nextInt(size) - (size / 2) + centerX;
         int y = 500;

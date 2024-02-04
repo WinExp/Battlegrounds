@@ -1,6 +1,7 @@
 package com.github.winexp.battlegrounds.entity.projectile;
 
 import com.github.winexp.battlegrounds.entity.EntityTypes;
+import com.github.winexp.battlegrounds.item.Items;
 import com.google.common.collect.Sets;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -12,7 +13,6 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
@@ -31,17 +31,12 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class ChannelingArrowEntity extends PersistentProjectileEntity {
-    private final static ItemStack DEFAULT_STACK;
-    private static final TrackedData<Integer> COLOR;
+    private final static ItemStack DEFAULT_STACK = new ItemStack(Items.ARROW);
+    private static final TrackedData<Integer> COLOR = DataTracker.registerData(ChannelingArrowEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private Potion potion;
     private final Set<StatusEffectInstance> effects;
     private boolean colorSet;
     private boolean channeling = false;
-
-    static{
-        DEFAULT_STACK = new ItemStack(Items.ARROW);
-        COLOR = DataTracker.registerData(ChannelingArrowEntity.class, TrackedDataHandlerRegistry.INTEGER);
-    }
 
     public ChannelingArrowEntity(EntityType<? extends ChannelingArrowEntity> entityType, World world) {
         super(entityType, world, DEFAULT_STACK);

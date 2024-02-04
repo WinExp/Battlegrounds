@@ -1,5 +1,7 @@
 package com.github.winexp.battlegrounds.helper.task;
 
+import com.github.winexp.battlegrounds.events.task.TaskTriggerCallback;
+
 public abstract class Task {
     private boolean cancelled = false;
     private final Runnable runnable;
@@ -11,6 +13,7 @@ public abstract class Task {
 
     public void run(){
         runnable.run();
+        TaskTriggerCallback.EVENT.invoker().interact(this);
     }
 
     protected Task(Runnable runnable){

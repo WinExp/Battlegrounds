@@ -6,6 +6,7 @@
   "mixins": [
     "MinecraftServerMixin",
     "PlayerManagerMixin",
+    "RecipeManagerMixin",
     "ServerPlayerEntityMixin",
     "item.BowItemMixin"
   ],

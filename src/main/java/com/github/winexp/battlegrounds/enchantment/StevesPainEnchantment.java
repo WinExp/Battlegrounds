@@ -20,15 +20,19 @@ public class StevesPainEnchantment extends Enchantment {
         super(rarity, target, slots);
     }
 
+    private void addEffects(LivingEntity source, LivingEntity target){
+        target.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, DURATION, 0), source);
+        target.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, DURATION, 3), source);
+        target.addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER, DURATION, 2), source);
+        target.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, DURATION, 0), source);
+        target.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, DURATION, 1), source);
+    }
+
     @Override
     public void onTargetDamaged(LivingEntity user, Entity target, int level){
         Random random = user.getRandom();
         if (random.nextInt(100) + 1 <= BOUND && target instanceof LivingEntity livingEntity){
-            livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, DURATION, 0), user);
-            livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, DURATION, 3), user);
-            livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER, DURATION, 2), user);
-            livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, DURATION, 0), user);
-            livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, DURATION, 1), user);
+            addEffects(user, livingEntity);
         }
     }
 

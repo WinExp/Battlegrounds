@@ -10,19 +10,17 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
 public class EntityTypes {
-    public final static EntityType<ChannelingArrowEntity> CHANNELING_ARROW;
+    public final static EntityType<ChannelingArrowEntity> CHANNELING_ARROW =
+            FabricEntityTypeBuilder.<ChannelingArrowEntity>create(SpawnGroup.MISC, ChannelingArrowEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.5f, 0.5f))
+                    .trackRangeChunks(4)
+                    .trackedUpdateRate(20)
+                    .build();
 
-    static{
-        CHANNELING_ARROW = Registry.register(
+    public static void registerEntities(){
+        Registry.register(
                 Registries.ENTITY_TYPE,
                 new Identifier("battlegrounds", "channeling_arrow"),
-                FabricEntityTypeBuilder.<ChannelingArrowEntity>create(SpawnGroup.MISC, ChannelingArrowEntity::new)
-                        .dimensions(EntityDimensions.fixed(0.5f, 0.5f))
-                        .trackRangeChunks(4)
-                        .trackedUpdateRate(20)
-                        .build()
-        );
+                CHANNELING_ARROW);
     }
-
-    public static void load() { }
 }

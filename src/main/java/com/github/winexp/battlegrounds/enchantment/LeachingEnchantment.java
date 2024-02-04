@@ -19,10 +19,14 @@ public class LeachingEnchantment extends Enchantment {
         super(rarity, target, slots);
     }
 
+    private void addEffects(LivingEntity source, LivingEntity target){
+        target.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, DURATION, 1), source);
+    }
+
     @Override
     public void onTargetDamaged(LivingEntity user, Entity target, int level){
         if (target instanceof LivingEntity livingEntity){
-            livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, DURATION, 1), user);
+            addEffects(user, livingEntity);
         }
     }
 
