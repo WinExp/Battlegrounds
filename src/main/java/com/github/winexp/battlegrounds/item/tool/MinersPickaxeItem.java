@@ -2,6 +2,7 @@ package com.github.winexp.battlegrounds.item.tool;
 
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.item.Items;
+import com.github.winexp.battlegrounds.item.recipe.NBTCrafting;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PickaxeItem;
@@ -10,6 +11,7 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RawShapedRecipe;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
+import net.minecraft.util.Identifier;
 
 import java.util.Map;
 
@@ -23,6 +25,11 @@ public class MinersPickaxeItem extends PickaxeItem implements NBTCrafting {
 
     public MinersPickaxeItem(ToolMaterial material, int attackDamage, float attackSpeed, Settings settings) {
         super(material, attackDamage, attackSpeed, settings);
+    }
+
+    @Override
+    public Identifier getIdentifier(){
+        return new Identifier("battlegrounds", "miners_pickaxe");
     }
 
     @Override
@@ -41,11 +48,10 @@ public class MinersPickaxeItem extends PickaxeItem implements NBTCrafting {
                 "aaa",
                 "aba",
                 "aaa");
-        ShapedRecipe shaped = new ShapedRecipe("battlegrounds.miners_pickaxe",
+        return new ShapedRecipe("battlegrounds.miners_pickaxe",
                 CraftingRecipeCategory.EQUIPMENT,
                 rawShaped,
                 Items.MINERS_PICKAXE.getItemStack()
         );
-        return shaped;
     }
 }

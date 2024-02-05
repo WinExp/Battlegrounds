@@ -2,6 +2,7 @@ package com.github.winexp.battlegrounds.item.tool;
 
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.item.Items;
+import com.github.winexp.battlegrounds.item.recipe.NBTCrafting;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -36,6 +37,11 @@ public class PVPProSwordItem extends SwordItem implements NBTCrafting {
     }
 
     @Override
+    public Identifier getIdentifier(){
+        return new Identifier("battlegrounds", "pvp_pro_sword");
+    }
+
+    @Override
     public ItemStack getItemStack(){
         ItemStack stack = new ItemStack(this, 1);
         ENCHANTMENTS.forEach((stack::addEnchantment));
@@ -53,11 +59,10 @@ public class PVPProSwordItem extends SwordItem implements NBTCrafting {
                 "aba",
                 "cdc",
                 "aba");
-        ShapedRecipe shaped = new ShapedRecipe("battlegrounds.pvp_pro_sword",
+        return new ShapedRecipe(getIdentifier().toString(),
                 CraftingRecipeCategory.EQUIPMENT,
                 rawShaped,
                 Items.PVP_PRO_SWORD.getItemStack()
         );
-        return shaped;
     }
 }
