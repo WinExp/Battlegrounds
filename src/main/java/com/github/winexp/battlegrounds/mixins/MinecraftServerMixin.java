@@ -3,7 +3,7 @@ package com.github.winexp.battlegrounds.mixins;
 import com.github.winexp.battlegrounds.events.server.ServerLoadedCallback;
 import com.github.winexp.battlegrounds.events.server.ServerSavingCallback;
 import com.github.winexp.battlegrounds.events.server.ServerTickCallback;
-import com.github.winexp.battlegrounds.events.server.WorldLoadedCallback;
+import com.github.winexp.battlegrounds.events.server.WorldsLoadedCallback;
 import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
@@ -21,7 +21,7 @@ public class MinecraftServerMixin {
 
     @Inject(method = "loadWorld", at = @At("TAIL"))
     private void onWorldLoaded(CallbackInfo ci){
-        WorldLoadedCallback.EVENT.invoker().interact((MinecraftServer) (Object) this);
+        WorldsLoadedCallback.EVENT.invoker().interact((MinecraftServer) (Object) this);
     }
 
     @Inject(method = "tick", at = @At("TAIL"))

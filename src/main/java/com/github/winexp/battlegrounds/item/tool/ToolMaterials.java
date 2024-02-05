@@ -1,6 +1,5 @@
-package com.github.winexp.battlegrounds.item.tool.materials;
+package com.github.winexp.battlegrounds.item.tool;
 
-import com.github.winexp.battlegrounds.item.tool.PVPProSwordItem;
 import net.minecraft.item.ToolMaterial;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.util.Lazy;
@@ -8,7 +7,8 @@ import net.minecraft.util.Lazy;
 import java.util.function.Supplier;
 
 public enum ToolMaterials implements ToolMaterial {
-    PVP_PRO(2573, 8.0F, 3.0F + PVPProSwordItem.DAMAGE_BONUS, 3, 0, Ingredient::empty);
+    PVP_PRO(2573, 8.0F, 3.0F + PVPProSwordItem.DAMAGE_BONUS, 3, 0, Ingredient::empty),
+    MINERS_PICKAXE(998, 8.0F, 3.0F, 3, 0, Ingredient::empty);
 
     private final int durability;
     private final float miningSpeed;

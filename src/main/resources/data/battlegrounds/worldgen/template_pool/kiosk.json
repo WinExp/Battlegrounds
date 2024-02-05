@@ -1,0 +1,15 @@
+{
+  "name": "kiosk",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "battlegrounds:kiosk",
+        "processors": "minecraft:empty"
+      }
+    }
+  ]
+}

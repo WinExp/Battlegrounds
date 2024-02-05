@@ -1,6 +1,7 @@
 package com.github.winexp.battlegrounds.commands;
 
-import com.github.winexp.battlegrounds.Battlegrounds;
+import com.github.winexp.battlegrounds.helper.task.TaskScheduler;
+import com.github.winexp.battlegrounds.util.Variable;
 import com.github.winexp.battlegrounds.helper.task.TaskTimer;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
 import com.github.winexp.battlegrounds.util.TextUtil;
@@ -38,7 +39,7 @@ public class RandomTpCommand {
                 });
             }, 0, 1);
         }
-        Battlegrounds.taskScheduler.runTask(coolDownUpdateTask);
+        TaskScheduler.INSTANCE.runTask(coolDownUpdateTask);
 
         ServerCommandSource source = context.getSource();
         assert source.getPlayer() != null;
@@ -52,8 +53,8 @@ public class RandomTpCommand {
         else{
             source.sendFeedback(() -> TextUtil.translatableWithColor("battlegrounds.command.randomtp.feedback",
                     TextUtil.GOLD), false);
-            PlayerUtil.randomTeleport(Battlegrounds.server.getOverworld(), Objects.requireNonNull(source.getPlayer()));
-            cooldownTimers.put(uuid, Battlegrounds.config.randomTpCooldownTicks);
+            PlayerUtil.randomTeleport(Variable.INSTANCE.server.getOverworld(), Objects.requireNonNull(source.getPlayer()));
+            cooldownTimers.put(uuid, Variable.INSTANCE.config.randomTpCooldownTicks);
         }
 
         return 1;

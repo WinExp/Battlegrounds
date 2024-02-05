@@ -8,7 +8,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
-public class Enchantments {
+public class Enchantments extends net.minecraft.enchantment.Enchantments {
     public final static SmeltingEnchantment SMELTING = new SmeltingEnchantment();
     public final static ChannelingProEnchantment CHANNELING_PRO = new ChannelingProEnchantment();
     public final static StevesPainEnchantment STEVES_PAIN = new StevesPainEnchantment();

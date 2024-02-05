@@ -1,12 +1,8 @@
 package com.github.winexp.battlegrounds.util;
 
-import com.github.winexp.battlegrounds.Battlegrounds;
-import org.apache.logging.log4j.Level;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.stream.Stream;
 
 public class FileUtil {
@@ -40,7 +36,7 @@ public class FileUtil {
                 sb.append('\n');
             }
         } catch (IOException e) {
-            Battlegrounds.logger.error("无法读取文件", e);
+            Environment.LOGGER.error("无法读取文件", e);
             throw new RuntimeException(e);
         }
         return sb.toString();
@@ -50,13 +46,13 @@ public class FileUtil {
         try {
             Files.createDirectories(fileName.getParent());
         } catch (IOException e){
-            Battlegrounds.logger.error("无法创建目录", e);
+            Environment.LOGGER.error("无法创建目录", e);
             throw new RuntimeException(e);
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName.toFile()))){
             writer.write(content);
         } catch (IOException e) {
-            Battlegrounds.logger.error("无法写入文件", e);
+            Environment.LOGGER.error("无法写入文件", e);
             throw new RuntimeException(e);
         }
     }

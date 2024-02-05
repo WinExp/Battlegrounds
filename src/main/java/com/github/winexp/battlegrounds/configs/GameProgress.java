@@ -10,10 +10,13 @@ public class GameProgress {
     public List<String> players = List.of();
 
     public enum Progress{
-        IDLE, RESET_WORLD, WAIT_PLAYER, DEVELOP, PVP, DEATHMATCH;
+        IDLE, RESET_WORLD, WAIT_PLAYER, DEVELOP, DEATHMATCH;
 
+        public boolean isDeathmatch(){
+            return this == DEATHMATCH;
+        }
         public boolean isResetWorld(){
-            return this == WAIT_PLAYER;
+            return this == RESET_WORLD;
         }
         public boolean isPreparing(){
             return this.ordinal() <= WAIT_PLAYER.ordinal() && this != IDLE;

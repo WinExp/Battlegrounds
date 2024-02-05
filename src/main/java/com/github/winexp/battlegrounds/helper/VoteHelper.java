@@ -1,6 +1,7 @@
 package com.github.winexp.battlegrounds.helper;
 
-import com.github.winexp.battlegrounds.Battlegrounds;
+import com.github.winexp.battlegrounds.helper.task.TaskScheduler;
+import com.github.winexp.battlegrounds.util.Variable;
 import com.github.winexp.battlegrounds.events.vote.PlayerVotedCallback;
 import com.github.winexp.battlegrounds.events.vote.VoteCompletedCallback;
 import com.github.winexp.battlegrounds.helper.task.Task;
@@ -47,7 +48,7 @@ public class VoteHelper{
         return result.get();
     }
 
-    public GameProfile[] getProfiles(){
+    public GameProfile[] getPlayerProfiles(){
         if (!voting) throw new RuntimeException("此实例没有正在进行的投票");
         return voteMap.keySet().toArray(new GameProfile[0]);
     }
@@ -82,8 +83,8 @@ public class VoteHelper{
             voteMap.put(player.getGameProfile(), false);
         }
         timeoutTask = new TaskLater(() -> stopVote(VoteCompletedCallback.Reason.TIMEOUT),
-                Battlegrounds.config.voteTimeoutTicks);
-        Battlegrounds.taskScheduler.runTask(timeoutTask);
+                Variable.INSTANCE.config.voteTimeoutTicks);
+        TaskScheduler.INSTANCE.runTask(timeoutTask);
     }
 
     public void stopVote(VoteCompletedCallback.Reason reason){
@@ -92,7 +93,7 @@ public class VoteHelper{
         voting = false;
         timeoutTask.cancel();
         cooldownTask.cancel();
-        cooldownTask = new TaskLater(Task.NONE_RUNNABLE, Battlegrounds.config.voteCooldownTicks);
-        Battlegrounds.taskScheduler.runTask(cooldownTask);
+        cooldownTask = new TaskLater(Task.NONE_RUNNABLE, Variable.INSTANCE.config.voteCooldownTicks);
+        TaskScheduler.INSTANCE.runTask(cooldownTask);
     }
 }

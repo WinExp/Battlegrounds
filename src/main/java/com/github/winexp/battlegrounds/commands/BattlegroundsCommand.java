@@ -1,8 +1,12 @@
 package com.github.winexp.battlegrounds.commands;
 
 import com.github.winexp.battlegrounds.Battlegrounds;
+import com.github.winexp.battlegrounds.helper.task.TaskScheduler;
+import com.github.winexp.battlegrounds.util.Variable;
 import com.github.winexp.battlegrounds.events.vote.VoteCompletedCallback;
+import com.github.winexp.battlegrounds.helper.GameHelper;
 import com.github.winexp.battlegrounds.helper.VoteHelper;
+import com.github.winexp.battlegrounds.util.Environment;
 import com.github.winexp.battlegrounds.util.TextFactory;
 import com.github.winexp.battlegrounds.util.TextUtil;
 import com.mojang.brigadier.CommandDispatcher;
@@ -31,8 +35,8 @@ public class BattlegroundsCommand {
                         "battlegrounds.vote.cooldown.feedback", TextUtil.RED, voter.getCooldown() / 20), false);
                 return 1;
             }
-            voter.startVote(Battlegrounds.server.getPlayerManager().getPlayerList().toArray(new ServerPlayerEntity[0]));
-            Battlegrounds.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
+            voter.startVote(Variable.INSTANCE.server.getPlayerManager().getPlayerList().toArray(new ServerPlayerEntity[0]));
+            Variable.INSTANCE.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
                     "battlegrounds.command.start.broadcast", TextUtil.GREEN, source.getName())
                     .append(TextFactory.LINEFEED)
                     .append(TextFactory.ACCEPT_BUTTON)
@@ -45,9 +49,9 @@ public class BattlegroundsCommand {
         var cStop = CommandManager.literal("stop").requires(source ->
                 source.hasPermissionLevel(4)).executes(context -> {
                     voter.stopVote(VoteCompletedCallback.Reason.MANUAL);
-                    Battlegrounds.taskScheduler.stopAllTask();
-                    Battlegrounds.gameHelper.stopGame();
-                    Battlegrounds.logger.info("已停止队列中所有任务");
+                    TaskScheduler.INSTANCE.stopAllTask();
+                    GameHelper.INSTANCE.stopGame();
+                    Environment.LOGGER.info("已停止队列中所有任务");
 
                     return 1;
         });

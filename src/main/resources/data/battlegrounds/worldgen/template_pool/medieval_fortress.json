@@ -1,0 +1,15 @@
+{
+  "name": "medieval_fortress",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "battlegrounds:medieval_fortress",
+        "processors": "minecraft:empty"
+      }
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 5651938,
+    "separation": 4,
+    "spacing": 20
+  },
+  "structures": [
+    {
+      "structure": "battlegrounds:desert_hut",
+      "weight": 1
+    }
+  ]
+}

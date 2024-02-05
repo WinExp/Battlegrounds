@@ -5,10 +5,10 @@ import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ActionResult;
 
-public interface WorldLoadedCallback {
-    Event<WorldLoadedCallback> EVENT = EventFactory.createArrayBacked(WorldLoadedCallback.class,
+public interface WorldsLoadedCallback {
+    Event<WorldsLoadedCallback> EVENT = EventFactory.createArrayBacked(WorldsLoadedCallback.class,
             (listeners) -> (server) -> {
-                for (WorldLoadedCallback listener : listeners){
+                for (WorldsLoadedCallback listener : listeners){
                     ActionResult actionResult = listener.interact(server);
                     if (actionResult != ActionResult.PASS) return actionResult;
                 }

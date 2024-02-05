@@ -16,7 +16,7 @@ public class VitalityEnchantment extends Enchantment {
         super(rarity, target, slots);
     }
 
-    public static void giveEffects(ServerPlayerEntity player, int level){
+    public void giveEffects(ServerPlayerEntity player, int level){
         player.addStatusEffect(new StatusEffectInstance(StatusEffects.HEALTH_BOOST, 2, level - 1));
     }
 

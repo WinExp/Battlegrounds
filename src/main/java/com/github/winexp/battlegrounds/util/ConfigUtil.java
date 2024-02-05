@@ -1,6 +1,5 @@
 package com.github.winexp.battlegrounds.util;
 
-import com.github.winexp.battlegrounds.Battlegrounds;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -28,7 +27,7 @@ public class ConfigUtil {
                 buildConfig(path, configName, instance);
                 return instance;
             } catch (Exception e){
-                Battlegrounds.logger.error("无法创建配置", e);
+                Environment.LOGGER.error("无法创建配置", e);
                 throw new RuntimeException(e);
             }
         }

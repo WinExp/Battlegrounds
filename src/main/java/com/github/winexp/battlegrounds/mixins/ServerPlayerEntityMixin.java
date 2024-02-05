@@ -44,13 +44,13 @@ public class ServerPlayerEntityMixin {
         ItemStack stack = player.getEquippedStack(EquipmentSlot.CHEST);
         int level = EnchantmentHelper.getLevel(Enchantments.VITALITY, stack);
         if (level > 0){
-            VitalityEnchantment.giveEffects((ServerPlayerEntity) (Object) this, level);
+            Enchantments.VITALITY.giveEffects((ServerPlayerEntity) (Object) this, level);
         }
 
         // PVP 大佬
-        stack = player.getEquippedStack(EquipmentSlot.MAINHAND);
-        if (stack.getItem() == Items.PVP_PRO_SWORD){
-            PVPProSwordItem.addEffects(player);
+        if (player.getEquippedStack(EquipmentSlot.MAINHAND).getItem() == Items.PVP_PRO_SWORD
+        || player.getEquippedStack(EquipmentSlot.OFFHAND).getItem() == Items.PVP_PRO_SWORD){
+            Items.PVP_PRO_SWORD.addEffects(player);
         }
     }
 }

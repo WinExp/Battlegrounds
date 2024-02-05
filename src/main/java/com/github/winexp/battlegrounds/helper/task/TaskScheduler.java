@@ -7,9 +7,11 @@ import net.minecraft.util.ActionResult;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class TaskScheduler {
+    public final static TaskScheduler INSTANCE = new TaskScheduler();
+
     private final CopyOnWriteArrayList<Task> tasks = new CopyOnWriteArrayList<>();
 
-    public TaskScheduler(){
+    private TaskScheduler(){
         ServerTickCallback.EVENT.register(this::tick);
     }
 
