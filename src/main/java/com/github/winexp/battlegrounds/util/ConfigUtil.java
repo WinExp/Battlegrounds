@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 
 import java.nio.file.Path;
 
+// TODO: 需要重写
 public class ConfigUtil {
     public static boolean isConfigExists(Path path, String configName){
         return FileUtil.isFileExists(path.resolve(configName + ".json"));
