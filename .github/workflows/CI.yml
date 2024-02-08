@@ -24,6 +24,11 @@ jobs:
           distribution: 'adopt'
           java-version: ${{ matrix.java }}
 
+      - name: Set up Gradle
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: 8.5
+
       - name: Cache Gradle packages
         uses: actions/cache@v3
         with:
