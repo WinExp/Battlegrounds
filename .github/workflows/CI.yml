@@ -55,11 +55,6 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Preprocess sources
-        env:
-          BUILD_TYPE: "BETA"
-        run: ./gradlew preprocessResources --stacktrace
-
       - name: Publish Maven with Gradle
         env:
           BUILD_TYPE: "BETA"
