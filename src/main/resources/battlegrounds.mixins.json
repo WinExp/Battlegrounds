@@ -8,6 +8,7 @@
     "PlayerManagerMixin",
     "RecipeManagerMixin",
     "ServerPlayerEntityMixin",
+    "Shield_LivingEntityMixin",
     "item.BowItemMixin"
   ],
   "client": [

@@ -18,7 +18,7 @@ import java.util.Map;
 @Mixin(RecipeManager.class)
 public class RecipeManagerMixin {
     @Inject(method = "apply(Ljava/util/Map;Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/util/profiler/Profiler;)V", at = @At("TAIL"))
-    private void onApply(Map<Identifier, JsonElement> map, ResourceManager resourceManager, Profiler profiler, CallbackInfo ci){
+    private void onApply(Map<Identifier, JsonElement> map, ResourceManager resourceManager, Profiler profiler, CallbackInfo ci) {
         RecipeManager instance = (RecipeManager) (Object) this;
         ArrayList<RecipeEntry<?>> list = new ArrayList<>(instance.values());
         list.addAll(RecipeUtil.getRecipes());

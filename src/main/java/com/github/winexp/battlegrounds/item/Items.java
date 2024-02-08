@@ -28,10 +28,10 @@ import java.util.List;
 import java.util.Map;
 
 public class Items extends net.minecraft.item.Items {
-    public final static PVPProSwordItem PVP_PRO_SWORD = new PVPProSwordItem(ToolMaterials.PVP_PRO, 3, -2.4F, new Item.Settings().rarity(Rarity.RARE));
+    public final static PVPProSwordItem PVP_PRO_SWORD = new PVPProSwordItem(ToolMaterials.PVP_PRO, 3, -2.4F, new Item.Settings().rarity(Rarity.RARE).fireproof());
     public final static MinersPickaxeItem MINERS_PICKAXE = new MinersPickaxeItem(ToolMaterials.MINERS_PICKAXE, 1, -2.8F, new Item.Settings().rarity(Rarity.RARE));
 
-    public static void registerItems(){
+    public static void registerItems() {
         Registry.register(Registries.ITEM,
                 PVP_PRO_SWORD.getIdentifier(),
                 PVP_PRO_SWORD
@@ -42,27 +42,25 @@ public class Items extends net.minecraft.item.Items {
         );
     }
 
-    public static void registerItemGroup(){
+    public static void registerItemGroup() {
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(content -> {
-            // PVP 大佬
             content.add(PVP_PRO_SWORD.getItemStack());
         });
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(content -> {
-            // 采矿者之镐
             content.add(MINERS_PICKAXE.getItemStack());
         });
     }
 
-    public static void addRecipes(){
+    public static void addRecipes() {
         List<ShapedNBTCrafting> shapedRecipes = List.of(
                 // 自动冶炼
                 new ShapedNBTCrafting(
                         new Identifier("battlegrounds", "enchanted_book_smelting"),
                         RawShapedRecipe.create(Map.of(
-                                'a', Ingredient.ofItems(Items.FURNACE),
-                                'b', Ingredient.ofItems(Items.STONE_PICKAXE),
-                                'c', Ingredient.ofItems(Items.RAW_IRON)
-                        ), "aba",
+                                        'a', Ingredient.ofItems(Items.FURNACE),
+                                        'b', Ingredient.ofItems(Items.STONE_PICKAXE),
+                                        'c', Ingredient.ofItems(Items.RAW_IRON)
+                                ), "aba",
                                 "bcb",
                                 "aba"),
                         CraftingRecipeCategory.EQUIPMENT,
@@ -74,10 +72,10 @@ public class Items extends net.minecraft.item.Items {
                 new ShapedNBTCrafting(
                         new Identifier("battlegrounds", "enchanted_book_channeling_pro"),
                         RawShapedRecipe.create(Map.of(
-                                'a', Ingredient.ofItems(Items.DIAMOND),
-                                'b', Ingredient.ofItems(Items.LIGHTNING_ROD),
-                                'c', Ingredient.ofItems(Items.BOOK)
-                        ), "aba",
+                                        'a', Ingredient.ofItems(Items.DIAMOND),
+                                        'b', Ingredient.ofItems(Items.LIGHTNING_ROD),
+                                        'c', Ingredient.ofItems(Items.BOOK)
+                                ), "aba",
                                 "aca",
                                 "aba"),
                         CraftingRecipeCategory.EQUIPMENT,
@@ -144,7 +142,7 @@ public class Items extends net.minecraft.item.Items {
         ));
         items.addAll(shapedRecipes);
         items.addAll(shapelessRecipes);
-        for (NBTCrafting item : items){
+        for (NBTCrafting item : items) {
             RecipeEntry<CraftingRecipe> entry = new RecipeEntry<>(
                     item.getIdentifier(),
                     item.getRecipe()

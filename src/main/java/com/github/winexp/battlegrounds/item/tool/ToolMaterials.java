@@ -6,8 +6,9 @@ import net.minecraft.util.Lazy;
 
 import java.util.function.Supplier;
 
+@SuppressWarnings("SameParameterValue")
 public enum ToolMaterials implements ToolMaterial {
-    PVP_PRO(2573, 8.0F, 3.0F + PVPProSwordItem.DAMAGE_BONUS, 3, 0, Ingredient::empty),
+    PVP_PRO(2573, 9.0F, 4.0F + PVPProSwordItem.DAMAGE_BONUS, 4, 0, Ingredient::empty),
     MINERS_PICKAXE(998, 8.0F, 3.0F, 3, 0, Ingredient::empty);
 
     private final int durability;
@@ -17,7 +18,7 @@ public enum ToolMaterials implements ToolMaterial {
     private final int enchantability;
     private final Lazy<Ingredient> repairIngredient;
 
-    ToolMaterials(int durability, float miningSpeed, float attackDamage, int miningLevel, int enchantability, Supplier<Ingredient> repairIngredient){
+    ToolMaterials(int durability, float miningSpeed, float attackDamage, int miningLevel, int enchantability, Supplier<Ingredient> repairIngredient) {
         this.durability = durability;
         this.miningSpeed = miningSpeed;
         this.attackDamage = attackDamage;

@@ -15,7 +15,7 @@ public class Enchantments extends net.minecraft.enchantment.Enchantments {
     public final static VitalityEnchantment VITALITY = new VitalityEnchantment();
     public final static LeachingEnchantment LEACHING = new LeachingEnchantment();
 
-    public static void registerEnchantments(){
+    public static void registerEnchantments() {
         Registry.register(Registries.ENCHANTMENT, new Identifier("battlegrounds", "smelting"),
                 SMELTING);
         Registry.register(Registries.ENCHANTMENT, new Identifier("battlegrounds", "channeling_pro"),
@@ -28,7 +28,7 @@ public class Enchantments extends net.minecraft.enchantment.Enchantments {
                 LEACHING);
     }
 
-    public static void registerItemGroup(){
+    public static void registerItemGroup() {
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register(content -> {
             content.add(EnchantedBookItem.forEnchantment(
                     new EnchantmentLevelEntry(SMELTING, 1)));

@@ -11,6 +11,6 @@ public class Variable {
     public RootConfig config;
     public GameProgress progress;
 
-    private Variable(){
+    private Variable() {
     }
 }

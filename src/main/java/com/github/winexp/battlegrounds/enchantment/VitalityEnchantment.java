@@ -12,26 +12,30 @@ public class VitalityEnchantment extends Enchantment {
         this(Rarity.VERY_RARE, EnchantmentTarget.ARMOR_CHEST, EquipmentSlot.MAINHAND);
     }
 
-    protected VitalityEnchantment(Rarity rarity, EnchantmentTarget target, EquipmentSlot... slots){
+    protected VitalityEnchantment(Rarity rarity, EnchantmentTarget target, EquipmentSlot... slots) {
         super(rarity, target, slots);
     }
 
-    public void giveEffects(ServerPlayerEntity player, int level){
+    public void giveEffects(ServerPlayerEntity player, int level) {
+        StatusEffectInstance effect = player.getStatusEffect(StatusEffects.HEALTH_BOOST);
+        if (effect != null) {
+            level += effect.getAmplifier() + 1;
+        }
         player.addStatusEffect(new StatusEffectInstance(StatusEffects.HEALTH_BOOST, 2, level - 1));
     }
 
     @Override
-    public int getMaxLevel(){
+    public int getMaxLevel() {
         return 3;
     }
 
     @Override
-    public int getMinPower(int level){
+    public int getMinPower(int level) {
         return 30;
     }
 
     @Override
-    public int getMaxPower(int level){
+    public int getMaxPower(int level) {
         return super.getMaxPower(level) + 40;
     }
 }

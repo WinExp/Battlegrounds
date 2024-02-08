@@ -9,7 +9,7 @@ import net.minecraft.util.ActionResult;
 public interface PlayerDeathCallback {
     Event<PlayerDeathCallback> EVENT = EventFactory.createArrayBacked(PlayerDeathCallback.class,
             (listeners) -> (source, instance) -> {
-                for (PlayerDeathCallback listener : listeners){
+                for (PlayerDeathCallback listener : listeners) {
                     ActionResult actionResult = listener.interact(source, instance);
                     if (actionResult != ActionResult.PASS) return actionResult;
                 }

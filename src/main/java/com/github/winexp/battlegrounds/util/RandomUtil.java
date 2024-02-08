@@ -8,8 +8,8 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
 public class RandomUtil {
-    public static boolean isSecure(World world, BlockPos pos){
-        for (int i = pos.getY() + 1; i <= 320; i++){
+    public static boolean isSecure(World world, BlockPos pos) {
+        for (int i = pos.getY() + 1; i <= 320; i++) {
             BlockPos pos1 = pos.withY(i);
             BlockState state = world.getBlockState(pos1);
             if (!state.getBlock().canMobSpawnInside(state)) return false;
@@ -17,7 +17,7 @@ public class RandomUtil {
         return true;
     }
 
-    public static BlockPos getSecureLocation(World world){
+    public static BlockPos getSecureLocation(World world) {
         WorldHelper helper = new WorldHelper(world);
         int centerX = helper.getBorderCenterX();
         int centerZ = helper.getBorderCenterZ();
@@ -27,11 +27,11 @@ public class RandomUtil {
         int x = random.nextInt(size) - (size / 2) + centerX;
         int y = 500;
         int z = random.nextInt(size) - (size / 2) + centerZ;
-        for (int k = 0; k < 200; k++){
-            for (int i = 320; i >= 63; i--){
+        for (int k = 0; k < 200; k++) {
+            for (int i = 320; i >= 63; i--) {
                 BlockPos pos = new BlockPos(x, i, z);
                 BlockState state = world.getBlockState(pos);
-                if (state.streamTags().anyMatch(BlockTags.VALID_SPAWN::equals)){
+                if (state.streamTags().anyMatch(BlockTags.VALID_SPAWN::equals)) {
                     y = i;
                     break;
                 }

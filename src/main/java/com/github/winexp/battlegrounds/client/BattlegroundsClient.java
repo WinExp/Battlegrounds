@@ -6,7 +6,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 
 public class BattlegroundsClient implements ClientModInitializer {
-    private void registerRenderer(){
+    private void registerRenderer() {
         EntityRendererRegistry.register(EntityTypes.CHANNELING_ARROW, ChannelingArrowEntityRenderer::new);
     }
 

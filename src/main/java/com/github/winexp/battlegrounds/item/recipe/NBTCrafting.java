@@ -6,6 +6,8 @@ import net.minecraft.util.Identifier;
 
 public interface NBTCrafting {
     Identifier getIdentifier();
+
     ItemStack getItemStack();
+
     CraftingRecipe getRecipe();
 }

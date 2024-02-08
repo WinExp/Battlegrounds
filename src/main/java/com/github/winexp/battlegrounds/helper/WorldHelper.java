@@ -8,39 +8,40 @@ public class WorldHelper {
     private final World world;
     private final WorldBorder border;
 
-    public WorldHelper(@NotNull World world){
+    public WorldHelper(@NotNull World world) {
         this.world = world;
         this.border = world.getWorldBorder();
     }
 
-    public World getWorld(){
+    public World getWorld() {
         return world;
     }
 
-    public WorldBorder getBorder(){
+    public WorldBorder getBorder() {
         return border;
     }
 
-    public int getBorderSize(){
+    public int getBorderSize() {
         return (int) border.getSize();
     }
 
-    public int getBorderCenterX(){
+    public void setBorderSize(int size) {
+        border.setSize(size);
+    }
+
+    public int getBorderCenterX() {
         return (int) border.getCenterX();
     }
 
-    public int getBorderCenterZ(){
+    public int getBorderCenterZ() {
         return (int) border.getCenterZ();
     }
 
-    public void setBorderSize(int size){
-        border.setSize(size);
-    }
-    public void setBorderSize(int size, long timeMillis){
+    public void setBorderSize(int size, long timeMillis) {
         border.interpolateSize(border.getSize(), size, timeMillis);
     }
 
-    public void setBorderCenter(int x, int z){
+    public void setBorderCenter(int x, int z) {
         border.setCenter(x, z);
     }
 }

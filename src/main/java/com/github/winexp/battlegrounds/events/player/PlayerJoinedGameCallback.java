@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public interface PlayerJoinedGameCallback {
     Event<PlayerJoinedGameCallback> EVENT = EventFactory.createArrayBacked(PlayerJoinedGameCallback.class,
             (listeners) -> (connection, player, clientData, cir) -> {
-                for (PlayerJoinedGameCallback listener : listeners){
+                for (PlayerJoinedGameCallback listener : listeners) {
                     ActionResult actionResult = listener.interact(connection, player, clientData, cir);
 
                     if (actionResult != ActionResult.PASS) return actionResult;

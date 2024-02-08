@@ -28,19 +28,19 @@ public class MinersPickaxeItem extends PickaxeItem implements NBTCrafting {
     }
 
     @Override
-    public Identifier getIdentifier(){
+    public Identifier getIdentifier() {
         return new Identifier("battlegrounds", "miners_pickaxe");
     }
 
     @Override
-    public ItemStack getItemStack(){
+    public ItemStack getItemStack() {
         ItemStack stack = new ItemStack(this, 1);
         ENCHANTMENTS.forEach((stack::addEnchantment));
         return stack;
     }
 
     @Override
-    public ShapedRecipe getRecipe(){
+    public ShapedRecipe getRecipe() {
         RawShapedRecipe rawShaped = RawShapedRecipe.create(Map.of(
                         'a', Ingredient.ofItems(Items.DIAMOND),
                         'b', Ingredient.ofItems(Items.IRON_PICKAXE)

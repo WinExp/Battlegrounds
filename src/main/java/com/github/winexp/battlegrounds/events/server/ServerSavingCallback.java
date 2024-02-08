@@ -8,7 +8,7 @@ import net.minecraft.util.ActionResult;
 public interface ServerSavingCallback {
     Event<ServerSavingCallback> EVENT = EventFactory.createArrayBacked(ServerSavingCallback.class,
             (listeners) -> (server, suppressLogs) -> {
-                for (ServerSavingCallback listener : listeners){
+                for (ServerSavingCallback listener : listeners) {
                     ActionResult actionResult = listener.interact(server, suppressLogs);
                     if (actionResult != ActionResult.PASS) return actionResult;
                 }

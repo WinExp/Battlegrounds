@@ -1,6 +1,6 @@
 package com.github.winexp.battlegrounds.helper.task;
 
-public class TaskCountdown extends TaskLater{
+public class TaskCountdown extends TaskLater {
     public final static TaskCountdown NONE_TASK = new TaskCountdown(Task.NONE_RUNNABLE, Task.NONE_RUNNABLE, -1, 0, -1);
     private final Runnable fixedRunnable;
     private final long unitTicks;
@@ -9,28 +9,27 @@ public class TaskCountdown extends TaskLater{
     public TaskCountdown(Runnable trigger, Runnable triggerEnd, long delay, long unitTicks, int count) {
         super(trigger, delay);
         fixedRunnable = () -> {
-            if (this.count < 0){
+            if (this.count < 0) {
                 throw new RunnableCancelledException(true);
             }
 
-            try{
-                if (this.count == 0){
+            try {
+                if (this.count == 0) {
                     this.preTriggerRunnable = () -> {
                         triggerEnd.run();
                         throw new RunnableCancelledException(false);
                     };
                 }
                 super.run();
-            }
-            catch (RunnableCancelledException e){
-                if (e.getEnforceCancel()){
+            } catch (RunnableCancelledException e) {
+                if (e.getEnforceCancel()) {
                     throw e;
                 }
                 this.count--;
                 this.delay = this.getUnitTicks();
             }
 
-            if (this.count < 0){
+            if (this.count < 0) {
                 throw new RunnableCancelledException(false);
             }
         };
@@ -40,20 +39,20 @@ public class TaskCountdown extends TaskLater{
     }
 
     @Override
-    public void run(){
+    public void run() {
         fixedRunnable.run();
     }
 
     @Override
-    public Runnable getRunnable(){
+    public Runnable getRunnable() {
         return fixedRunnable;
     }
 
-    public int getCount(){
+    public int getCount() {
         return count;
     }
 
-    public long getUnitTicks(){
+    public long getUnitTicks() {
         return unitTicks;
     }
 }

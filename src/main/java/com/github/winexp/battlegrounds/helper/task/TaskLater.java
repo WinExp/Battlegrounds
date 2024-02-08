@@ -1,21 +1,20 @@
 package com.github.winexp.battlegrounds.helper.task;
 
-public class TaskLater extends Task{
+public class TaskLater extends Task {
     public final static TaskLater NONE_TASK = new TaskLater(Task.NONE_RUNNABLE, -1);
     private final Runnable fixedRunnable;
     protected long delay;
-    protected Runnable preTriggerRunnable = () -> {};
+    protected Runnable preTriggerRunnable = () -> {
+    };
 
-    public long getDelay() { return delay; }
-
-    public TaskLater(Runnable runnable, long delay){
+    public TaskLater(Runnable runnable, long delay) {
         super(runnable);
         fixedRunnable = () -> {
             if (this.delay < 0) throw new RunnableCancelledException(true);
 
             this.delay--;
 
-            if (this.delay <= 0){
+            if (this.delay <= 0) {
                 preTriggerRunnable.run();
                 super.run();
                 throw new RunnableCancelledException(false);
@@ -25,13 +24,17 @@ public class TaskLater extends Task{
         this.delay = delay;
     }
 
+    public long getDelay() {
+        return delay;
+    }
+
     @Override
-    public void run(){
+    public void run() {
         fixedRunnable.run();
     }
 
     @Override
-    public Runnable getRunnable(){
+    public Runnable getRunnable() {
         return fixedRunnable;
     }
 }

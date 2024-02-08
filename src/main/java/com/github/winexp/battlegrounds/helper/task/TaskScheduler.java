@@ -6,22 +6,22 @@ import net.minecraft.util.ActionResult;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
+@SuppressWarnings("SameReturnValue")
 public class TaskScheduler {
     public final static TaskScheduler INSTANCE = new TaskScheduler();
 
     private final CopyOnWriteArrayList<Task> tasks = new CopyOnWriteArrayList<>();
 
-    private TaskScheduler(){
+    private TaskScheduler() {
         ServerTickCallback.EVENT.register(this::tick);
     }
 
-    private ActionResult tick(MinecraftServer server){
-        for (Task task : tasks){
+    private ActionResult tick(MinecraftServer server) {
+        for (Task task : tasks) {
             if (task.isCancelled()) tasks.remove(task);
-            try{
+            try {
                 task.run();
-            }
-            catch (RunnableCancelledException e){
+            } catch (RunnableCancelledException e) {
                 tasks.remove(task);
             }
         }
@@ -29,11 +29,12 @@ public class TaskScheduler {
         return ActionResult.PASS;
     }
 
-    public void runTask(Task task){
+    public void runTask(Task task) {
         if (tasks.contains(task)) return;
         tasks.add(task);
     }
-    public void stopAllTask(){
+
+    public void stopAllTask() {
         tasks.clear();
     }
 }

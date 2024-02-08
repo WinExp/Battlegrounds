@@ -1,13 +1,13 @@
 {
   "placement": {
     "type": "minecraft:random_spread",
-    "salt": 82697053,
+    "salt": 56519382,
     "separation": 4,
     "spacing": 20
   },
   "structures": [
     {
-      "structure": "battlegrounds:canopies",
+      "structure": "battlegrounds:medieval_fortress",
       "weight": 1
     }
   ]

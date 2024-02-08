@@ -8,7 +8,7 @@ import net.minecraft.util.ActionResult;
 public interface TaskTriggerCallback {
     Event<TaskTriggerCallback> EVENT = EventFactory.createArrayBacked(TaskTriggerCallback.class,
             (listeners) -> (task) -> {
-                for (TaskTriggerCallback listener : listeners){
+                for (TaskTriggerCallback listener : listeners) {
                     ActionResult actionResult = listener.interact(task);
                     if (actionResult != ActionResult.PASS) return actionResult;
                 }

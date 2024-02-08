@@ -7,7 +7,7 @@ import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.util.Identifier;
 
-public class ShapedNBTCrafting implements NBTCrafting{
+public class ShapedNBTCrafting implements NBTCrafting {
     private final ItemStack result;
     private final ShapedRecipe recipe;
     private final Identifier identifier;
@@ -15,7 +15,7 @@ public class ShapedNBTCrafting implements NBTCrafting{
     public ShapedNBTCrafting(Identifier identifier,
                              RawShapedRecipe raw,
                              CraftingRecipeCategory category,
-                             ItemStack result){
+                             ItemStack result) {
         this.identifier = identifier;
         this.result = result;
         this.recipe = new ShapedRecipe(identifier.toString(), category, raw, result);

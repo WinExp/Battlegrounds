@@ -8,7 +8,7 @@ import net.minecraft.util.ActionResult;
 public interface ServerLoadedCallback {
     Event<ServerLoadedCallback> EVENT = EventFactory.createArrayBacked(ServerLoadedCallback.class,
             (listeners) -> (server) -> {
-                for (ServerLoadedCallback listener : listeners){
+                for (ServerLoadedCallback listener : listeners) {
                     ActionResult actionResult = listener.interact(server);
                     if (actionResult != ActionResult.PASS) return actionResult;
                 }

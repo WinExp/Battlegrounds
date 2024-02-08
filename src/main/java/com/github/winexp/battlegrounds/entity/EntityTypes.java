@@ -17,7 +17,7 @@ public class EntityTypes {
                     .trackedUpdateRate(20)
                     .build();
 
-    public static void registerEntities(){
+    public static void registerEntities() {
         Registry.register(
                 Registries.ENTITY_TYPE,
                 new Identifier("battlegrounds", "channeling_arrow"),

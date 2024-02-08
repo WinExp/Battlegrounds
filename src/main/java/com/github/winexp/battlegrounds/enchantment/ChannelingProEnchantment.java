@@ -9,17 +9,17 @@ public class ChannelingProEnchantment extends Enchantment {
         this(Rarity.VERY_RARE, EnchantmentTarget.BOW, EquipmentSlot.MAINHAND);
     }
 
-    protected ChannelingProEnchantment(Rarity rarity, EnchantmentTarget target, EquipmentSlot... slots){
+    protected ChannelingProEnchantment(Rarity rarity, EnchantmentTarget target, EquipmentSlot... slots) {
         super(rarity, target, slots);
     }
 
     @Override
-    public int getMinPower(int level){
+    public int getMinPower(int level) {
         return 30;
     }
 
     @Override
-    public int getMaxPower(int level){
+    public int getMaxPower(int level) {
         return 60;
     }
 }

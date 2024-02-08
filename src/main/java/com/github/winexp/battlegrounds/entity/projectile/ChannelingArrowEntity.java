@@ -33,8 +33,8 @@ import java.util.Set;
 public class ChannelingArrowEntity extends PersistentProjectileEntity {
     private final static ItemStack DEFAULT_STACK = new ItemStack(Items.ARROW);
     private static final TrackedData<Integer> COLOR = DataTracker.registerData(ChannelingArrowEntity.class, TrackedDataHandlerRegistry.INTEGER);
-    private Potion potion;
     private final Set<StatusEffectInstance> effects;
+    private Potion potion;
     private boolean colorSet;
     private boolean channeling = false;
 
@@ -50,10 +50,15 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
         this.effects = Sets.newHashSet();
     }
 
-    public static ChannelingArrowEntity createArrow(World world, ItemStack stack, LivingEntity shooter){
+    public static ChannelingArrowEntity createArrow(World world, ItemStack stack, LivingEntity shooter) {
         ChannelingArrowEntity arrow = new ChannelingArrowEntity(world, shooter, stack.copyWithCount(1));
         arrow.initFromStack(stack);
         return arrow;
+    }
+
+    public static int getCustomPotionColor(ItemStack stack) {
+        NbtCompound nbtCompound = stack.getNbt();
+        return nbtCompound != null && nbtCompound.contains("CustomPotionColor", 99) ? nbtCompound.getInt("CustomPotionColor") : -1;
     }
 
     public void initFromStack(ItemStack stack) {
@@ -80,11 +85,6 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
 
     }
 
-    public static int getCustomPotionColor(ItemStack stack) {
-        NbtCompound nbtCompound = stack.getNbt();
-        return nbtCompound != null && nbtCompound.contains("CustomPotionColor", 99) ? nbtCompound.getInt("CustomPotionColor") : -1;
-    }
-
     private void initColor() {
         this.colorSet = false;
         if (this.potion == Potions.EMPTY && this.effects.isEmpty()) {
@@ -105,7 +105,7 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
         this.dataTracker.startTracking(COLOR, -1);
     }
 
-    public void spawnEndRodParticles(int amount, double speedOffset){
+    public void spawnEndRodParticles(int amount, double speedOffset) {
         Random random = this.getWorld().getRandom();
         double x = random.nextDouble() * (speedOffset * 2) - speedOffset;
         double y = random.nextDouble() * (speedOffset * 2) - speedOffset;
@@ -115,14 +115,14 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
         }
     }
 
-    private void spawnParticles(int amount){
+    private void spawnParticles(int amount) {
         int i = this.getColor();
         if (i != -1 && amount > 0) {
-            double d = (double)(i >> 16 & 255) / 255.0;
-            double e = (double)(i >> 8 & 255) / 255.0;
-            double f = (double)(i & 255) / 255.0;
+            double d = (double) (i >> 16 & 255) / 255.0;
+            double e = (double) (i >> 8 & 255) / 255.0;
+            double f = (double) (i & 255) / 255.0;
 
-            for(int j = 0; j < amount; ++j) {
+            for (int j = 0; j < amount; ++j) {
                 this.getWorld().addParticle(ParticleTypes.ENTITY_EFFECT, this.getParticleX(0.5), this.getRandomBodyY(), this.getParticleZ(0.5), d, e, f);
             }
 
@@ -139,7 +139,7 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
     }
 
     @Override
-    public void tick(){
+    public void tick() {
         super.tick();
         if (this.getWorld().isClient) {
             if (this.inGround) {
@@ -152,7 +152,7 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
                 this.spawnEndRodParticles(2, 0.15);
             }
         } else if (this.inGround && this.inGroundTime != 0 && !this.effects.isEmpty() && this.inGroundTime >= 600) {
-            this.getWorld().sendEntityStatus(this, (byte)0);
+            this.getWorld().sendEntityStatus(this, (byte) 0);
             this.potion = Potions.EMPTY;
             this.effects.clear();
             this.dataTracker.set(COLOR, -1);
@@ -160,7 +160,7 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
     }
 
     @Override
-    protected void onHit(LivingEntity target){
+    protected void onHit(LivingEntity target) {
         super.onHit(target);
         Entity entity = this.getEffectCause();
         Iterator<StatusEffectInstance> var3 = this.potion.getEffects().iterator();
@@ -174,17 +174,17 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
         if (!this.effects.isEmpty()) {
             var3 = this.effects.iterator();
 
-            while(var3.hasNext()) {
+            while (var3.hasNext()) {
                 statusEffectInstance = var3.next();
                 target.addStatusEffect(statusEffectInstance, entity);
             }
         }
 
-        if (this.getChanneling()){
+        if (this.getChanneling()) {
             LightningEntity lightning = EntityType.LIGHTNING_BOLT.create(target.getWorld());
             if (lightning != null) {
                 lightning.refreshPositionAfterTeleport(target.getPos());
-                if (this.getOwner() instanceof ServerPlayerEntity player){
+                if (this.getOwner() instanceof ServerPlayerEntity player) {
                     lightning.setChanneler(player);
                 }
                 target.getWorld().spawnEntity(lightning);
@@ -194,7 +194,7 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
     }
 
     @Override
-    public void readCustomDataFromNbt(NbtCompound nbt){
+    public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         if (nbt.contains("Potion", 8)) {
             this.potion = PotionUtil.getPotion(nbt);
@@ -213,7 +213,7 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
     }
 
     @Override
-    public void writeCustomDataToNbt(NbtCompound nbt){
+    public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         if (this.potion != Potions.EMPTY) {
             nbt.putString("Potion", Registries.POTION.getId(this.potion).toString());
@@ -252,11 +252,11 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
         if (status == 0) {
             int i = this.getColor();
             if (i != -1) {
-                double d = (double)(i >> 16 & 255) / 255.0;
-                double e = (double)(i >> 8 & 255) / 255.0;
-                double f = (double)(i & 255) / 255.0;
+                double d = (double) (i >> 16 & 255) / 255.0;
+                double e = (double) (i >> 8 & 255) / 255.0;
+                double f = (double) (i & 255) / 255.0;
 
-                for(int j = 0; j < 20; ++j) {
+                for (int j = 0; j < 20; ++j) {
                     this.getWorld().addParticle(ParticleTypes.ENTITY_EFFECT, this.getParticleX(0.5), this.getRandomBodyY(), this.getParticleZ(0.5), d, e, f);
                 }
             }
@@ -266,11 +266,11 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
 
     }
 
-    public boolean getChanneling(){
+    public boolean getChanneling() {
         return channeling;
     }
 
-    public void setChanneling(boolean bl){
+    public void setChanneling(boolean bl) {
         channeling = bl;
     }
 }

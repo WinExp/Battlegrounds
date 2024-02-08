@@ -19,37 +19,37 @@ import net.minecraft.util.Identifier;
 import java.util.Map;
 
 public class PVPProSwordItem extends SwordItem implements NBTCrafting {
-    public final static float DAMAGE_BONUS = 2.5F;
+    public final static float DAMAGE_BONUS = 0.0F;
     public final static Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
             Enchantments.FIRE_ASPECT, 1,
             Enchantments.KNOCKBACK, 1,
             Enchantments.SWEEPING, 2,
             Enchantments.LOOTING, 3
-            );
+    );
 
-    public PVPProSwordItem(ToolMaterial toolMaterial, int attackDamage, float attackSpeed, Settings settings){
+    public PVPProSwordItem(ToolMaterial toolMaterial, int attackDamage, float attackSpeed, Settings settings) {
         super(toolMaterial, attackDamage, attackSpeed, settings);
     }
 
-    public void addEffects(ServerPlayerEntity player){
+    public void addEffects(ServerPlayerEntity player) {
         player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 2, 0));
         player.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 2, 0));
     }
 
     @Override
-    public Identifier getIdentifier(){
+    public Identifier getIdentifier() {
         return new Identifier("battlegrounds", "pvp_pro_sword");
     }
 
     @Override
-    public ItemStack getItemStack(){
+    public ItemStack getItemStack() {
         ItemStack stack = new ItemStack(this, 1);
         ENCHANTMENTS.forEach((stack::addEnchantment));
         return stack;
     }
 
     @Override
-    public ShapedRecipe getRecipe(){
+    public ShapedRecipe getRecipe() {
         RawShapedRecipe rawShaped = RawShapedRecipe.create(Map.of(
                         'a', Ingredient.ofItems(Items.IRON_INGOT),
                         'b', Ingredient.ofItems(Items.GOLD_INGOT),
