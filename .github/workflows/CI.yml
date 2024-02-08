@@ -66,8 +66,8 @@ jobs:
           name: "${{ steps.mod_info.outputs.mod_name }} ${{ steps.mod_info.outputs.mod_version }}.${{ steps.get_commit_count.outputs.commit_count }}+${{ steps.get_short_sha.outputs.short_sha }}"
           path: |
             LICENSE
-            fabricWrapper/build/libs/*.jar
-            fabricWrapper/build/tmp/submods/META-INF/jars/*.jar
+            build/libs/*.jar
+            build/tmp/submods/META-INF/jars/*.jar
 
       - name: Create Github release
         if: contains(github.event.head_commit.message, '[publish skip]') == false && contains(github.event.ref, 'refs/heads/exp') == false
@@ -76,8 +76,8 @@ jobs:
           prerelease: true
           files: |
             LICENSE
-            fabricWrapper/build/libs/*.jar
-            fabricWrapper/build/tmp/submods/META-INF/jars/*.jar
+            build/libs/*.jar
+            build/tmp/submods/META-INF/jars/*.jar
           name: "[CI#${{ github.run_number }}]${{ steps.mod_info.outputs.mod_name }} ${{ steps.mod_info.outputs.mod_version }}.${{ steps.get_commit_count.outputs.commit_count }}+${{ steps.get_short_sha.outputs.short_sha }}"
           tag_name: "${{ github.ref_name }}.${{ github.run_number }}"
           target_commitish: ${{ github.event.ref }}
