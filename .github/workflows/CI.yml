@@ -65,14 +65,3 @@ jobs:
         with:
           name: "${{ steps.mod_info.outputs.mod_name }} ${{ steps.mod_info.outputs.mod_version }}.${{ steps.get_commit_count.outputs.commit_count }}+${{ steps.get_short_sha.outputs.short_sha }}"
           path: build/libs/*.jar
-
-      - name: Create Github release
-        if: contains(github.event.head_commit.message, '[publish skip]') == false && contains(github.event.ref, 'refs/heads/exp') == false
-        uses: softprops/action-gh-release@v1
-        with:
-          prerelease: true
-          files: build/libs/*.jar
-          name: "[CI#${{ github.run_number }}]${{ steps.mod_info.outputs.mod_name }} ${{ steps.mod_info.outputs.mod_version }}.${{ steps.get_commit_count.outputs.commit_count }}+${{ steps.get_short_sha.outputs.short_sha }}"
-          tag_name: "${{ github.ref_name }}.${{ github.run_number }}"
-          target_commitish: ${{ github.event.ref }}
-          generate_release_notes: true
