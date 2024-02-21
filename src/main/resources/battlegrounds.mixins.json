@@ -4,14 +4,15 @@
   "package": "com.github.winexp.battlegrounds.mixins",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "MinecraftServerMixin",
     "PlayerManagerMixin",
+    "MinecraftServerMixin",
     "RecipeManagerMixin",
     "ServerPlayerEntityMixin",
-    "Shield_LivingEntityMixin",
     "item.BowItemMixin"
   ],
   "client": [
+  ],
+  "server": [
   ],
   "injectors": {
     "defaultRequire": 1

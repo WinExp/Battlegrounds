@@ -9,12 +9,16 @@ import com.github.winexp.battlegrounds.util.*;
 import com.mojang.authlib.GameProfile;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.attribute.EntityAttributeInstance;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.boss.BossBarManager;
 import net.minecraft.entity.boss.CommandBossBar;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.projectile.FireworkRocketEntity;
+import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
@@ -33,14 +37,17 @@ import net.minecraft.world.World;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GameHelper {
     public final static GameHelper INSTANCE = new GameHelper();
+    private final String healthModifierId = "game.health_modifier";
     private final static Identifier BAR_ID = new Identifier("battlegrounds", "progress_bar");
-    private final static boolean KEEP_INVENTORY = false;
     private final static Path SAVE_PATH_TMP_FILE = FabricLoader.getInstance().getGameDir().resolve(Path.of("reset_world.session"));
+    private final static boolean KEEP_INVENTORY = false;
+    private TeamHelper teamHelper;
     public TaskTimer reduceTask = TaskTimer.NONE_TASK;
     public TaskTimer barUpdateTask = TaskTimer.NONE_TASK;
     public TaskCountdown stopTask = TaskCountdown.NONE_TASK;
@@ -58,36 +65,43 @@ public class GameHelper {
 
     public void setServer(MinecraftServer server) {
         this.server = server;
+        this.teamHelper = new TeamHelper(this.server.getScoreboard());
     }
 
     public void initialize() {
         if (Variable.INSTANCE.progress.gameStage.isResetWorld()) {
             Variable.INSTANCE.progress.gameStage = GameProgress.GameStage.WAIT_PLAYER;
-            setInitialProgress();
+            this.setInitialProgress();
         }
 
-        setKeepInventory(KEEP_INVENTORY);
+        this.setKeepInventory(KEEP_INVENTORY);
         if (Variable.INSTANCE.progress.resizeLapTimer <= 0
                 && Variable.INSTANCE.progress.gameStage != GameProgress.GameStage.DEATHMATCH) {
             Variable.INSTANCE.progress.resizeLapTimer = Variable.INSTANCE.config.border.resizeDelayTicks;
         }
         if (Variable.INSTANCE.progress.gameStage.isStarted()) {
-            resumeGame();
+            this.resumeGame();
+        }
+    }
+
+    public void onPlayerRespawn(ServerPlayerEntity player) {
+        if (Variable.INSTANCE.progress.gameStage.isStarted()) {
+            PlayerUtil.setGameModeWithMap(player);
         }
     }
 
     public void onPlayerDeath(ServerPlayerEntity player) {
-        if (Variable.INSTANCE.progress.gameStage.isDeathmatch()) {
-            PlayerUtil.setGameMode(player, GameMode.SPECTATOR);
-            if (getInGamePlayers() == 1) {
-                ServerPlayerEntity p = getFirstPlayer();
-                server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
+        if (Variable.INSTANCE.progress.gameStage.isStarted()) {
+            PlayerUtil.setGameModeMap(player, GameMode.SPECTATOR);
+            if (this.getInGamePlayersNum() == 1) {
+                ServerPlayerEntity p = this.getLastInGamePlayer();
+                this.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
                         "battlegrounds.game.end.broadcast", TextUtil.GOLD, p.getName()), false);
 
                 Random random = p.getWorld().getRandom();
                 int amount = random.nextInt(4) + 1;
                 for (int i = 0; i < amount; i++) {
-                    FireworkRocketEntity firework = EntityType.FIREWORK_ROCKET.create(server.getOverworld());
+                    FireworkRocketEntity firework = EntityType.FIREWORK_ROCKET.create(this.server.getOverworld());
                     if (firework != null) {
                         Vec3d pos = p.getPos();
                         Vec3d offset = new Vec3d(
@@ -100,13 +114,13 @@ public class GameHelper {
                     }
                 }
 
-                stopGame();
+                this.stopGame();
             }
+            this.server.getPlayerManager().getWhitelist().remove(player.getGameProfile());
         }
-        PlayerUtil.setGameModeWithMap(player);
     }
 
-    public ActionResult onPlayerDamaged(DamageSource source) {
+    public ActionResult onPlayerDamaged(DamageSource source, ServerPlayerEntity player) {
         if (Variable.INSTANCE.progress.pvpMode == GameProgress.PVPMode.PEACEFUL) {
             return ActionResult.FAIL;
         } else if (Variable.INSTANCE.progress.pvpMode == GameProgress.PVPMode.NO_PVP) {
@@ -114,14 +128,18 @@ public class GameHelper {
                 return ActionResult.FAIL;
             }
         }
+        if (source.getSource() != null && source.getSource().isPlayer()) {
+            ServerPlayerEntity attacker = (ServerPlayerEntity) source.getSource();
+            attacker.isTeammate(player);
+        }
         return ActionResult.PASS;
     }
 
     public void prepareStartGame() {
-        server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
+        this.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
                 "battlegrounds.game.already.broadcast",
                 TextUtil.GREEN), false);
-        startTask = new TaskCountdown(
+        this.startTask = new TaskCountdown(
                 () -> {
                     for (ServerPlayerEntity player1 : server.getPlayerManager().getPlayerList()) {
                         PlayerUtil.sendTitle(player1, TextUtil.withColor(
@@ -129,7 +147,7 @@ public class GameHelper {
                         player1.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HAT.value(), SoundCategory.NEUTRAL, 0.7f, 1.0f);
                     }
                 },
-                this::startGame,
+                () -> this.startGame(false),
                 0, 20,
                 Variable.INSTANCE.config.gameStartDelaySeconds
         );
@@ -156,11 +174,14 @@ public class GameHelper {
                 SAVE_PATH_TMP_FILE,
                 this.server.getSavePath(WorldSavePath.ROOT).toString()
         );
-        HashMap<String, String> playerList = new HashMap<>();
+        HashMap<UUID, GameProgress.PlayerPermission> playerList = new HashMap<>();
         for (GameProfile profile : voter.getPlayerProfiles()) {
+            GameProgress.PlayerPermission permission = new GameProgress.PlayerPermission();
+            permission.gameMode = GameMode.ADVENTURE;
+            permission.inGame = true;
             playerList.put(
-                    profile.getId().toString(),
-                    "adventure"
+                    profile.getId(),
+                    permission
             );
         }
         Variable.INSTANCE.progress.players = playerList;
@@ -170,7 +191,7 @@ public class GameHelper {
 
     public void tryResetWorlds() {
         if (Files.isRegularFile(SAVE_PATH_TMP_FILE)) {
-            resetWorlds();
+            this.resetWorlds();
             FileUtil.delete(SAVE_PATH_TMP_FILE, true);
             Environment.LOGGER.info("已重置地图");
         }
@@ -183,7 +204,6 @@ public class GameHelper {
 
     public void setInitialProgress() {
         Variable.INSTANCE.progress.pvpMode = GameProgress.PVPMode.PEACEFUL;
-        Variable.INSTANCE.progress.hasEffects = false;
         Variable.INSTANCE.progress.currentLap = 0;
         Variable.INSTANCE.progress.resizeLapTimer = Variable.INSTANCE.config.border.resizeDelayTicks;
     }
@@ -192,17 +212,22 @@ public class GameHelper {
         this.server.getGameRules().get(GameRules.KEEP_INVENTORY).set(value, this.server);
     }
 
-    public int getInGamePlayers() {
+    public int getInGamePlayersNum() {
         int num = 0;
         for (ServerPlayerEntity player : this.server.getPlayerManager().getPlayerList()) {
-            if (player.interactionManager.getGameMode() == GameMode.SURVIVAL &&
-                    Variable.INSTANCE.progress.players.containsKey(player.getGameProfile().getId().toString())) num++;
+            if (Variable.INSTANCE.progress.players.get(PlayerUtil.getUUID(player)).inGame) num++;
         }
         return num;
     }
 
-    public ServerPlayerEntity getFirstPlayer() {
-        return this.server.getPlayerManager().getPlayerList().get(0);
+    public ServerPlayerEntity getLastInGamePlayer() {
+        ServerPlayerEntity result = null;
+        for (ServerPlayerEntity player : this.server.getPlayerManager().getPlayerList()) {
+            if (Variable.INSTANCE.progress.players.get(PlayerUtil.getUUID(player)).inGame) {
+                result = player;
+            }
+        }
+        return result;
     }
 
     public void stopServer(Text message) {
@@ -213,18 +238,39 @@ public class GameHelper {
         this.server.stop(false);
     }
 
-    public void startGame() {
-        World world = this.server.getOverworld();
-        worldHelper = new WorldHelper(world);
-        BlockPos pos = RandomUtil.getSecureLocation(world);
-        worldHelper.setBorderCenter(pos.getX(), pos.getZ());
-        worldHelper.setBorderSize(Variable.INSTANCE.config.border.initialSize);
+    private void assignTeams() {
+        String[] teams = new String[] { "Team_A", "Team_B" };
+        for (String teamName : teams) {
+            Team team = this.teamHelper.addTeam(teamName);
+            team.setFriendlyFireAllowed(false);
+        }
+        List<ServerPlayerEntity> players = Variable.INSTANCE.progress.players.keySet().stream().map((uuid) ->
+                this.server.getPlayerManager().getPlayer(uuid)).toList();
+        this.teamHelper.assignPlayers(players);
+    }
 
-        for (String uuid : Variable.INSTANCE.progress.players.keySet()) {
-            ServerPlayerEntity player = this.server.getPlayerManager().getPlayer(UUID.fromString(uuid));
+    public void startGame(boolean assignTeam) {
+        World world = this.server.getOverworld();
+        this.worldHelper = new WorldHelper(world);
+        BlockPos pos = RandomUtil.getSecureLocation(world);
+        this.worldHelper.setBorderCenter(pos.getX(), pos.getZ());
+        this.worldHelper.setBorderSize(Variable.INSTANCE.config.border.initialSize);
+        this.server.getPlayerManager().setWhitelistEnabled(true);
+        if (assignTeam) {
+            this.teamHelper.setMaxPlayers(1);
+            this.assignTeams();
+        }
+
+        for (UUID uuid : Variable.INSTANCE.progress.players.keySet()) {
+            ServerPlayerEntity player = this.server.getPlayerManager().getPlayer(uuid);
             if (player != null) {
-                player.addStatusEffect(new StatusEffectInstance(StatusEffects.SATURATION, 15 * 20, 4));
+                EntityAttributeInstance attribute = player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
+                assert attribute != null;
+                EffectUtil.addAttribute(attribute, healthModifierId, Variable.INSTANCE.config.attributes.genericAdditionHealth, EntityAttributeModifier.Operation.ADDITION);
+                player.setHealth(player.getMaxHealth());
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.SATURATION, 15 * 20, 3));
                 player.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 15 * 20, 3));
+                Variable.INSTANCE.progress.players.get(uuid).hasEffects = true;
 
                 PlayerUtil.randomTeleport(this.server.getOverworld(), player);
                 player.getInventory().clear();
@@ -233,40 +279,39 @@ public class GameHelper {
         }
         Variable.INSTANCE.progress.pvpMode = GameProgress.PVPMode.NO_PVP;
         Variable.INSTANCE.progress.gameStage = GameProgress.GameStage.DEVELOP;
-        Variable.INSTANCE.progress.hasEffects = true;
-        runTasks();
-        createBossBar();
+        this.runTasks();
+        this.createBossBar();
     }
 
     public void resumeGame() {
         World world = this.server.getOverworld();
-        worldHelper = new WorldHelper(world);
-        runTasks();
-        createBossBar();
+        this.worldHelper = new WorldHelper(world);
+        this.runTasks();
+        this.createBossBar();
     }
 
     private void createBossBar() {
         BossBarManager manager = this.server.getBossBarManager();
         if (manager.get(BAR_ID) != null) {
-            bossBar = manager.get(BAR_ID);
+            this.bossBar = manager.get(BAR_ID);
         } else {
-            bossBar = manager.add(BAR_ID,
+            this.bossBar = manager.add(BAR_ID,
                     TextUtil.translatableWithColor("battlegrounds.border.bar",
                             TextUtil.GREEN,
-                            reduceTask.getDelay() / 20)
+                            this.reduceTask.getDelay() / 20)
             );
         }
-        barUpdateTask = new TaskTimer(() -> {
-            if (bossBar == null) {
+        this.barUpdateTask = new TaskTimer(() -> {
+            if (this.bossBar == null) {
                 throw new RunnableCancelledException();
             }
-            bossBar.addPlayers(this.server.getPlayerManager().getPlayerList());
-            bossBar.setMaxValue((int) (Variable.INSTANCE.config.border.resizeDelayTicks + Variable.INSTANCE.config.border.resizeTimeTicks));
-            bossBar.setValue((int) reduceTask.getDelay());
-            bossBar.setName(TextUtil.translatableWithColor("battlegrounds.border.bar",
+            this.bossBar.addPlayers(this.server.getPlayerManager().getPlayerList());
+            this.bossBar.setMaxValue((int) (Variable.INSTANCE.config.border.resizeDelayTicks + Variable.INSTANCE.config.border.resizeTimeTicks));
+            this.bossBar.setValue((int) this.reduceTask.getDelay());
+            this.bossBar.setName(TextUtil.translatableWithColor("battlegrounds.border.bar",
                     TextUtil.GREEN,
-                    reduceTask.getDelay() / 20));
-        }, reduceTask.getDelay() % 20, 20);
+                    this.reduceTask.getDelay() / 20));
+        }, this.reduceTask.getDelay() % 20, 20);
         TaskScheduler.INSTANCE.runTask(barUpdateTask);
     }
 
@@ -277,7 +322,7 @@ public class GameHelper {
             bar.clearPlayers();
             manager.remove(bar);
         }
-        bossBar = null;
+        this.bossBar = null;
     }
 
     public void runTasks() {
@@ -286,16 +331,19 @@ public class GameHelper {
             if (Variable.INSTANCE.progress.currentLap + 1
                     == Variable.INSTANCE.config.border.pvpModeBeginBorderNum) {
                 Variable.INSTANCE.progress.pvpMode = GameProgress.PVPMode.PVP_MODE;
-                Variable.INSTANCE.progress.hasEffects = false;
+                for (UUID uuid : Variable.INSTANCE.progress.players.keySet()) {
+                    Variable.INSTANCE.progress.players.get(uuid).hasEffects = false;
+                }
+
                 this.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
                         "battlegrounds.game.pvp.enable.broadcast", TextUtil.GOLD), false);
-                worldHelper.setBorderSize(worldHelper.getBorderSize() - Variable.INSTANCE.config.border.resizeBlocks,
+                this.worldHelper.setBorderSize(worldHelper.getBorderSize() - Variable.INSTANCE.config.border.resizeBlocks,
                         Variable.INSTANCE.config.border.resizeTimeTicks * 50);
             }
             // 最终圈
             if (Variable.INSTANCE.progress.currentLap + 1
                     == Variable.INSTANCE.config.border.finalBorderNum) {
-                worldHelper.setBorderSize(worldHelper.getBorderSize() - Variable.INSTANCE.config.border.resizeBlocks,
+                this.worldHelper.setBorderSize(worldHelper.getBorderSize() - Variable.INSTANCE.config.border.resizeBlocks,
                         Variable.INSTANCE.config.border.resizeTimeTicks * 50);
             }
             // 死亡竞赛-提示
@@ -312,13 +360,15 @@ public class GameHelper {
                 this.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
                         "battlegrounds.game.deathmatch.start.broadcast", TextUtil.GOLD), false);
                 this.worldHelper.setBorderSize(Variable.INSTANCE.config.border.deathmatch.initialSize);
-                for (String uuid : Variable.INSTANCE.progress.players.keySet()) {
-                    ServerPlayerEntity player = this.server.getPlayerManager().getPlayer(UUID.fromString(uuid));
+                for (UUID uuid : Variable.INSTANCE.progress.players.keySet()) {
+                    ServerPlayerEntity player = this.server.getPlayerManager().getPlayer(uuid);
                     if (player != null) {
+                        player.clearStatusEffects();
                         PlayerUtil.randomTeleport(this.server.getOverworld(), player);
+                        player.setHealth(player.getMaxHealth());
                     }
                 }
-                worldHelper.setBorderSize(Variable.INSTANCE.config.border.deathmatch.finalSize,
+                this.worldHelper.setBorderSize(Variable.INSTANCE.config.border.deathmatch.finalSize,
                         Variable.INSTANCE.config.border.deathmatch.resizeDelayTicks * 50);
             }
             // 死亡竞赛-最终圈
@@ -345,7 +395,19 @@ public class GameHelper {
         }
 
         Variable.INSTANCE.progress.gameStage = GameProgress.GameStage.IDLE;
-        setInitialProgress();
-        worldHelper.setBorderSize(Variable.INSTANCE.config.border.initialSize);
+        this.setInitialProgress();
+        this.removeBossBar();
+        this.reduceTask.cancel();
+        this.server.getPlayerManager().setWhitelistEnabled(false);
+        this.worldHelper.setBorderSize(Variable.INSTANCE.config.border.initialSize);
+        for (UUID uuid : Variable.INSTANCE.progress.players.keySet()) {
+            ServerPlayerEntity player = this.server.getPlayerManager().getPlayer(uuid);
+            if (player != null) {
+                EntityAttributeInstance attribute = player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
+                assert attribute != null;
+                EffectUtil.removeAttribute(attribute, this.healthModifierId);
+            }
+        }
+        ConfigUtil.saveConfig(Variable.INSTANCE.server.getSavePath(WorldSavePath.ROOT), "bg_progress", new GameProgress());
     }
 }

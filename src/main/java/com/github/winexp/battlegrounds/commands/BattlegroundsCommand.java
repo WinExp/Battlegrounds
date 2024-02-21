@@ -6,20 +6,18 @@ import com.github.winexp.battlegrounds.helper.GameHelper;
 import com.github.winexp.battlegrounds.helper.TeamHelper;
 import com.github.winexp.battlegrounds.helper.VoteHelper;
 import com.github.winexp.battlegrounds.helper.task.TaskScheduler;
-import com.github.winexp.battlegrounds.util.Environment;
-import com.github.winexp.battlegrounds.util.TextFactory;
-import com.github.winexp.battlegrounds.util.TextUtil;
-import com.github.winexp.battlegrounds.util.Variable;
+import com.github.winexp.battlegrounds.util.*;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.LiteralMessage;
-import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.scoreboard.Team;
+import net.minecraft.command.argument.EntityArgumentType;
+import net.minecraft.command.argument.GameModeArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
+import net.minecraft.world.GameMode;
+
+import java.util.Collection;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
@@ -34,57 +32,43 @@ public class BattlegroundsCommand {
         var cHelp = literal("help").executes(BattlegroundsCommand::executeHelp);
         var cStart = literal("start").executes(BattlegroundsCommand::executeStart);
         var cStop = literal("stop").requires(source ->
-                source.hasPermissionLevel(4)).executes(BattlegroundsCommand::executeStop);
+                source.hasPermissionLevel(2)).executes(BattlegroundsCommand::executeStop);
         var cAccept = literal("accept").requires(
                 ServerCommandSource::isExecutedByPlayer).executes(BattlegroundsCommand::executeAccept);
         var cDeny = literal("deny").requires(
                 ServerCommandSource::isExecutedByPlayer).executes(BattlegroundsCommand::executeDeny);
-        var cReload = literal("reload").executes(BattlegroundsCommand::executeReload);
-        var cNode = dispatcher.register(cRoot.then(cHelp).then(cStart).then(cStop).then(cAccept).then(cDeny).then(cReload));
+        var cReload = literal("reload").requires(source ->
+                source.hasPermissionLevel(2)).executes(BattlegroundsCommand::executeReload);
+        var cMode = registerGameMode();
+        var cNode = dispatcher.register(cRoot.then(cMode).then(cHelp).then(cStart).then(cStop).then(cAccept).then(cDeny).then(cReload));
 
         // 命令缩写
         var cRoot_redir = literal("bg").executes(BattlegroundsCommand::executeHelp).redirect(cNode);
         dispatcher.register(cRoot_redir);
     }
 
-    private static LiteralArgumentBuilder<ServerCommandSource> buildTeamCommand() {
-        var cRoot = literal("team").requires(ServerCommandSource::isExecutedByPlayer);
-        var cCreate = literal("create")
-                .then(argument("teamName", StringArgumentType.word()))
-                .executes(BattlegroundsCommand::executeTeamCreate);
-        var cJoin = literal("join")
-                .then(argument("teamName", StringArgumentType.word()))
-                .executes(BattlegroundsCommand::executeTeamJoin);
+    public static ArgumentBuilder<ServerCommandSource, ?> registerGameMode() {
+        var cRoot = literal("gamemode");
+        var aMode = argument("gamemode", GameModeArgumentType.gameMode()).executes((context) ->
+                executeChangeGameMode(context, true));
+        var aPlayer = argument("players", EntityArgumentType.players()).executes((context ->
+                executeChangeGameMode(context, false)));
 
-        return null;
+        return cRoot.then(aMode.then(aPlayer));
     }
 
-    private static int executeTeamCreate(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        String teamName = StringArgumentType.getString(context, "teamName");
-        if (teamHelper.getTeam(teamName) != null) throw new CommandSyntaxException(
-                CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument(),
-                new LiteralMessage("队伍已存在")
-        );
-        Team team = teamHelper.addTeam(teamName);
-        team.setFriendlyFireAllowed(false);
-        team.setPrefix(Text.literal('[' + teamName + ']'));
-        teamHelper.addPlayerToTeam(teamName, context.getSource().getPlayerOrThrow());
-
-        return 1;
-    }
-
-    private static int executeTeamJoin(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        String teamName = StringArgumentType.getString(context, "teamName");
-        if (teamHelper.getTeam(teamName) == null) {
-            throw new CommandSyntaxException(
-                    CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument(),
-                    new LiteralMessage("队伍不存在")
-            );
-        } else if (teamHelper.getPlayerTeam(context.getSource().getPlayerOrThrow()) != null) {
-
+    private static int executeChangeGameMode(CommandContext<ServerCommandSource> context, boolean isSelf) throws CommandSyntaxException {
+        GameMode gameMode = GameModeArgumentType.getGameMode(context, "gamemode");
+        if (isSelf && context.getSource().isExecutedByPlayer()) {
+            ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
+            PlayerUtil.setGameMode(player, gameMode);
         }
-
-
+        else if (!isSelf) {
+            Collection<ServerPlayerEntity> players = EntityArgumentType.getPlayers(context, "players");
+            for (ServerPlayerEntity player : players) {
+                PlayerUtil.setGameMode(player, gameMode);
+            }
+        }
         return 1;
     }
 
@@ -122,6 +106,7 @@ public class BattlegroundsCommand {
     private static int executeAccept(CommandContext<ServerCommandSource> context) {
         ServerCommandSource source = context.getSource();
         ServerPlayerEntity player = source.getPlayer();
+        assert player != null;
         if (!voter.isVoting()) {
             source.sendFeedback(() -> TextUtil.translatableWithColor(
                     "battlegrounds.vote.not_voting.feedback", TextUtil.RED), false);
@@ -135,6 +120,7 @@ public class BattlegroundsCommand {
     private static int executeDeny(CommandContext<ServerCommandSource> context) {
         ServerCommandSource source = context.getSource();
         ServerPlayerEntity player = source.getPlayer();
+        assert player != null;
         if (!voter.isVoting()) {
             source.sendFeedback(() -> TextUtil.translatableWithColor(
                     "battlegrounds.vote.not_voting.feedback", TextUtil.RED), false);

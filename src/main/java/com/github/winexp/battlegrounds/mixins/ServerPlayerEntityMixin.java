@@ -1,9 +1,12 @@
 package com.github.winexp.battlegrounds.mixins;
 
+import com.github.winexp.battlegrounds.configs.GameProgress;
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.events.player.PlayerDamagedCallback;
 import com.github.winexp.battlegrounds.events.player.PlayerDeathCallback;
+import com.github.winexp.battlegrounds.events.player.PlayerRespawnCallback;
 import com.github.winexp.battlegrounds.item.Items;
+import com.github.winexp.battlegrounds.util.PlayerUtil;
 import com.github.winexp.battlegrounds.util.Variable;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EquipmentSlot;
@@ -37,6 +40,13 @@ public class ServerPlayerEntityMixin {
         PlayerDeathCallback.EVENT.invoker().interact(source, instance);
     }
 
+    @Inject(method = "onSpawn", at = @At("HEAD"))
+    private void onPlayerRespawn(CallbackInfo ci) {
+        ServerPlayerEntity instance = (ServerPlayerEntity) (Object) this;
+
+        PlayerRespawnCallback.EVENT.invoker().interact(instance);
+    }
+
     @Inject(method = "tick", at = @At("TAIL"))
     private void tick(CallbackInfo ci) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
@@ -44,9 +54,7 @@ public class ServerPlayerEntityMixin {
         // 生机勃勃 附魔 状态效果
         ItemStack stack = player.getEquippedStack(EquipmentSlot.CHEST);
         int level = EnchantmentHelper.getLevel(Enchantments.VITALITY, stack);
-        if (level > 0) {
-            Enchantments.VITALITY.giveEffects((ServerPlayerEntity) (Object) this, level);
-        }
+        Enchantments.VITALITY.modifyHealth(player, level, level > 0);
 
         // PVP 大佬
         if (player.getEquippedStack(EquipmentSlot.MAINHAND).getItem() == Items.PVP_PRO_SWORD
@@ -55,8 +63,8 @@ public class ServerPlayerEntityMixin {
         }
 
         // 自带效果
-        if (Variable.INSTANCE.progress.hasEffects) {
-            player.addStatusEffect(new StatusEffectInstance(StatusEffects.HEALTH_BOOST, 2, 4));
+        GameProgress.PlayerPermission permission = Variable.INSTANCE.progress.players.get(PlayerUtil.getUUID(player));
+        if (permission != null && permission.hasEffects) {
             player.addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 2, 0));
             player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 2, 1));
             player.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 2, 1));

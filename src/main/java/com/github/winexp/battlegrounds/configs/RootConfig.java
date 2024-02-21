@@ -2,17 +2,16 @@ package com.github.winexp.battlegrounds.configs;
 
 @SuppressWarnings("CanBeFinal")
 public class RootConfig {
-    public long discussionTimeoutTicks = 600;
-    public long discussionCooldownTicks = 600;
-    public long randomTpCooldownTicks = 600;
+    public long discussionTimeoutTicks = 30 * 20;
+    public long discussionCooldownTicks = 30 * 20;
+    public long randomTpCooldownTicks = 30 * 20;
     public int serverCloseDelaySeconds = 10;
     public int gameStartDelaySeconds = 10;
-    public AttributeConfig attribute = new AttributeConfig();
+    public AttributeConfig attributes = new AttributeConfig();
     public BorderConfig border = new BorderConfig();
 
     public static class AttributeConfig {
-        public int genericMaxHealth = 40;
-        public int deathmatchMaxHealth = 20;
+        public int genericAdditionHealth = 20;
     }
 
     public static class BorderConfig {
@@ -29,7 +28,7 @@ public class RootConfig {
         public static class DeathmatchBorderConfig {
             public int initialSize = 300;
             public long resizeDelayTicks = 5 * 60 * 20;
-            public int finalSize = 100;
+            public int finalSize = 150;
         }
     }
 }

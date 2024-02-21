@@ -9,6 +9,7 @@ import com.github.winexp.battlegrounds.entity.EntityTypes;
 import com.github.winexp.battlegrounds.events.player.PlayerDamagedCallback;
 import com.github.winexp.battlegrounds.events.player.PlayerDeathCallback;
 import com.github.winexp.battlegrounds.events.player.PlayerJoinedGameCallback;
+import com.github.winexp.battlegrounds.events.player.PlayerRespawnCallback;
 import com.github.winexp.battlegrounds.events.server.ServerLoadedCallback;
 import com.github.winexp.battlegrounds.events.server.ServerSavingCallback;
 import com.github.winexp.battlegrounds.events.server.WorldsLoadedCallback;
@@ -25,6 +26,7 @@ import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.WhitelistEntry;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ConnectedClientData;
@@ -58,6 +60,7 @@ public class Battlegrounds implements ModInitializer {
 
     public static void reload() {
         loadConfigs();
+        Items.addRecipes();
         GameHelper.INSTANCE.reduceTask.cancel();
         if (Variable.INSTANCE.progress.gameStage.isStarted() && !Variable.INSTANCE.progress.gameStage.isDeathmatch()) {
             GameHelper.INSTANCE.runTasks();
@@ -74,6 +77,12 @@ public class Battlegrounds implements ModInitializer {
 
     private ActionResult onWorldLoaded(MinecraftServer server) {
         GameHelper.INSTANCE.initialize();
+
+        return ActionResult.PASS;
+    }
+
+    private ActionResult onPlayerRespawn(ServerPlayerEntity player) {
+        GameHelper.INSTANCE.onPlayerRespawn(player);
 
         return ActionResult.PASS;
     }
@@ -112,7 +121,7 @@ public class Battlegrounds implements ModInitializer {
     }
 
     private ActionResult onPlayerDamaged(DamageSource source, ServerPlayerEntity instance) {
-        return GameHelper.INSTANCE.onPlayerDamaged(source);
+        return GameHelper.INSTANCE.onPlayerDamaged(source, instance);
     }
 
     private void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
@@ -125,8 +134,13 @@ public class Battlegrounds implements ModInitializer {
     }
 
     private ActionResult onPlayerJoin(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData clientData, CallbackInfoReturnable<Text> cir) {
+        if (Variable.INSTANCE.server.getPlayerManager().isWhitelistEnabled()
+                && !Variable.INSTANCE.server.getPlayerManager().isWhitelisted(clientData.gameProfile())) {
+            connection.disconnect(Text.of("你没有权限进入服务器！"));
+            return ActionResult.PASS;
+        }
         if (Variable.INSTANCE.progress.gameStage.isPreparing()) {
-            if (!Variable.INSTANCE.progress.players.containsKey(player.getGameProfile().getId().toString())) {
+            if (!Variable.INSTANCE.progress.players.containsKey(player.getGameProfile().getId())) {
                 player.changeGameMode(GameMode.SPECTATOR);
                 cir.setReturnValue(TextUtil.translatableWithColor("battlegrounds.game.join.spectator.broadcast",
                         TextUtil.DARK_GRAY, player.getName()));
@@ -135,7 +149,11 @@ public class Battlegrounds implements ModInitializer {
                         "battlegrounds.game.join.broadcast",
                         TextUtil.GREEN,
                         player.getName(),
-                        GameHelper.INSTANCE.getInGamePlayers() + 1, Variable.INSTANCE.progress.players.size()));
+                        Variable.INSTANCE.server
+                                .getPlayerManager().getCurrentPlayerCount() + 1,
+                        Variable.INSTANCE.progress.players.size()
+                ));
+                Variable.INSTANCE.server.getPlayerManager().getWhitelist().add(new WhitelistEntry(clientData.gameProfile()));
                 if (Variable.INSTANCE.server.getPlayerManager().getPlayerList().size() + 1 == Variable.INSTANCE.progress.players.size()) {
                     GameHelper.INSTANCE.prepareStartGame();
                 }
@@ -172,6 +190,7 @@ public class Battlegrounds implements ModInitializer {
         PlayerDamagedCallback.EVENT.register(this::onPlayerDamaged);
         PlayerJoinedGameCallback.EVENT.register(this::onPlayerJoin);
         PlayerDeathCallback.EVENT.register(this::onPlayerDeath);
+        PlayerRespawnCallback.EVENT.register(this::onPlayerRespawn);
 
         // 注册实体
         EntityTypes.registerEntities();

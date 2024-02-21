@@ -1,5 +1,6 @@
 package com.github.winexp.battlegrounds.helper;
 
+import com.github.winexp.battlegrounds.util.Variable;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.scoreboard.ScoreHolder;
 import net.minecraft.scoreboard.Scoreboard;
@@ -7,6 +8,7 @@ import net.minecraft.scoreboard.Team;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -14,7 +16,7 @@ public class TeamHelper {
     private final HashMap<String, Team> teams = new HashMap<>();
     private final HashMap<GameProfile, Team> playerMap = new HashMap<>();
     private final Scoreboard scoreboard;
-    private int maxPlayers = 2;
+    private int maxPlayers = 1;
 
     public TeamHelper(Scoreboard scoreboard) {
         this.scoreboard = scoreboard;
@@ -35,6 +37,23 @@ public class TeamHelper {
         Team team = scoreboard.getTeam(teamName);
         Objects.requireNonNull(team);
         scoreboard.removeTeam(team);
+    }
+
+    public void assignPlayers(Collection<ServerPlayerEntity> players) {
+        if (this.maxPlayers * this.teams.size() > Variable.INSTANCE.progress.players.keySet().size()) throw new RuntimeException("玩家数量不足");
+        for (ServerPlayerEntity player : players) {
+            if (player != null) {
+                while (true) {
+                    int idx = player.getRandom().nextInt(this.teams.size());
+                    String teamName = this.teams.keySet().toArray(new String[0])[idx];
+                    Team team = this.getTeam(teamName);
+                    assert team != null;
+                    if (team.getPlayerList().size() >= this.maxPlayers) continue;
+                    this.addPlayerToTeam(teamName, player);
+                    break;
+                }
+            }
+        }
     }
 
     public int getMaxPlayers() {

@@ -13,6 +13,7 @@ import net.minecraft.enchantment.EnchantmentLevelEntry;
 import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroups;
+import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RawShapedRecipe;
@@ -44,9 +45,11 @@ public class Items extends net.minecraft.item.Items {
 
     public static void registerItemGroup() {
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(content -> {
+            // 战斗用品
             content.add(PVP_PRO_SWORD.getItemStack());
         });
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(content -> {
+            // 工具
             content.add(MINERS_PICKAXE.getItemStack());
         });
     }
@@ -81,6 +84,40 @@ public class Items extends net.minecraft.item.Items {
                         CraftingRecipeCategory.EQUIPMENT,
                         EnchantedBookItem.forEnchantment(new EnchantmentLevelEntry(
                                 Enchantments.CHANNELING_PRO, 1
+                        ))
+                ),
+                // 铁镐（自动冶炼）
+                new ShapedNBTCrafting(
+                        new Identifier("battlegrounds", "iron_pickaxe_smelting"),
+                        RawShapedRecipe.create(Map.of(
+                                        'a', Ingredient.ofItems(Items.DIAMOND),
+                                        'b', Ingredient.ofItems(Items.LIGHTNING_ROD),
+                                        'c', Ingredient.ofItems(Items.BOOK)
+                                ), "aaa",
+                                "bcb",
+                                " c "),
+                        CraftingRecipeCategory.EQUIPMENT,
+                        () -> {
+                            ItemStack stack = new ItemStack(Items.IRON_PICKAXE, 1);
+                            stack.addEnchantment(Enchantments.SMELTING, 1);
+                            return stack;
+                        }
+                ),
+                // 史蒂夫の痛
+                new ShapedNBTCrafting(
+                        new Identifier("battlegrounds", "enchanted_book_steves_pain"),
+                        RawShapedRecipe.create(Map.of(
+                                        'a', Ingredient.ofItems(Items.DIAMOND_BLOCK),
+                                        'b', Ingredient.ofItems(Items.LAPIS_LAZULI),
+                                        'c', Ingredient.ofItems(Items.TOTEM_OF_UNDYING),
+                                        'd', Ingredient.ofItems(Items.ZOMBIE_HEAD),
+                                        'e', Ingredient.ofItems(Items.DIAMOND_SWORD)
+                                ), "aba",
+                                "ced",
+                                "aba"),
+                        CraftingRecipeCategory.EQUIPMENT,
+                        EnchantedBookItem.forEnchantment(new EnchantmentLevelEntry(
+                                Enchantments.STEVES_PAIN, 1
                         ))
                 )
         );

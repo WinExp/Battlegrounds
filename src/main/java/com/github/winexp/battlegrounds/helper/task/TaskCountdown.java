@@ -1,12 +1,14 @@
 package com.github.winexp.battlegrounds.helper.task;
 
+import org.jetbrains.annotations.Range;
+
 public class TaskCountdown extends TaskLater {
-    public final static TaskCountdown NONE_TASK = new TaskCountdown(Task.NONE_RUNNABLE, Task.NONE_RUNNABLE, -1, 0, -1);
+    public final static TaskCountdown NONE_TASK = new TaskCountdown(Task.NONE_RUNNABLE, Task.NONE_RUNNABLE, -1, 1, -1);
     private final Runnable fixedRunnable;
     private final long unitTicks;
     private int count;
 
-    public TaskCountdown(Runnable trigger, Runnable triggerEnd, long delay, long unitTicks, int count) {
+    public TaskCountdown(Runnable trigger, Runnable triggerEnd, long delay, @Range(from = 1, to = Long.MAX_VALUE) long unitTicks, int count) {
         super(trigger, delay);
         fixedRunnable = () -> {
             if (this.count < 0) {

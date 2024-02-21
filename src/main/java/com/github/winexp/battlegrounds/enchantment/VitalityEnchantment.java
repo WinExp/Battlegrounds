@@ -1,27 +1,34 @@
 package com.github.winexp.battlegrounds.enchantment;
 
+import com.github.winexp.battlegrounds.util.EffectUtil;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentTarget;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.attribute.EntityAttributeInstance;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public class VitalityEnchantment extends Enchantment {
+    private final String healthModifierId = "enchantment.vitality.health_modifier";
+
     public VitalityEnchantment() {
-        this(Rarity.VERY_RARE, EnchantmentTarget.ARMOR_CHEST, EquipmentSlot.MAINHAND);
+        this(Rarity.VERY_RARE, EnchantmentTarget.ARMOR_CHEST, EquipmentSlot.CHEST);
     }
 
     protected VitalityEnchantment(Rarity rarity, EnchantmentTarget target, EquipmentSlot... slots) {
         super(rarity, target, slots);
     }
 
-    public void giveEffects(ServerPlayerEntity player, int level) {
-        StatusEffectInstance effect = player.getStatusEffect(StatusEffects.HEALTH_BOOST);
-        if (effect != null) {
-            level += effect.getAmplifier() + 1;
+    public void modifyHealth(ServerPlayerEntity player, int level, boolean addition) {
+        EntityAttributeInstance attribute = player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
+        assert attribute != null;
+        if (addition) {
+            EffectUtil.addAttribute(attribute, healthModifierId,
+                    level * 4, EntityAttributeModifier.Operation.ADDITION);
+        } else {
+            EffectUtil.removeAttribute(attribute, healthModifierId);
         }
-        player.addStatusEffect(new StatusEffectInstance(StatusEffects.HEALTH_BOOST, 2, level - 1));
     }
 
     @Override

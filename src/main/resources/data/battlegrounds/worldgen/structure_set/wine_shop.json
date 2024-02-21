@@ -1,13 +1,13 @@
 {
   "placement": {
     "type": "minecraft:random_spread",
-    "salt": 82697053,
+    "salt": 19034053,
     "separation": 6,
     "spacing": 25
   },
   "structures": [
     {
-      "structure": "battlegrounds:canopies",
+      "structure": "battlegrounds:wine_shop",
       "weight": 1
     }
   ]

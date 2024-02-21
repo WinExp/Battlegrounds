@@ -36,14 +36,18 @@ public class ConfigUtil {
 
     public static <T> T readConfig(Path path, String configName, Class<T> clazz) {
         Path fileName = path.resolve(configName + ".json");
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .create();
         String json = FileUtil.readString(fileName);
         return gson.fromJson(json, clazz);
     }
 
     public static void buildConfig(Path path, String configName, Object config) {
         Path fileName = path.resolve(configName + ".json");
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .create();
         String json = gson.toJson(config);
         FileUtil.writeString(fileName, json);
     }

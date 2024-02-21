@@ -1,7 +1,7 @@
 {
   "type": "minecraft:jigsaw",
   "step": "surface_structures",
-  "terrain_adaptation": "beard_thin",
+  "terrain_adaptation": "none",
   "biomes": "#minecraft:has_structure/pillager_outpost",
   "max_distance_from_center": 50,
   "spawn_overrides": {},
