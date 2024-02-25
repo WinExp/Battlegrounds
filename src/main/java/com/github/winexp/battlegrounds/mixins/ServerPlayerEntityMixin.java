@@ -7,7 +7,7 @@ import com.github.winexp.battlegrounds.events.player.PlayerDeathCallback;
 import com.github.winexp.battlegrounds.events.player.PlayerRespawnCallback;
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
-import com.github.winexp.battlegrounds.util.Variable;
+import com.github.winexp.battlegrounds.util.Variables;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.damage.DamageSource;
@@ -23,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ServerPlayerEntity.class)
-public class ServerPlayerEntityMixin {
+public abstract class ServerPlayerEntityMixin {
     @Inject(method = "damage", at = @At("HEAD"), cancellable = true)
     private void onPlayerDamaged(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         ServerPlayerEntity instance = (ServerPlayerEntity) (Object) this;
@@ -63,7 +63,7 @@ public class ServerPlayerEntityMixin {
         }
 
         // 自带效果
-        GameProgress.PlayerPermission permission = Variable.INSTANCE.progress.players.get(PlayerUtil.getUUID(player));
+        GameProgress.PlayerPermission permission = Variables.progress.players.get(PlayerUtil.getUUID(player));
         if (permission != null && permission.hasEffects) {
             player.addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 2, 0));
             player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 2, 1));

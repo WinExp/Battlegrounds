@@ -9,19 +9,19 @@ import net.minecraft.util.Identifier;
 
 import java.util.function.Supplier;
 
-public class ShapedNBTCrafting implements NBTCrafting {
+public class ShapedNbtCrafting implements NbtCrafting {
     private final ItemStack result;
     private final ShapedRecipe recipe;
     private final Identifier identifier;
 
-    public ShapedNBTCrafting(Identifier identifier,
+    public ShapedNbtCrafting(Identifier identifier,
                              RawShapedRecipe raw,
                              CraftingRecipeCategory category,
                              Supplier<ItemStack> result) {
         this(identifier, raw, category, result.get());
     }
 
-    public ShapedNBTCrafting(Identifier identifier,
+    public ShapedNbtCrafting(Identifier identifier,
                              RawShapedRecipe raw,
                              CraftingRecipeCategory category,
                              ItemStack result) {

@@ -2,7 +2,7 @@ package com.github.winexp.battlegrounds.item.tool;
 
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.item.Items;
-import com.github.winexp.battlegrounds.item.recipe.NBTCrafting;
+import com.github.winexp.battlegrounds.item.recipe.NbtCrafting;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PickaxeItem;
@@ -15,7 +15,7 @@ import net.minecraft.util.Identifier;
 
 import java.util.Map;
 
-public class MinersPickaxeItem extends PickaxeItem implements NBTCrafting {
+public class MinersPickaxeItem extends PickaxeItem implements NbtCrafting {
     public final static Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
             Enchantments.FORTUNE, 3,
             Enchantments.EFFICIENCY, 4,
@@ -25,6 +25,16 @@ public class MinersPickaxeItem extends PickaxeItem implements NBTCrafting {
 
     public MinersPickaxeItem(ToolMaterial material, int attackDamage, float attackSpeed, Settings settings) {
         super(material, attackDamage, attackSpeed, settings);
+    }
+
+    @Override
+    public boolean hasGlint(ItemStack stack) {
+        return true;
+    }
+
+    @Override
+    public boolean isEnchantable(ItemStack stack) {
+        return false;
     }
 
     @Override

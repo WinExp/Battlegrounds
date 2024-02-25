@@ -4,7 +4,7 @@ import com.github.winexp.battlegrounds.helper.task.TaskScheduler;
 import com.github.winexp.battlegrounds.helper.task.TaskTimer;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
 import com.github.winexp.battlegrounds.util.TextUtil;
-import com.github.winexp.battlegrounds.util.Variable;
+import com.github.winexp.battlegrounds.util.Variables;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.server.command.CommandManager;
@@ -51,8 +51,8 @@ public class RandomTpCommand {
         } else {
             source.sendFeedback(() -> TextUtil.translatableWithColor("battlegrounds.command.randomtp.feedback",
                     TextUtil.GOLD), false);
-            PlayerUtil.randomTeleport(Variable.INSTANCE.server.getOverworld(), Objects.requireNonNull(source.getPlayer()));
-            cooldownTimers.put(uuid, Variable.INSTANCE.config.randomTpCooldownTicks);
+            PlayerUtil.randomTeleport(Variables.server.getOverworld(), Objects.requireNonNull(source.getPlayer()));
+            cooldownTimers.put(uuid, Variables.config.cooldown.randomTpCooldownTicks);
         }
 
         return 1;

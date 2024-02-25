@@ -83,8 +83,8 @@ public class BattlegroundsCommand {
                     "battlegrounds.vote.cooldown.feedback", TextUtil.RED, voter.getCooldown() / 20), false);
             return 1;
         }
-        voter.startVote(Variable.INSTANCE.server.getPlayerManager().getPlayerList().toArray(new ServerPlayerEntity[0]));
-        Variable.INSTANCE.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
+        voter.startVote(Variables.server.getPlayerManager().getPlayerList().toArray(new ServerPlayerEntity[0]));
+        Variables.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
                         "battlegrounds.command.start.broadcast", TextUtil.GREEN, source.getName())
                 .append(TextFactory.LINEFEED)
                 .append(TextFactory.ACCEPT_BUTTON)
@@ -98,7 +98,7 @@ public class BattlegroundsCommand {
         voter.stopVote(VoteCompletedCallback.Reason.MANUAL);
         TaskScheduler.INSTANCE.stopAllTask();
         GameHelper.INSTANCE.stopGame();
-        Environment.LOGGER.info("已停止队列中所有任务");
+        Constants.LOGGER.info("已停止队列中所有任务");
 
         return 1;
     }

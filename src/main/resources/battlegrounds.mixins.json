@@ -4,13 +4,16 @@
   "package": "com.github.winexp.battlegrounds.mixins",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "PlayerManagerMixin",
     "MinecraftServerMixin",
+    "naturalRegen_PlayerEntityMixin",
+    "PlayerManagerMixin",
     "RecipeManagerMixin",
     "ServerPlayerEntityMixin",
     "item.BowItemMixin"
   ],
   "client": [
+    "client.flash_BackgroundRendererMixin",
+    "client.MinecraftClientMixin"
   ],
   "server": [
   ],

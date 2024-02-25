@@ -4,7 +4,6 @@ import com.github.winexp.battlegrounds.entity.EntityTypes;
 import com.github.winexp.battlegrounds.item.Items;
 import com.google.common.collect.Sets;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
@@ -38,7 +37,7 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
     private boolean colorSet;
     private boolean channeling = false;
 
-    public ChannelingArrowEntity(EntityType<? extends ChannelingArrowEntity> entityType, World world) {
+    public ChannelingArrowEntity(net.minecraft.entity.EntityType<? extends ChannelingArrowEntity> entityType, World world) {
         super(entityType, world, DEFAULT_STACK);
         this.potion = Potions.EMPTY;
         this.effects = Sets.newHashSet();
@@ -181,7 +180,7 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
         }
 
         if (this.getChanneling()) {
-            LightningEntity lightning = EntityType.LIGHTNING_BOLT.create(target.getWorld());
+            LightningEntity lightning = net.minecraft.entity.EntityType.LIGHTNING_BOLT.create(target.getWorld());
             if (lightning != null) {
                 lightning.refreshPositionAfterTeleport(target.getPos());
                 if (this.getOwner() instanceof ServerPlayerEntity player) {

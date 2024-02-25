@@ -2,7 +2,7 @@ package com.github.winexp.battlegrounds.item.tool;
 
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.item.Items;
-import com.github.winexp.battlegrounds.item.recipe.NBTCrafting;
+import com.github.winexp.battlegrounds.item.recipe.NbtCrafting;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -18,7 +18,7 @@ import net.minecraft.util.Identifier;
 
 import java.util.Map;
 
-public class PVPProSwordItem extends SwordItem implements NBTCrafting {
+public class PVPProSwordItem extends SwordItem implements NbtCrafting {
     public final static float DAMAGE_BONUS = 0.0F;
     public final static Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
             Enchantments.FIRE_ASPECT, 1,
@@ -37,6 +37,16 @@ public class PVPProSwordItem extends SwordItem implements NBTCrafting {
     }
 
     @Override
+    public boolean hasGlint(ItemStack stack) {
+        return true;
+    }
+
+    @Override
+    public boolean isEnchantable(ItemStack stack) {
+        return false;
+    }
+
+    @Override
     public Identifier getIdentifier() {
         return new Identifier("battlegrounds", "pvp_pro_sword");
     }
@@ -51,14 +61,15 @@ public class PVPProSwordItem extends SwordItem implements NBTCrafting {
     @Override
     public ShapedRecipe getRecipe() {
         RawShapedRecipe rawShaped = RawShapedRecipe.create(Map.of(
-                        'a', Ingredient.ofItems(Items.IRON_INGOT),
-                        'b', Ingredient.ofItems(Items.GOLD_INGOT),
+                        'a', Ingredient.ofItems(Items.DIAMOND_BLOCK),
+                        'b', Ingredient.ofItems(Items.GOLD_BLOCK),
                         'c', Ingredient.ofItems(Items.TOTEM_OF_UNDYING, Items.GOLDEN_APPLE),
-                        'd', Ingredient.ofItems(Items.DIAMOND_SWORD)
+                        'd', Ingredient.ofItems(Items.DIAMOND_SWORD),
+                        'e', Ingredient.ofItems(Items.DIAMOND)
                 ),
                 "aba",
                 "cdc",
-                "aba");
+                "ebe");
         return new ShapedRecipe(getIdentifier().toString(),
                 CraftingRecipeCategory.EQUIPMENT,
                 rawShaped,

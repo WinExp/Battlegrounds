@@ -40,19 +40,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @SuppressWarnings("SameReturnValue")
 public class Battlegrounds implements ModInitializer {
     public static void saveConfigs() {
-        ConfigUtil.saveConfig(Environment.CONFIG_PATH, "config", Variable.INSTANCE.config);
-        if (Variable.INSTANCE.server != null) {
+        ConfigUtil.saveConfig(Constants.CONFIG_PATH, "config", Variables.config);
+        if (Variables.server != null) {
             if (GameHelper.INSTANCE.reduceTask.getDelay() >= 0) {
-                Variable.INSTANCE.progress.resizeLapTimer = GameHelper.INSTANCE.reduceTask.getDelay();
+                Variables.progress.resizeLapTimer = GameHelper.INSTANCE.reduceTask.getDelay();
             }
-            ConfigUtil.saveConfig(Variable.INSTANCE.server.getSavePath(WorldSavePath.ROOT), "bg_progress", Variable.INSTANCE.progress);
+            ConfigUtil.saveConfig(Variables.server.getSavePath(WorldSavePath.ROOT), "bg_progress", Variables.progress);
         }
     }
 
     public static void loadConfigs() {
-        Variable.INSTANCE.config = ConfigUtil.createOrLoadConfig(Environment.CONFIG_PATH, "config", RootConfig.class);
-        if (Variable.INSTANCE.server != null) {
-            Variable.INSTANCE.progress = ConfigUtil.createOrLoadConfig(Variable.INSTANCE.server.getSavePath(WorldSavePath.ROOT),
+        Variables.config = ConfigUtil.createOrLoadConfig(Constants.CONFIG_PATH, "config", RootConfig.class);
+        if (Variables.server != null) {
+            Variables.progress = ConfigUtil.createOrLoadConfig(Variables.server.getSavePath(WorldSavePath.ROOT),
                     "bg_progress",
                     GameProgress.class);
         }
@@ -62,13 +62,13 @@ public class Battlegrounds implements ModInitializer {
         loadConfigs();
         Items.addRecipes();
         GameHelper.INSTANCE.reduceTask.cancel();
-        if (Variable.INSTANCE.progress.gameStage.isStarted() && !Variable.INSTANCE.progress.gameStage.isDeathmatch()) {
+        if (Variables.progress.gameStage.isStarted() && !Variables.progress.gameStage.isDeathmatch()) {
             GameHelper.INSTANCE.runTasks();
         }
     }
 
     private ActionResult onServerLoaded(MinecraftServer server) {
-        Variable.INSTANCE.server = server;
+        Variables.server = server;
         GameHelper.INSTANCE.setServer(server);
         loadConfigs();
 
@@ -95,11 +95,11 @@ public class Battlegrounds implements ModInitializer {
 
     private ActionResult onPlayerVote(VoteHelper voter, ServerPlayerEntity player, boolean result) {
         if (result) {
-            Variable.INSTANCE.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
+            Variables.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
                     "battlegrounds.command.accept.broadcast", TextUtil.GREEN,
                     player.getName(), voter.getAccepted(), voter.getTotal()), false);
         } else {
-            Variable.INSTANCE.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
+            Variables.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
                     "battlegrounds.command.deny.broadcast", TextUtil.GOLD,
                     player.getName(), voter.getAccepted(), voter.getTotal()), false);
         }
@@ -108,10 +108,10 @@ public class Battlegrounds implements ModInitializer {
 
     private ActionResult onVoteStop(VoteHelper voter, VoteCompletedCallback.Reason reason) {
         if (reason == VoteCompletedCallback.Reason.TIMEOUT) {
-            Variable.INSTANCE.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
+            Variables.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
                     "battlegrounds.vote.timeout.broadcast", TextUtil.GOLD), false);
         } else if (reason == VoteCompletedCallback.Reason.MANUAL) {
-            Variable.INSTANCE.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
+            Variables.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
                     "battlegrounds.vote.manual.broadcast", TextUtil.GOLD), false);
         } else if (reason == VoteCompletedCallback.Reason.ACCEPT) {
             GameHelper.INSTANCE.prepareResetWorlds(voter);
@@ -125,22 +125,17 @@ public class Battlegrounds implements ModInitializer {
     }
 
     private void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
-        if (environment.dedicated) {
-            BattlegroundsCommand.registerRoot(dispatcher);
-            RandomTpCommand.register(dispatcher);
-        } else {
-            Environment.LOGGER.error("Battlegrounds 只可在专用服务器 (Dedicated Server) 上运行！");
-        }
+        BattlegroundsCommand.registerRoot(dispatcher);
+        RandomTpCommand.register(dispatcher);
     }
 
     private ActionResult onPlayerJoin(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData clientData, CallbackInfoReturnable<Text> cir) {
-        if (Variable.INSTANCE.server.getPlayerManager().isWhitelistEnabled()
-                && !Variable.INSTANCE.server.getPlayerManager().isWhitelisted(clientData.gameProfile())) {
+        if (!Variables.server.getPlayerManager().isWhitelisted(clientData.gameProfile())) {
             connection.disconnect(Text.of("你没有权限进入服务器！"));
             return ActionResult.PASS;
         }
-        if (Variable.INSTANCE.progress.gameStage.isPreparing()) {
-            if (!Variable.INSTANCE.progress.players.containsKey(player.getGameProfile().getId())) {
+        if (Variables.progress.gameStage.isPreparing()) {
+            if (!Variables.progress.players.containsKey(player.getGameProfile().getId())) {
                 player.changeGameMode(GameMode.SPECTATOR);
                 cir.setReturnValue(TextUtil.translatableWithColor("battlegrounds.game.join.spectator.broadcast",
                         TextUtil.DARK_GRAY, player.getName()));
@@ -149,16 +144,16 @@ public class Battlegrounds implements ModInitializer {
                         "battlegrounds.game.join.broadcast",
                         TextUtil.GREEN,
                         player.getName(),
-                        Variable.INSTANCE.server
+                        Variables.server
                                 .getPlayerManager().getCurrentPlayerCount() + 1,
-                        Variable.INSTANCE.progress.players.size()
+                        Variables.progress.players.size()
                 ));
-                Variable.INSTANCE.server.getPlayerManager().getWhitelist().add(new WhitelistEntry(clientData.gameProfile()));
-                if (Variable.INSTANCE.server.getPlayerManager().getPlayerList().size() + 1 == Variable.INSTANCE.progress.players.size()) {
+                Variables.server.getPlayerManager().getWhitelist().add(new WhitelistEntry(clientData.gameProfile()));
+                if (Variables.server.getPlayerManager().getPlayerList().size() + 1 == Variables.progress.players.size()) {
                     GameHelper.INSTANCE.prepareStartGame();
                 }
             }
-        } else if (Variable.INSTANCE.progress.gameStage.isDeathmatch()) {
+        } else if (Variables.progress.gameStage.isDeathmatch()) {
             player.sendMessage(TextUtil.translatableWithColor(
                     "battlegrounds.game.deathmatch.start.broadcast", TextUtil.GOLD), false);
         }
@@ -169,7 +164,7 @@ public class Battlegrounds implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        Environment.LOGGER.info("正在加载 Battlegrounds");
+        Constants.LOGGER.info("正在加载 Battlegrounds");
 
         // 注册指令
         CommandRegistrationCallback.EVENT.register(this::registerCommands);
@@ -180,8 +175,7 @@ public class Battlegrounds implements ModInitializer {
         WorldsLoadedCallback.EVENT.register(this::onWorldLoaded);
         ServerSavingCallback.EVENT.register((server, suppressLogs) -> {
             saveConfigs();
-            loadConfigs();
-            if (!suppressLogs) Environment.LOGGER.info("已保存游戏配置");
+            if (!suppressLogs) Constants.LOGGER.info("已保存游戏配置");
 
             return ActionResult.PASS;
         });

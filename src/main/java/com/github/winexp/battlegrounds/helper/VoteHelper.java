@@ -5,7 +5,7 @@ import com.github.winexp.battlegrounds.events.vote.VoteCompletedCallback;
 import com.github.winexp.battlegrounds.helper.task.Task;
 import com.github.winexp.battlegrounds.helper.task.TaskLater;
 import com.github.winexp.battlegrounds.helper.task.TaskScheduler;
-import com.github.winexp.battlegrounds.util.Variable;
+import com.github.winexp.battlegrounds.util.Variables;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -94,7 +94,7 @@ public class VoteHelper {
             voteMap.put(player.getGameProfile(), false);
         }
         timeoutTask = new TaskLater(() -> stopVote(VoteCompletedCallback.Reason.TIMEOUT),
-                Variable.INSTANCE.config.discussionTimeoutTicks);
+                Variables.config.timeout.discussionTimeoutTicks);
         TaskScheduler.INSTANCE.runTask(timeoutTask);
     }
 
@@ -104,7 +104,7 @@ public class VoteHelper {
         voting = false;
         timeoutTask.cancel();
         cooldownTask.cancel();
-        cooldownTask = new TaskLater(Task.NONE_RUNNABLE, Variable.INSTANCE.config.discussionCooldownTicks);
+        cooldownTask = new TaskLater(Task.NONE_RUNNABLE, Variables.config.cooldown.discussionCooldownTicks);
         TaskScheduler.INSTANCE.runTask(cooldownTask);
     }
 }

@@ -18,6 +18,20 @@ public class GameProgress {
     public long resizeLapTimer = 0;
     public HashMap<UUID, PlayerPermission> players = new HashMap<>();
 
+    public boolean isInGame(UUID uuid) {
+        PlayerPermission permission = this.players.get(uuid);
+        return permission != null && permission.inGame;
+    }
+
+    public GameMode getGameMode(UUID uuid) {
+        PlayerPermission permission = this.players.get(uuid);
+        if (permission == null) {
+            return GameMode.SPECTATOR;
+        } else {
+            return permission.gameMode;
+        }
+    }
+
     public static class PlayerPermission {
         @NotNull
         @JsonAdapter(GameModeTypeAdapter.class)

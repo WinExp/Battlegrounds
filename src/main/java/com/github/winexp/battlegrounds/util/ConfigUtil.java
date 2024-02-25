@@ -28,7 +28,7 @@ public class ConfigUtil {
                 buildConfig(path, configName, instance);
                 return instance;
             } catch (Exception e) {
-                Environment.LOGGER.error("无法创建配置", e);
+                Constants.LOGGER.error("无法创建配置", e);
                 throw new RuntimeException(e);
             }
         }

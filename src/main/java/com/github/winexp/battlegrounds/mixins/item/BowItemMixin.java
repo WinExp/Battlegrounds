@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BowItem.class)
-public class BowItemMixin {
+public abstract class BowItemMixin {
     @Unique
     private ItemStack tmpStack;
 

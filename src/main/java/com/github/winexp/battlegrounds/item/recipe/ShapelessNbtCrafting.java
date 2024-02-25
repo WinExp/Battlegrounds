@@ -10,12 +10,12 @@ import net.minecraft.util.collection.DefaultedList;
 
 import java.util.List;
 
-public class ShapelessNBTCrafting implements NBTCrafting {
+public class ShapelessNbtCrafting implements NbtCrafting {
     private final ItemStack result;
     private final ShapelessRecipe recipe;
     private final Identifier identifier;
 
-    public ShapelessNBTCrafting(Identifier identifier,
+    public ShapelessNbtCrafting(Identifier identifier,
                                 CraftingRecipeCategory category,
                                 ItemStack result,
                                 List<Ingredient> ingredients) {

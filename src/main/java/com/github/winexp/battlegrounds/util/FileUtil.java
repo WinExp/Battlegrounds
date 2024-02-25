@@ -20,7 +20,7 @@ public class FileUtil {
                 Files.delete(path);
             }
         } catch (IOException e) {
-            Environment.LOGGER.error("无法删除文件", e);
+            Constants.LOGGER.error("无法删除文件", e);
         }
     }
 
@@ -32,7 +32,7 @@ public class FileUtil {
                 sb.append('\n');
             }
         } catch (IOException e) {
-            Environment.LOGGER.error("无法读取文件", e);
+            Constants.LOGGER.error("无法读取文件", e);
             throw new RuntimeException(e);
         }
         return sb.toString();
@@ -42,13 +42,13 @@ public class FileUtil {
         try {
             Files.createDirectories(fileName.getParent());
         } catch (IOException e) {
-            Environment.LOGGER.error("无法创建目录", e);
+            Constants.LOGGER.error("无法创建目录", e);
             throw new RuntimeException(e);
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName.toFile()))) {
             writer.write(content);
         } catch (IOException e) {
-            Environment.LOGGER.error("无法写入文件", e);
+            Constants.LOGGER.error("无法写入文件", e);
             throw new RuntimeException(e);
         }
     }

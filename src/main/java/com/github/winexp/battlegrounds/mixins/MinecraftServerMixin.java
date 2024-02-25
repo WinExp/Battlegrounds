@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.function.BooleanSupplier;
 
 @Mixin(MinecraftServer.class)
-public class MinecraftServerMixin {
+public abstract class MinecraftServerMixin {
     @Inject(method = "loadWorld", at = @At("HEAD"))
     private void onServerLoaded(CallbackInfo ci) {
         ServerLoadedCallback.EVENT.invoker().interact((MinecraftServer) (Object) this);

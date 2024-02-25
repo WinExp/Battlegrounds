@@ -1,4 +1,4 @@
-package com.github.winexp.battlegrounds.client.renderer;
+package com.github.winexp.battlegrounds.client.render;
 
 import com.github.winexp.battlegrounds.entity.projectile.ChannelingArrowEntity;
 import net.fabricmc.api.EnvType;

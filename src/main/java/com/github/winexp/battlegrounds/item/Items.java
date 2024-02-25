@@ -1,9 +1,10 @@
 package com.github.winexp.battlegrounds.item;
 
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
-import com.github.winexp.battlegrounds.item.recipe.NBTCrafting;
-import com.github.winexp.battlegrounds.item.recipe.ShapedNBTCrafting;
-import com.github.winexp.battlegrounds.item.recipe.ShapelessNBTCrafting;
+import com.github.winexp.battlegrounds.item.recipe.NbtCrafting;
+import com.github.winexp.battlegrounds.item.recipe.ShapedNbtCrafting;
+import com.github.winexp.battlegrounds.item.recipe.ShapelessNbtCrafting;
+import com.github.winexp.battlegrounds.item.thrown.FlashBangItem;
 import com.github.winexp.battlegrounds.item.tool.MinersPickaxeItem;
 import com.github.winexp.battlegrounds.item.tool.PVPProSwordItem;
 import com.github.winexp.battlegrounds.item.tool.ToolMaterials;
@@ -31,6 +32,7 @@ import java.util.Map;
 public class Items extends net.minecraft.item.Items {
     public final static PVPProSwordItem PVP_PRO_SWORD = new PVPProSwordItem(ToolMaterials.PVP_PRO, 3, -2.4F, new Item.Settings().rarity(Rarity.RARE).fireproof());
     public final static MinersPickaxeItem MINERS_PICKAXE = new MinersPickaxeItem(ToolMaterials.MINERS_PICKAXE, 1, -2.8F, new Item.Settings().rarity(Rarity.RARE));
+    public final static FlashBangItem FLASH_BANG = new FlashBangItem(new Item.Settings().maxCount(16).rarity(Rarity.UNCOMMON));
 
     public static void registerItems() {
         Registry.register(Registries.ITEM,
@@ -41,12 +43,17 @@ public class Items extends net.minecraft.item.Items {
                 MINERS_PICKAXE.getIdentifier(),
                 MINERS_PICKAXE
         );
+        Registry.register(Registries.ITEM,
+                new Identifier("battlegrounds", "flash_bang"),
+                FLASH_BANG
+        );
     }
 
     public static void registerItemGroup() {
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(content -> {
             // 战斗用品
             content.add(PVP_PRO_SWORD.getItemStack());
+            content.add(new ItemStack(FLASH_BANG));
         });
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(content -> {
             // 工具
@@ -55,9 +62,9 @@ public class Items extends net.minecraft.item.Items {
     }
 
     public static void addRecipes() {
-        List<ShapedNBTCrafting> shapedRecipes = List.of(
+        List<ShapedNbtCrafting> shapedRecipes = List.of(
                 // 自动冶炼
-                new ShapedNBTCrafting(
+                new ShapedNbtCrafting(
                         new Identifier("battlegrounds", "enchanted_book_smelting"),
                         RawShapedRecipe.create(Map.of(
                                         'a', Ingredient.ofItems(Items.FURNACE),
@@ -72,7 +79,7 @@ public class Items extends net.minecraft.item.Items {
                         ))
                 ),
                 // 引雷 Pro Max
-                new ShapedNBTCrafting(
+                new ShapedNbtCrafting(
                         new Identifier("battlegrounds", "enchanted_book_channeling_pro"),
                         RawShapedRecipe.create(Map.of(
                                         'a', Ingredient.ofItems(Items.DIAMOND),
@@ -87,7 +94,7 @@ public class Items extends net.minecraft.item.Items {
                         ))
                 ),
                 // 铁镐（自动冶炼）
-                new ShapedNBTCrafting(
+                new ShapedNbtCrafting(
                         new Identifier("battlegrounds", "iron_pickaxe_smelting"),
                         RawShapedRecipe.create(Map.of(
                                         'a', Ingredient.ofItems(Items.DIAMOND),
@@ -104,7 +111,7 @@ public class Items extends net.minecraft.item.Items {
                         }
                 ),
                 // 史蒂夫の痛
-                new ShapedNBTCrafting(
+                new ShapedNbtCrafting(
                         new Identifier("battlegrounds", "enchanted_book_steves_pain"),
                         RawShapedRecipe.create(Map.of(
                                         'a', Ingredient.ofItems(Items.DIAMOND_BLOCK),
@@ -121,9 +128,9 @@ public class Items extends net.minecraft.item.Items {
                         ))
                 )
         );
-        List<ShapelessNBTCrafting> shapelessRecipes = List.of(
+        List<ShapelessNbtCrafting> shapelessRecipes = List.of(
                 // 锋利 1 附魔书
-                new ShapelessNBTCrafting(
+                new ShapelessNbtCrafting(
                         new Identifier("battlegrounds", "enchanted_book_sharpness_1"),
                         CraftingRecipeCategory.EQUIPMENT,
                         EnchantedBookItem.forEnchantment(new EnchantmentLevelEntry(
@@ -135,7 +142,7 @@ public class Items extends net.minecraft.item.Items {
                         )
                 ),
                 // 浸毒 附魔书
-                new ShapelessNBTCrafting(
+                new ShapelessNbtCrafting(
                         new Identifier("battlegrounds", "enchanted_book_leaching"),
                         CraftingRecipeCategory.EQUIPMENT,
                         EnchantedBookItem.forEnchantment(new EnchantmentLevelEntry(
@@ -149,7 +156,7 @@ public class Items extends net.minecraft.item.Items {
                         )
                 ),
                 // 保护 1 附魔书
-                new ShapelessNBTCrafting(
+                new ShapelessNbtCrafting(
                         new Identifier("battlegrounds", "enchanted_book_protection_1"),
                         CraftingRecipeCategory.EQUIPMENT,
                         EnchantedBookItem.forEnchantment(new EnchantmentLevelEntry(
@@ -161,7 +168,7 @@ public class Items extends net.minecraft.item.Items {
                         )
                 ),
                 // 力量 1 附魔书
-                new ShapelessNBTCrafting(
+                new ShapelessNbtCrafting(
                         new Identifier("battlegrounds", "enchanted_book_power_1"),
                         CraftingRecipeCategory.EQUIPMENT,
                         EnchantedBookItem.forEnchantment(new EnchantmentLevelEntry(
@@ -174,12 +181,12 @@ public class Items extends net.minecraft.item.Items {
                 )
         );
 
-        ArrayList<NBTCrafting> items = new ArrayList<>(List.of(
+        ArrayList<NbtCrafting> items = new ArrayList<>(List.of(
                 PVP_PRO_SWORD, MINERS_PICKAXE
         ));
         items.addAll(shapedRecipes);
         items.addAll(shapelessRecipes);
-        for (NBTCrafting item : items) {
+        for (NbtCrafting item : items) {
             RecipeEntry<CraftingRecipe> entry = new RecipeEntry<>(
                     item.getIdentifier(),
                     item.getRecipe()

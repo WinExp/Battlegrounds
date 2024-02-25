@@ -1,6 +1,7 @@
 package com.github.winexp.battlegrounds.util;
 
 import com.github.winexp.battlegrounds.configs.GameProgress;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.SubtitleS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
@@ -30,12 +31,12 @@ public class PlayerUtil {
     }
 
     public static void setGameModeMap(ServerPlayerEntity player, GameMode gameMode) {
-        if (Variable.INSTANCE.progress.players.get(getUUID(player)) == null) {
+        if (Variables.progress.players.get(getUUID(player)) == null) {
             GameProgress.PlayerPermission permission = new GameProgress.PlayerPermission();
             permission.gameMode = gameMode;
-            Variable.INSTANCE.progress.players.put(getUUID(player), permission);
+            Variables.progress.players.put(getUUID(player), permission);
         } else {
-            Variable.INSTANCE.progress.players.get(getUUID(player)).gameMode = gameMode;
+            Variables.progress.players.get(getUUID(player)).gameMode = gameMode;
         }
     }
 
@@ -46,7 +47,7 @@ public class PlayerUtil {
 
     public static GameMode getDefaultGameMode() {
         GameMode gameMode;
-        if (Variable.INSTANCE.progress.gameStage.isIdle()) {
+        if (Variables.progress.gameStage.isIdle()) {
             gameMode = GameMode.ADVENTURE;
         } else {
             gameMode = GameMode.SPECTATOR;
@@ -56,14 +57,14 @@ public class PlayerUtil {
 
     public static void setGameModeWithMap(ServerPlayerEntity player) {
         GameMode defaultGameMode = getDefaultGameMode();
-        if (Variable.INSTANCE.progress.players.get(getUUID(player)) == null) {
+        if (Variables.progress.players.get(getUUID(player)) == null) {
             player.changeGameMode(defaultGameMode);
         } else {
-            player.changeGameMode(Variable.INSTANCE.progress.players.get(getUUID(player)).gameMode);
+            player.changeGameMode(Variables.progress.players.get(getUUID(player)).gameMode);
         }
     }
 
-    public static UUID getUUID(ServerPlayerEntity player) {
+    public static UUID getUUID(PlayerEntity player) {
         return player.getGameProfile().getId();
     }
 }
