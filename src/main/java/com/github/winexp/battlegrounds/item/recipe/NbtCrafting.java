@@ -7,7 +7,7 @@ import net.minecraft.util.Identifier;
 public interface NbtCrafting {
     Identifier getIdentifier();
 
-    ItemStack getItemStack();
+    ItemStack getDefaultStack();
 
     CraftingRecipe getRecipe();
 }

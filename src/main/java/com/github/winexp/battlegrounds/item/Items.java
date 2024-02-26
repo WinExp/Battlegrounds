@@ -1,6 +1,7 @@
 package com.github.winexp.battlegrounds.item;
 
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
+import com.github.winexp.battlegrounds.entity.projectile.FlashBangEntity;
 import com.github.winexp.battlegrounds.item.recipe.NbtCrafting;
 import com.github.winexp.battlegrounds.item.recipe.ShapedNbtCrafting;
 import com.github.winexp.battlegrounds.item.recipe.ShapelessNbtCrafting;
@@ -10,7 +11,10 @@ import com.github.winexp.battlegrounds.item.tool.PVPProSwordItem;
 import com.github.winexp.battlegrounds.item.tool.ToolMaterials;
 import com.github.winexp.battlegrounds.util.RecipeUtil;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.minecraft.block.DispenserBlock;
+import net.minecraft.block.dispenser.ProjectileDispenserBehavior;
 import net.minecraft.enchantment.EnchantmentLevelEntry;
+import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroups;
@@ -22,8 +26,12 @@ import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
+import net.minecraft.util.Util;
+import net.minecraft.util.math.Position;
+import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,17 +55,32 @@ public class Items extends net.minecraft.item.Items {
                 new Identifier("battlegrounds", "flash_bang"),
                 FLASH_BANG
         );
+        registerDispenserBehavior();
+    }
+
+    public static RegistryEntry<Item> getEntry(Item item) {
+        return Registries.ITEM.getEntry(item);
+    }
+
+    public static void registerDispenserBehavior() {
+        DispenserBlock.registerBehavior(Items.FLASH_BANG, new ProjectileDispenserBehavior() {
+            @Override
+            protected ProjectileEntity createProjectile(World world, Position position, ItemStack stack) {
+                return Util.make(new FlashBangEntity(world, position.getX(), position.getY(), position.getZ(), FlashBangItem.getFuse(stack.getNbt())), (entity) ->
+                        entity.setItem(stack));
+            }
+        });
     }
 
     public static void registerItemGroup() {
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(content -> {
             // 战斗用品
-            content.add(PVP_PRO_SWORD.getItemStack());
-            content.add(new ItemStack(FLASH_BANG));
+            content.add(PVP_PRO_SWORD.getDefaultStack());
         });
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(content -> {
-            // 工具
-            content.add(MINERS_PICKAXE.getItemStack());
+            // 工具与实用物品
+            content.add(MINERS_PICKAXE.getDefaultStack());
+            content.add(FLASH_BANG.getDefaultStack());
         });
     }
 

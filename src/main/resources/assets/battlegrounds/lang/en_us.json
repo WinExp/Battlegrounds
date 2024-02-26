@@ -7,5 +7,7 @@
 
   "item.battlegrounds.pvp_pro_sword": "PVP Pro",
   "item.battlegrounds.miners_pickaxe": "Miner's Pickaxe",
-  "item.battlegrounds.flash_bang": "Flash-Bang"
+  "item.battlegrounds.flash_bang": "Flash Bang",
+  "item.battlegrounds.flash_bang.fuse": "Fuse: ",
+  "item.battlegrounds.flash_bang.velocity": "Throwing Velocity: "
 }

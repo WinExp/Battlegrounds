@@ -2,22 +2,30 @@ package com.github.winexp.battlegrounds.item.thrown;
 
 import com.github.winexp.battlegrounds.entity.projectile.FlashBangEntity;
 import com.github.winexp.battlegrounds.item.Items;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.RangedWeaponItem;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.UseAction;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 public class FlashBangItem extends RangedWeaponItem {
     public final static Predicate<ItemStack> PROJECTILES = (stack) -> stack.isOf(Items.FLASH_BANG);
-    public final static float SPEED = 1.0F;
+    public final static float DEFAULT_VELOCITY = 1.3F;
+    private final static int DEFAULT_FUSE = 30;
 
     public FlashBangItem(Settings settings) {
         super(settings);
@@ -40,9 +48,10 @@ public class FlashBangItem extends RangedWeaponItem {
             if (progress >= 0.15F) {
                 world.playSound(null, user.getX(), user.getY(), user.getZ(), SoundEvents.ENTITY_SNOWBALL_THROW, SoundCategory.NEUTRAL, 0.5F, 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F));
                 if (!world.isClient) {
-                    FlashBangEntity entity = new FlashBangEntity(player, world);
+                    NbtCompound nbt = stack.getNbt();
+                    FlashBangEntity entity = new FlashBangEntity(player, world, getFuse(nbt));
                     entity.setItem(stack);
-                    entity.setVelocity(player, player.getPitch(), player.getYaw(), 0.0F, progress * SPEED, 1.0F);
+                    entity.setVelocity(player, player.getPitch(), player.getYaw(), 0.0F, progress * getVelocity(nbt), 1.0F);
                     world.spawnEntity(entity);
                 }
                 if (!player.getAbilities().creativeMode) stack.decrement(1);
@@ -74,6 +83,41 @@ public class FlashBangItem extends RangedWeaponItem {
 
     @Override
     public int getRange() {
-        return 10;
+        return 15;
+    }
+
+    @Override
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        NbtCompound nbt = stack.getNbt();
+        float fuseSeconds =  (float) getFuse(nbt) / 20;
+        float velocity = getVelocity(nbt) * 20;
+        tooltip.add(Text.translatable("item.battlegrounds.flash_bang.fuse")
+                .append(Float.toString(fuseSeconds)).append("s").formatted(Formatting.GRAY));
+        tooltip.add(Text.translatable("item.battlegrounds.flash_bang.velocity")
+                .append(Float.toString(velocity)).append("m/s").formatted(Formatting.GRAY));
+    }
+
+    @Override
+    public ItemStack getDefaultStack() {
+        NbtCompound nbt = new NbtCompound();
+        nbt.putInt("fuse", DEFAULT_FUSE);
+        nbt.putFloat("velocity", DEFAULT_VELOCITY);
+        return new ItemStack(Items.getEntry(Items.FLASH_BANG), 1, Optional.of(nbt));
+    }
+
+    public static int getFuse(NbtCompound nbt) {
+        int fuse = DEFAULT_FUSE;
+        if (nbt != null && nbt.contains("fuse")) {
+            fuse = nbt.getInt("fuse");
+        }
+        return fuse;
+    }
+
+    public static float getVelocity(NbtCompound nbt) {
+        float speed = DEFAULT_VELOCITY;
+        if (nbt != null && nbt.contains("velocity")) {
+            speed = nbt.getFloat("velocity");
+        }
+        return speed;
     }
 }

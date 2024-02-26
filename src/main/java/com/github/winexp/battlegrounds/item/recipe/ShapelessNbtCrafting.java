@@ -31,7 +31,7 @@ public class ShapelessNbtCrafting implements NbtCrafting {
     }
 
     @Override
-    public ItemStack getItemStack() {
+    public ItemStack getDefaultStack() {
         return result;
     }
 

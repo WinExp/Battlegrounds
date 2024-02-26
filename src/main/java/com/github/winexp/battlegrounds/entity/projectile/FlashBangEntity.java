@@ -29,14 +29,20 @@ import java.util.List;
 public class FlashBangEntity extends ThrownItemEntity {
     public final static float MAX_FLASH_TICKS = 80;
     public final static int MAX_DISTANCE = 32;
-    private int fuse = 40;
+    private int fuse = 0;
 
     public FlashBangEntity(net.minecraft.entity.EntityType<? extends ThrownItemEntity> entityType, World world) {
         super(entityType, world);
     }
 
-    public FlashBangEntity(LivingEntity livingEntity, World world) {
+    public FlashBangEntity(World world, double d, double e, double f, int fuse) {
+        super(EntityTypes.FLASH_BANG, d, e, f, world);
+        this.fuse = fuse;
+    }
+
+    public FlashBangEntity(LivingEntity livingEntity, World world, int fuse) {
         super(EntityTypes.FLASH_BANG, livingEntity, world);
+        this.fuse = fuse;
     }
 
     private ParticleEffect getParticleParameters() {
@@ -69,12 +75,12 @@ public class FlashBangEntity extends ThrownItemEntity {
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
-        if (nbt.contains("Fuse")) this.fuse = nbt.getInt("LeftTime");
+        if (nbt.contains("fuse")) this.fuse = nbt.getInt("fuse");
     }
 
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
-        nbt.putInt("Fuse", this.fuse < 0 ? -1 : this.fuse);
+        nbt.putInt("fuse", this.fuse < 0 ? -1 : this.fuse);
     }
 
     @Override

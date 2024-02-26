@@ -7,5 +7,7 @@
 
   "item.battlegrounds.pvp_pro_sword": "🗡PVP 大佬",
   "item.battlegrounds.miners_pickaxe": "⛏采矿者之镐",
-  "item.battlegrounds.flash_bang": "闪光震撼弹"
+  "item.battlegrounds.flash_bang": "闪光震撼弹",
+  "item.battlegrounds.flash_bang.fuse": "引信时间：",
+  "item.battlegrounds.flash_bang.velocity": "投掷速度: "
 }

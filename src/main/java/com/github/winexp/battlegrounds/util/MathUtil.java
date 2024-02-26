@@ -1,13 +1,23 @@
 package com.github.winexp.battlegrounds.util;
 
+import com.github.winexp.battlegrounds.util.result.BlockRaycastResult;
+import net.minecraft.block.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.ProjectileUtil;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
+import net.minecraft.world.World;
+
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class MathUtil {
+    private final static double RAYCAST_ACCURATE = 5;
+
     public static Vec3d getRotationVector(float pitch, float yaw) {
         float f = pitch * 0.017453292F;
         float g = -yaw * 0.017453292F;
@@ -36,12 +46,52 @@ public class MathUtil {
         return MathHelper.sqrt(f * f + g * g + h * h);
     }
 
+    public static float getOffset(Vec3d start, Vec3d end) {
+        Vec3d offsetVec3d = start.subtract(end);
+        float x = MathHelper.abs((float) offsetVec3d.x) * 100;
+        float y = MathHelper.abs((float) offsetVec3d.y) * 100;
+        float z = MathHelper.abs((float) offsetVec3d.z) * 100;
+        return MathHelper.sqrt(x * x + y * y + z * z) / 100;
+    }
+
     public static EntityHitResult raycastEntity(Entity entity, double maxDistance, float tickDelta, Vec3d target) {
         double e = maxDistance * maxDistance;
         Vec3d vec3d = entity.getCameraPosVec(tickDelta);
         Vec3d vec3d2 = getRotationWithEntity(entity, target);
-        Vec3d vec3d3 = vec3d.add(vec3d2.x * maxDistance, vec3d2.y * maxDistance, vec3d2.z * maxDistance);
         Box box = entity.getBoundingBox().stretch(vec3d2.multiply(maxDistance)).expand(1.0, 1.0, 1.0);
-        return ProjectileUtil.raycast(entity, vec3d, vec3d3, box, (entity1) -> !entity1.isSpectator() && entity1.canHit(), e);
+        return ProjectileUtil.raycast(entity, vec3d, target, box, (entity1) -> !entity1.isSpectator() && entity1.canHit(), e);
+    }
+
+    public static BlockRaycastResult raycastBlock(Entity entity, Vec3d start, Vec3d end, RaycastContext.FluidHandling fluidHandling, Predicate<BlockHitResult> blockPredicate) {
+        World world = entity.getWorld();
+        Function<Block, Float> transparentStrengthFunction = (block) -> {
+            if (block instanceof LeavesBlock) {
+                return 0.95F;
+            } else if (block instanceof TintedGlassBlock) {
+                return 0.93F;
+            } else if (block instanceof TransparentBlock) {
+                return 0.98F;
+            } else return 1.0F;
+        };
+        BlockHitResult blockHitResult;
+        float strength = 1.0F;
+        do {
+            blockHitResult = world.raycast(new RaycastContext(start, end, RaycastContext.ShapeType.OUTLINE, fluidHandling, entity));
+            Block block = world.getBlockState(blockHitResult.getBlockPos()).getBlock();
+            if (blockPredicate == null) return new BlockRaycastResult(blockHitResult, start, end, strength);
+            else {
+                if (blockPredicate.test(blockHitResult)) {
+                    return new BlockRaycastResult(blockHitResult, start, end, strength);
+                } else {
+                    double distance = end.distanceTo(start);
+                    double x = (end.x - start.x) / distance / RAYCAST_ACCURATE;
+                    double y = (end.y - start.y) / distance / RAYCAST_ACCURATE;
+                    double z = (end.z - start.z) / distance / RAYCAST_ACCURATE;
+                    start = blockHitResult.getPos().add(x, y, z);
+                    strength *= transparentStrengthFunction.apply(block);
+                }
+            }
+        } while (end.distanceTo(start) > 1 / RAYCAST_ACCURATE / 2);
+        return new BlockRaycastResult(blockHitResult, start, end, strength);
     }
 }

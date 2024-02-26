@@ -52,7 +52,7 @@ public class PVPProSwordItem extends SwordItem implements NbtCrafting {
     }
 
     @Override
-    public ItemStack getItemStack() {
+    public ItemStack getDefaultStack() {
         ItemStack stack = new ItemStack(this, 1);
         ENCHANTMENTS.forEach((stack::addEnchantment));
         return stack;
@@ -73,7 +73,7 @@ public class PVPProSwordItem extends SwordItem implements NbtCrafting {
         return new ShapedRecipe(getIdentifier().toString(),
                 CraftingRecipeCategory.EQUIPMENT,
                 rawShaped,
-                Items.PVP_PRO_SWORD.getItemStack()
+                Items.PVP_PRO_SWORD.getDefaultStack()
         );
     }
 }
