@@ -19,7 +19,7 @@ import net.minecraft.util.Identifier;
 import java.util.Map;
 
 public class PVPProSwordItem extends SwordItem implements NbtCrafting {
-    public final static float DAMAGE_BONUS = 0.0F;
+    public final static float DAMAGE_BONUS = 3.0F;
     public final static Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
             Enchantments.FIRE_ASPECT, 1,
             Enchantments.KNOCKBACK, 1,
