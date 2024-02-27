@@ -4,6 +4,7 @@
   "package": "com.github.winexp.battlegrounds.mixins",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "EnchantmentMixin",
     "MinecraftServerMixin",
     "naturalRegen_PlayerEntityMixin",
     "PlayerManagerMixin",
@@ -13,6 +14,7 @@
   ],
   "client": [
     "client.flash_BackgroundRendererMixin",
+    "client.flash_InGameHudMixin",
     "client.MinecraftClientMixin"
   ],
   "server": [

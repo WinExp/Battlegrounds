@@ -10,6 +10,7 @@ public class TextUtil {
     public final static TextColor GOLD = TextColor.fromFormatting(Formatting.GOLD);
     public final static TextColor RED = TextColor.fromFormatting(Formatting.RED);
     public final static TextColor DARK_GRAY = TextColor.fromFormatting(Formatting.DARK_GRAY);
+    public final static TextColor GRAY = TextColor.fromFormatting(Formatting.GRAY);
 
     public static MutableText withColor(MutableText text, TextColor color) {
         return text.styled(style -> style.withColor(color));

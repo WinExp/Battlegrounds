@@ -54,7 +54,7 @@ public class PVPProSwordItem extends SwordItem implements NbtCrafting {
     @Override
     public ItemStack getDefaultStack() {
         ItemStack stack = new ItemStack(this, 1);
-        ENCHANTMENTS.forEach((stack::addEnchantment));
+        ENCHANTMENTS.forEach(stack::addEnchantment);
         return stack;
     }
 

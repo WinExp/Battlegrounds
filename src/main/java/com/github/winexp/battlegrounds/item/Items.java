@@ -26,7 +26,6 @@ import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.Util;
@@ -36,11 +35,18 @@ import net.minecraft.world.World;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public class Items extends net.minecraft.item.Items {
     public final static PVPProSwordItem PVP_PRO_SWORD = new PVPProSwordItem(ToolMaterials.PVP_PRO, 3, -2.4F, new Item.Settings().rarity(Rarity.RARE).fireproof());
     public final static MinersPickaxeItem MINERS_PICKAXE = new MinersPickaxeItem(ToolMaterials.MINERS_PICKAXE, 1, -2.8F, new Item.Settings().rarity(Rarity.RARE));
     public final static FlashBangItem FLASH_BANG = new FlashBangItem(new Item.Settings().maxCount(16).rarity(Rarity.UNCOMMON));
+
+    public final static Predicate<Item> ENCHANTMENT_PREDICATE = (item) -> {
+        if (item instanceof PVPProSwordItem) return false;
+        else if (item instanceof MinersPickaxeItem) return false;
+        else return true;
+    };
 
     public static void registerItems() {
         Registry.register(Registries.ITEM,
@@ -56,10 +62,6 @@ public class Items extends net.minecraft.item.Items {
                 FLASH_BANG
         );
         registerDispenserBehavior();
-    }
-
-    public static RegistryEntry<Item> getEntry(Item item) {
-        return Registries.ITEM.getEntry(item);
     }
 
     public static void registerDispenserBehavior() {

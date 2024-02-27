@@ -18,7 +18,7 @@
             }
           ],
           "weight": 1,
-          "name": "minecraft:gold_nugget"
+          "name": "minecraft:iron_nugget"
         },
         {
           "type": "minecraft:item",
@@ -34,8 +34,18 @@
             }
           ],
           "weight": 1,
-          "name": "minecraft:iron_nugget"
-        },
+          "name": "minecraft:gold_nugget"
+        }
+      ],
+      "rolls": {
+        "type": "minecraft:uniform",
+        "max": 3.0,
+        "min": 2.0
+      }
+    },
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
         {
           "type": "minecraft:item",
           "functions": [

@@ -12,11 +12,21 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 public class MathUtil {
-    private final static double RAYCAST_ACCURATE = 5;
+    private final static double RAYCAST_ACCURATE = 10;
+
+    private final static Function<Block, Float> TRANSPARENT_STRENGTH_FUNCTION = (block) -> {
+        if (block instanceof LeavesBlock) {
+            return 0.95F;
+        } else if (block instanceof TintedGlassBlock) {
+            return 0.9F;
+        } else if (block instanceof TransparentBlock) {
+            return 0.98F;
+        } else return 0.99F;
+    };
 
     public static Vec3d getRotationVector(float pitch, float yaw) {
         float f = pitch * 0.017453292F;
@@ -48,10 +58,10 @@ public class MathUtil {
 
     public static float getOffset(Vec3d start, Vec3d end) {
         Vec3d offsetVec3d = start.subtract(end);
-        float x = MathHelper.abs((float) offsetVec3d.x) * 100;
-        float y = MathHelper.abs((float) offsetVec3d.y) * 100;
-        float z = MathHelper.abs((float) offsetVec3d.z) * 100;
-        return MathHelper.sqrt(x * x + y * y + z * z) / 100;
+        float x = MathHelper.abs((float) offsetVec3d.x) * 360;
+        float y = MathHelper.abs((float) offsetVec3d.y) * 360;
+        float z = MathHelper.abs((float) offsetVec3d.z) * 360;
+        return MathHelper.sqrt(x * x + y * y + z * z) / 360;
     }
 
     public static EntityHitResult raycastEntity(Entity entity, double maxDistance, float tickDelta, Vec3d target) {
@@ -62,17 +72,8 @@ public class MathUtil {
         return ProjectileUtil.raycast(entity, vec3d, target, box, (entity1) -> !entity1.isSpectator() && entity1.canHit(), e);
     }
 
-    public static BlockRaycastResult raycastBlock(Entity entity, Vec3d start, Vec3d end, RaycastContext.FluidHandling fluidHandling, Predicate<BlockHitResult> blockPredicate) {
+    public static BlockRaycastResult raycastBlock(Entity entity, Vec3d start, Vec3d end, RaycastContext.FluidHandling fluidHandling, BiFunction<BlockHitResult, World, Boolean> blockPredicate) {
         World world = entity.getWorld();
-        Function<Block, Float> transparentStrengthFunction = (block) -> {
-            if (block instanceof LeavesBlock) {
-                return 0.95F;
-            } else if (block instanceof TintedGlassBlock) {
-                return 0.93F;
-            } else if (block instanceof TransparentBlock) {
-                return 0.98F;
-            } else return 1.0F;
-        };
         BlockHitResult blockHitResult;
         float strength = 1.0F;
         do {
@@ -80,7 +81,7 @@ public class MathUtil {
             Block block = world.getBlockState(blockHitResult.getBlockPos()).getBlock();
             if (blockPredicate == null) return new BlockRaycastResult(blockHitResult, start, end, strength);
             else {
-                if (blockPredicate.test(blockHitResult)) {
+                if (blockPredicate.apply(blockHitResult, world)) {
                     return new BlockRaycastResult(blockHitResult, start, end, strength);
                 } else {
                     double distance = end.distanceTo(start);
@@ -88,10 +89,10 @@ public class MathUtil {
                     double y = (end.y - start.y) / distance / RAYCAST_ACCURATE;
                     double z = (end.z - start.z) / distance / RAYCAST_ACCURATE;
                     start = blockHitResult.getPos().add(x, y, z);
-                    strength *= transparentStrengthFunction.apply(block);
+                    strength *= TRANSPARENT_STRENGTH_FUNCTION.apply(block);
                 }
             }
-        } while (end.distanceTo(start) > 1 / RAYCAST_ACCURATE / 2);
+        } while (end.distanceTo(start) > 1 / RAYCAST_ACCURATE);
         return new BlockRaycastResult(blockHitResult, start, end, strength);
     }
 }

@@ -4,22 +4,9 @@ import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 
 public class TextFactory {
     public final static Text LINEFEED = Text.of("\n");
-
-    public final static MutableText HELP_TEXT = Text.literal("[Battlegrounds]").formatted(Formatting.GOLD)
-            .append(LINEFEED)
-            .append(Text.translatable("battlegrounds.command.start.description"))
-            .append(LINEFEED)
-            .append(Text.translatable("battlegrounds.command.stop.description"))
-            .append(LINEFEED)
-            .append(Text.translatable("battlegrounds.command.accept.description"))
-            .append(LINEFEED)
-            .append(Text.translatable("battlegrounds.command.deny.description"))
-            .append(LINEFEED)
-            .append(Text.translatable("battlegrounds.command.help.description"));
 
     public final static MutableText ACCEPT_BUTTON = TextUtil.translatableWithColor(
             "battlegrounds.vote.button.accept", TextUtil.GREEN).styled(style -> style.withClickEvent(

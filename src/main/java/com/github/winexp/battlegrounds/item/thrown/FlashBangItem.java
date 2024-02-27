@@ -2,6 +2,7 @@ package com.github.winexp.battlegrounds.item.thrown;
 
 import com.github.winexp.battlegrounds.entity.projectile.FlashBangEntity;
 import com.github.winexp.battlegrounds.item.Items;
+import com.github.winexp.battlegrounds.util.TextUtil;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -11,7 +12,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.UseAction;
@@ -19,7 +19,6 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
 
 public class FlashBangItem extends RangedWeaponItem {
@@ -91,18 +90,8 @@ public class FlashBangItem extends RangedWeaponItem {
         NbtCompound nbt = stack.getNbt();
         float fuseSeconds =  (float) getFuse(nbt) / 20;
         float velocity = getVelocity(nbt) * 20;
-        tooltip.add(Text.translatable("item.battlegrounds.flash_bang.fuse")
-                .append(Float.toString(fuseSeconds)).append("s").formatted(Formatting.GRAY));
-        tooltip.add(Text.translatable("item.battlegrounds.flash_bang.velocity")
-                .append(Float.toString(velocity)).append("m/s").formatted(Formatting.GRAY));
-    }
-
-    @Override
-    public ItemStack getDefaultStack() {
-        NbtCompound nbt = new NbtCompound();
-        nbt.putInt("fuse", DEFAULT_FUSE);
-        nbt.putFloat("velocity", DEFAULT_VELOCITY);
-        return new ItemStack(Items.getEntry(Items.FLASH_BANG), 1, Optional.of(nbt));
+        tooltip.add(TextUtil.translatableWithColor("item.battlegrounds.flash_bang.fuse", TextUtil.GRAY, fuseSeconds));
+        tooltip.add(TextUtil.translatableWithColor("item.battlegrounds.flash_bang.velocity", TextUtil.GRAY, velocity));
     }
 
     public static int getFuse(NbtCompound nbt) {
