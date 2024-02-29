@@ -35,15 +35,17 @@ import java.util.function.BiFunction;
 public class FlashBangEntity extends ThrownItemEntity {
     public final static float MAX_FLASH_TICKS = 80;
     public final static int MAX_DISTANCE = 32;
-    public final static float FLASH_STRENGTH_LEFT_SPEED = 0.02F;
-    public final static float FLASH_VISIBILITY = 3.0F;
+    public final static float STRENGTH_LEFT_SPEED = 0.02F;
+    public final static float FOG_VISIBILITY = 3.0F;
+    public final static float DISTANCE_INCREMENT = 5;
+    private int fuse = 0;
+
     private final static BiFunction<BlockHitResult, World, Boolean> BLOCK_PREDICATE = (hitResult, world) -> {
         BlockPos blockPos = hitResult.getBlockPos();
         return hitResult.getType() == HitResult.Type.MISS
                 || (BlockUtil.isSolidBlock(world, blockPos)
                 && !BlockUtil.isTransparent(world, blockPos));
     };
-    private int fuse = 0;
 
     public FlashBangEntity(net.minecraft.entity.EntityType<? extends ThrownItemEntity> entityType, World world) {
         super(entityType, world);
@@ -78,7 +80,7 @@ public class FlashBangEntity extends ThrownItemEntity {
         if (entityHitResult == null && (raycastResult.hitResult().getType() == HitResult.Type.MISS
                 || !BlockUtil.isSolidBlock(world, blockPos)
                 || BlockUtil.isTransparent(world, blockPos))) {
-            return (distance - rotationAttenuate) * (FlashBangEntity.MAX_FLASH_TICKS + 20) * FlashBangEntity.FLASH_STRENGTH_LEFT_SPEED * raycastResult.strength();
+            return (distance - rotationAttenuate) * (FlashBangEntity.MAX_FLASH_TICKS + 20) * FlashBangEntity.STRENGTH_LEFT_SPEED * raycastResult.strength();
         } else return 0;
     }
 
@@ -87,10 +89,10 @@ public class FlashBangEntity extends ThrownItemEntity {
         for (PlayerEntity player1 : players) {
             ServerPlayerEntity player = (ServerPlayerEntity) player1;
             float distance = MathUtil.distanceTo(pos, player.getEyePos());
-            if (distance <= MAX_DISTANCE) {
+            if (distance <= MAX_DISTANCE + DISTANCE_INCREMENT) {
                 PacketByteBuf buf = PacketByteBufs.create();
-                float strength = (MAX_DISTANCE - distance) / MAX_DISTANCE;
-                buf.writeFloat(strength);
+                float distanceStrength = (MAX_DISTANCE - distance + DISTANCE_INCREMENT) / MAX_DISTANCE;
+                buf.writeFloat(distanceStrength);
                 buf.writeVec3d(pos);
                 ServerPlayNetworking.send(player, Constants.FLASH_BANG_PACKET_ID, buf);
             }
@@ -114,10 +116,11 @@ public class FlashBangEntity extends ThrownItemEntity {
         if (status == 3) {
             ParticleEffect particleEffect = this.getParticleParameters();
 
-            for(int i = 0; i < 8; ++i) {
+            for (int i = 0; i < 8; ++i) {
                 this.getWorld().addParticle(particleEffect, this.getX(), this.getY(), this.getZ(), 0.0, 0.0, 0.0);
             }
         }
+        else super.handleStatus(status);
     }
 
     @Override

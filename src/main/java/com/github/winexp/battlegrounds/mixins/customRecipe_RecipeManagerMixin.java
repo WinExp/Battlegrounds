@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 @Mixin(RecipeManager.class)
-public abstract class RecipeManagerMixin {
+public abstract class customRecipe_RecipeManagerMixin {
     @Inject(method = "apply(Ljava/util/Map;Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/util/profiler/Profiler;)V", at = @At("TAIL"))
     private void onApply(Map<Identifier, JsonElement> map, ResourceManager resourceManager, Profiler profiler, CallbackInfo ci) {
         RecipeManager instance = (RecipeManager) (Object) this;

@@ -9,20 +9,24 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.FogShape;
 import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BackgroundRenderer.class)
 public abstract class flash_BackgroundRendererMixin {
+    @Unique
+    private final static boolean FOG_ENABLED = true;
+
     @Inject(method = "applyFog", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderFogStart(F)V"), cancellable = true)
     private static void onApplyFog(Camera camera, BackgroundRenderer.FogType fogType, float viewDistance, boolean thickFog, float tickDelta, CallbackInfo ci, @Local BackgroundRenderer.FogData fogData) {
-        if (ClientVariables.INSTANCE.flashMode != ClientVariables.FlashMode.FOG) return;
+        if (!FOG_ENABLED) return;
         float flashStrength = ClientVariables.INSTANCE.flashStrength;
-        float flashLeftSpeed = FlashBangEntity.FLASH_STRENGTH_LEFT_SPEED;
+        float flashLeftSpeed = FlashBangEntity.STRENGTH_LEFT_SPEED;
         if (flashStrength > 0) {
             fogData.fogShape = FogShape.SPHERE;
-            float f = MathHelper.lerp(Math.min(1.0F, (flashStrength / flashLeftSpeed / 20) - (flashLeftSpeed * 20)), viewDistance, FlashBangEntity.FLASH_VISIBILITY);
+            float f = MathHelper.lerp(Math.min(1.0F, (flashStrength / flashLeftSpeed / 20) - (flashLeftSpeed * 20)), viewDistance, FlashBangEntity.FOG_VISIBILITY);
             if (fogData.fogType == BackgroundRenderer.FogType.FOG_SKY) {
                 fogData.fogStart = Math.min(fogData.fogStart, 0.0F);
                 fogData.fogEnd = Math.min(fogData.fogEnd, f * 0.8F);

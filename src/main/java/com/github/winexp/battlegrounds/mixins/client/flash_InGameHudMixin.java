@@ -22,7 +22,6 @@ public class flash_InGameHudMixin {
 
     @Unique
     private void renderFlash(DrawContext context, float strength) {
-        if (ClientVariables.INSTANCE.flashMode != ClientVariables.FlashMode.FILL) return;
         if (strength > 1.0F) strength = 1.0F;
         int width = context.getScaledWindowWidth();
         int height = context.getScaledWindowHeight();

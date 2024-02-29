@@ -1,6 +1,7 @@
 package com.github.winexp.battlegrounds.item.tool;
 
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
+import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.item.recipe.NbtCrafting;
 import net.minecraft.enchantment.Enchantment;
@@ -18,7 +19,7 @@ import net.minecraft.util.Identifier;
 
 import java.util.Map;
 
-public class PVPProSwordItem extends SwordItem implements NbtCrafting {
+public class PVPProSwordItem extends SwordItem implements NbtCrafting, EnchantRestrict {
     public final static float DAMAGE_BONUS = 3.0F;
     public final static Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
             Enchantments.FIRE_ASPECT, 1,

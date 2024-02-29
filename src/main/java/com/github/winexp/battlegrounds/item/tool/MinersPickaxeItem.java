@@ -1,6 +1,7 @@
 package com.github.winexp.battlegrounds.item.tool;
 
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
+import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.item.recipe.NbtCrafting;
 import net.minecraft.enchantment.Enchantment;
@@ -15,7 +16,7 @@ import net.minecraft.util.Identifier;
 
 import java.util.Map;
 
-public class MinersPickaxeItem extends PickaxeItem implements NbtCrafting {
+public class MinersPickaxeItem extends PickaxeItem implements NbtCrafting, EnchantRestrict {
     public final static Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
             Enchantments.FORTUNE, 3,
             Enchantments.EFFICIENCY, 4,

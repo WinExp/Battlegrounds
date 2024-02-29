@@ -4,13 +4,14 @@
   "package": "com.github.winexp.battlegrounds.mixins",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "EnchantmentMixin",
+    "channeling_BowItemMixin",
+    "customRecipe_RecipeManagerMixin",
+    "deny_EnchantmentMixin",
+    "deny_GrindstoneScreenHandlerMixin",
     "MinecraftServerMixin",
     "naturalRegen_PlayerEntityMixin",
     "PlayerManagerMixin",
-    "RecipeManagerMixin",
-    "ServerPlayerEntityMixin",
-    "item.BowItemMixin"
+    "ServerPlayerEntityMixin"
   ],
   "client": [
     "client.flash_BackgroundRendererMixin",

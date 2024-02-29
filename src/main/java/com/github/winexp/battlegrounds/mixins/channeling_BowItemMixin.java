@@ -1,4 +1,4 @@
-package com.github.winexp.battlegrounds.mixins.item;
+package com.github.winexp.battlegrounds.mixins;
 
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.entity.projectile.ChannelingArrowEntity;
@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BowItem.class)
-public abstract class BowItemMixin {
+public abstract class channeling_BowItemMixin {
     @Unique
     private ItemStack tmpStack;
 

@@ -15,6 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
@@ -104,13 +105,13 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
         this.dataTracker.startTracking(COLOR, -1);
     }
 
-    public void spawnEndRodParticles(int amount, double speedOffset) {
+    private void spawnParticlesWithOffset(ParticleEffect particle, int amount, double speedOffset) {
         Random random = this.getWorld().getRandom();
-        double x = random.nextDouble() * (speedOffset * 2) - speedOffset;
-        double y = random.nextDouble() * (speedOffset * 2) - speedOffset;
-        double z = random.nextDouble() * (speedOffset * 2) - speedOffset;
         for (int i = 0; i < amount; i++) {
-            this.getWorld().addParticle(ParticleTypes.END_ROD, this.getParticleX(0.5), this.getRandomBodyY(), this.getParticleZ(0.5), x, y, z);
+            double x = random.nextDouble() * (speedOffset * 2) - speedOffset;
+            double y = random.nextDouble() * (speedOffset * 2) - speedOffset;
+            double z = random.nextDouble() * (speedOffset * 2) - speedOffset;
+            this.getWorld().addParticle(particle, this.getParticleX(0.5), this.getRandomBodyY(), this.getParticleZ(0.5), x, y, z);
         }
     }
 
@@ -144,11 +145,11 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
             if (this.inGround) {
                 if (this.inGroundTime % 5 == 0) {
                     this.spawnParticles(1);
-                    this.spawnEndRodParticles(1, 0.1);
+                    this.spawnParticlesWithOffset(ParticleTypes.END_ROD, 1, 0.1);
                 }
             } else {
                 this.spawnParticles(2);
-                this.spawnEndRodParticles(2, 0.15);
+                this.spawnParticlesWithOffset(ParticleTypes.END_ROD, 1, 0.15);
             }
         } else if (this.inGround && this.inGroundTime != 0 && !this.effects.isEmpty() && this.inGroundTime >= 600) {
             this.getWorld().sendEntityStatus(this, (byte) 0);
@@ -187,6 +188,7 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
                     lightning.setChanneler(player);
                 }
                 target.getWorld().spawnEntity(lightning);
+                this.getWorld().sendEntityStatus(this, (byte) 3);
                 this.playSound(SoundEvents.ITEM_TRIDENT_THUNDER, 5, 1);
             }
         }
@@ -259,6 +261,10 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
                     this.getWorld().addParticle(ParticleTypes.ENTITY_EFFECT, this.getParticleX(0.5), this.getRandomBodyY(), this.getParticleZ(0.5), d, e, f);
                 }
             }
+        }
+        else if (status == 3) {
+            this.spawnParticlesWithOffset(ParticleTypes.FLASH, 20, 0);
+            this.spawnParticlesWithOffset(ParticleTypes.END_ROD, 30, 0.3);
         } else {
             super.handleStatus(status);
         }

@@ -13,7 +13,7 @@ public abstract class MinecraftClientMixin {
     @Inject(method = "tick", at = @At("TAIL"))
     private void onTick(CallbackInfo ci) {
         if (ClientVariables.INSTANCE.flashStrength > 0) {
-            ClientVariables.INSTANCE.flashStrength -= FlashBangEntity.FLASH_STRENGTH_LEFT_SPEED;
+            ClientVariables.INSTANCE.flashStrength -= FlashBangEntity.STRENGTH_LEFT_SPEED;
         }
         else if (ClientVariables.INSTANCE.flashStrength < 0){
             ClientVariables.INSTANCE.flashStrength = 0;
