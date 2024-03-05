@@ -1,11 +1,12 @@
 package com.github.winexp.battlegrounds.events.vote;
 
-import com.github.winexp.battlegrounds.helper.VoteHelper;
+import com.github.winexp.battlegrounds.discussion.vote.VoteHelper;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 
+@FunctionalInterface
 public interface PlayerVotedCallback {
     Event<PlayerVotedCallback> EVENT = EventFactory.createArrayBacked(PlayerVotedCallback.class,
             (listeners) -> (voter, player, result) -> {

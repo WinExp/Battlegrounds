@@ -1,8 +1,7 @@
 package com.github.winexp.battlegrounds.helper.task;
 
-import com.github.winexp.battlegrounds.events.server.ServerTickCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ActionResult;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -12,11 +11,11 @@ public class TaskScheduler {
 
     private final CopyOnWriteArrayList<Task> tasks = new CopyOnWriteArrayList<>();
 
-    private TaskScheduler() {
-        ServerTickCallback.EVENT.register(this::tick);
+    public TaskScheduler() {
+        ServerTickEvents.END_SERVER_TICK.register(this::onTick);
     }
 
-    private ActionResult tick(MinecraftServer server) {
+    private void onTick(MinecraftServer server) {
         for (Task task : tasks) {
             if (task.isCancelled()) tasks.remove(task);
             try {
@@ -25,8 +24,6 @@ public class TaskScheduler {
                 tasks.remove(task);
             }
         }
-
-        return ActionResult.PASS;
     }
 
     public void runTask(Task task) {

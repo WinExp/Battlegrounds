@@ -9,6 +9,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 import java.util.HashMap;
 import java.util.Objects;
@@ -31,6 +32,14 @@ public class RandomTpCommand {
         dispatcher.register(cRoot_redir);
     }
 
+    public static void setCooldown(ServerPlayerEntity player, long cooldown) {
+        UUID uuid = PlayerUtil.getUUID(player);
+        Long currentCooldown;
+        if ((currentCooldown = cooldownTimers.putIfAbsent(uuid, cooldown)) != null) {
+            cooldownTimers.put(uuid, Math.max(currentCooldown, cooldown));
+        }
+    }
+
     private static int randomtp(CommandContext<ServerCommandSource> context) {
         if (coolDownUpdateTask == TaskTimer.NONE_TASK) {
             coolDownUpdateTask = new TaskTimer(() -> cooldownTimers.forEach((uuid, ticks) -> {
@@ -42,7 +51,7 @@ public class RandomTpCommand {
 
         ServerCommandSource source = context.getSource();
         assert source.getPlayer() != null;
-        UUID uuid = source.getPlayer().getGameProfile().getId();
+        UUID uuid = PlayerUtil.getUUID(source.getPlayer());
         if (!cooldownTimers.containsKey(uuid)) cooldownTimers.put(uuid, 0L);
         Long cooldown = cooldownTimers.get(uuid);
         if (cooldown > 0) {

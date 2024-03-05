@@ -4,7 +4,10 @@ import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.item.recipe.NbtCrafting;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
@@ -14,13 +17,14 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RawShapedRecipe;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 import java.util.Map;
 
 public class PVPProSwordItem extends SwordItem implements NbtCrafting, EnchantRestrict {
-    public final static float DAMAGE_BONUS = 3.0F;
+    public final static float DAMAGE_BONUS = 1.0F;
     public final static Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
             Enchantments.FIRE_ASPECT, 1,
             Enchantments.KNOCKBACK, 1,
@@ -30,11 +34,20 @@ public class PVPProSwordItem extends SwordItem implements NbtCrafting, EnchantRe
 
     public PVPProSwordItem(ToolMaterial toolMaterial, int attackDamage, float attackSpeed, Settings settings) {
         super(toolMaterial, attackDamage, attackSpeed, settings);
+        ServerTickEvents.END_SERVER_TICK.register(this::onTick);
     }
 
-    public void addEffects(ServerPlayerEntity player) {
-        player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 2, 0));
-        player.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 2, 0));
+    private void onTick(MinecraftServer server) {
+        for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+            if (player.getEquippedStack(EquipmentSlot.MAINHAND).getItem() == Items.PVP_PRO_SWORD) {
+                this.addEffects(player);
+            }
+        }
+    }
+
+    private void addEffects(LivingEntity livingEntity) {
+        livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 2, 0));
+        livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 2, 0));
     }
 
     @Override

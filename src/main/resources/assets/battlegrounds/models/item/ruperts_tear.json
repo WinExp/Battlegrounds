@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "battlegrounds:item/flash_bang"
+    "layer0": "battlegrounds:item/ruperts_tear"
   }
 }

@@ -22,7 +22,7 @@ public abstract class flash_BackgroundRendererMixin {
     @Inject(method = "applyFog", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderFogStart(F)V"), cancellable = true)
     private static void onApplyFog(Camera camera, BackgroundRenderer.FogType fogType, float viewDistance, boolean thickFog, float tickDelta, CallbackInfo ci, @Local BackgroundRenderer.FogData fogData) {
         if (!FOG_ENABLED) return;
-        float flashStrength = ClientVariables.INSTANCE.flashStrength;
+        float flashStrength = ClientVariables.flashStrength;
         float flashLeftSpeed = FlashBangEntity.STRENGTH_LEFT_SPEED;
         if (flashStrength > 0) {
             fogData.fogShape = FogShape.SPHERE;

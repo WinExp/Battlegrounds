@@ -5,7 +5,7 @@ import com.github.winexp.battlegrounds.entity.projectile.FlashBangEntity;
 import com.github.winexp.battlegrounds.events.vote.VoteCompletedCallback;
 import com.github.winexp.battlegrounds.helper.GameHelper;
 import com.github.winexp.battlegrounds.helper.TeamHelper;
-import com.github.winexp.battlegrounds.helper.VoteHelper;
+import com.github.winexp.battlegrounds.discussion.vote.VoteHelper;
 import com.github.winexp.battlegrounds.helper.task.TaskScheduler;
 import com.github.winexp.battlegrounds.util.*;
 import com.mojang.brigadier.CommandDispatcher;

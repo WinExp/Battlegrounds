@@ -9,10 +9,10 @@ import net.minecraft.world.World;
 
 public class RandomUtil {
     public static boolean isSecure(World world, BlockPos pos) {
+        if (!world.getWorldBorder().contains(pos)) return false;
         for (int i = pos.getY() + 1; i <= 320; i++) {
             BlockPos pos1 = pos.withY(i);
-            BlockState state = world.getBlockState(pos1);
-            if (!state.getBlock().canMobSpawnInside(state)) return false;
+            if (!WorldUtil.canMobSpawnInside(world, pos1)) return false;
         }
         return true;
     }

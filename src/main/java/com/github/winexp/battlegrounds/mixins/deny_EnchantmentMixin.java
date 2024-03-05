@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(Enchantment.class)
-public class deny_EnchantmentMixin {
+public abstract class deny_EnchantmentMixin {
     @Redirect(method = "isAcceptableItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/enchantment/EnchantmentTarget;isAcceptableItem(Lnet/minecraft/item/Item;)Z"))
     private boolean isAcceptable(EnchantmentTarget instance, Item item) {
         boolean bl = true;

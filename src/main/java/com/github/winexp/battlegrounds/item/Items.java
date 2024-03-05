@@ -8,6 +8,7 @@ import com.github.winexp.battlegrounds.item.recipe.ShapelessNbtCrafting;
 import com.github.winexp.battlegrounds.item.thrown.FlashBangItem;
 import com.github.winexp.battlegrounds.item.tool.MinersPickaxeItem;
 import com.github.winexp.battlegrounds.item.tool.PVPProSwordItem;
+import com.github.winexp.battlegrounds.item.tool.RupertsTearItem;
 import com.github.winexp.battlegrounds.item.tool.ToolMaterials;
 import com.github.winexp.battlegrounds.util.RecipeUtil;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
@@ -40,6 +41,7 @@ public class Items extends net.minecraft.item.Items {
     public final static PVPProSwordItem PVP_PRO_SWORD = new PVPProSwordItem(ToolMaterials.PVP_PRO, 3, -2.4F, new Item.Settings().rarity(Rarity.RARE).fireproof());
     public final static MinersPickaxeItem MINERS_PICKAXE = new MinersPickaxeItem(ToolMaterials.MINERS_PICKAXE, 1, -2.8F, new Item.Settings().rarity(Rarity.RARE));
     public final static FlashBangItem FLASH_BANG = new FlashBangItem(new Item.Settings().maxCount(16).rarity(Rarity.UNCOMMON));
+    public final static RupertsTearItem RUPERTS_TEAR = new RupertsTearItem(ToolMaterials.RUPERTS_TEAR, new Item.Settings().maxCount(16).rarity(Rarity.UNCOMMON));
 
     public static void registerItems() {
         Registry.register(Registries.ITEM,
@@ -53,6 +55,10 @@ public class Items extends net.minecraft.item.Items {
         Registry.register(Registries.ITEM,
                 new Identifier("battlegrounds", "flash_bang"),
                 FLASH_BANG
+        );
+        Registry.register(Registries.ITEM,
+                new Identifier("battlegrounds", "ruperts_tear"),
+                RUPERTS_TEAR
         );
         registerDispenserBehavior();
     }
@@ -76,6 +82,7 @@ public class Items extends net.minecraft.item.Items {
             // 工具与实用物品
             content.add(MINERS_PICKAXE.getDefaultStack());
             content.add(FLASH_BANG.getDefaultStack());
+            content.add(RUPERTS_TEAR.getDefaultStack());
         });
     }
 

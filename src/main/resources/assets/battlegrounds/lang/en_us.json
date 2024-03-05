@@ -9,5 +9,14 @@
   "item.battlegrounds.miners_pickaxe": "Miner's Pickaxe",
   "item.battlegrounds.flash_bang": "Flash Bang",
   "item.battlegrounds.flash_bang.fuse": "Fuse: %fs",
-  "item.battlegrounds.flash_bang.velocity": "Throwing Velocity: %fm/s"
+  "item.battlegrounds.flash_bang.velocity": "Throwing Velocity: %fm/s",
+  "item.battlegrounds.ruperts_tear": "Rupert's Tear",
+  "item.battlegrounds.ruperts_tear.cooldown": "Cooldown Time：%fs",
+  "item.battlegrounds.ruperts_tear.max_distance": "Max Distance: %d 格",
+
+  "gui.battlegrounds.vote.accept": "Accept",
+  "gui.battlegrounds.vote.deny": "Deny",
+
+  "key.battlegrounds.vote_screen": "Voting Screen",
+  "key.categories.battlegrounds": "Battlegrounds"
 }

@@ -1,18 +1,17 @@
 package com.github.winexp.battlegrounds.util;
 
-import com.github.winexp.battlegrounds.util.result.BlockRaycastResult;
+import com.github.winexp.battlegrounds.util.raycast.BlockRaycastResult;
 import net.minecraft.block.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 public class MathUtil {
@@ -64,35 +63,36 @@ public class MathUtil {
         return MathHelper.sqrt(x * x + y * y + z * z) / 360;
     }
 
-    public static EntityHitResult raycastEntity(Entity entity, double maxDistance, float tickDelta, Vec3d target) {
+    public static EntityHitResult raycastEntity(Entity entity, Vec3d end, double maxDistance, float tickDelta) {
         double e = maxDistance * maxDistance;
         Vec3d vec3d = entity.getCameraPosVec(tickDelta);
-        Vec3d vec3d2 = getRotationWithEntity(entity, target);
+        Vec3d vec3d2 = getRotationWithEntity(entity, end);
         Box box = entity.getBoundingBox().stretch(vec3d2.multiply(maxDistance)).expand(1.0, 1.0, 1.0);
-        return ProjectileUtil.raycast(entity, vec3d, target, box, (entity1) -> !entity1.isSpectator() && entity1.canHit(), e);
+        return ProjectileUtil.raycast(entity, vec3d, end, box, (entity1) -> !entity1.isSpectator() && entity1.canHit(), e);
     }
 
-    public static BlockRaycastResult raycastBlock(Entity entity, Vec3d start, Vec3d end, RaycastContext.FluidHandling fluidHandling, BiFunction<BlockHitResult, World, Boolean> blockPredicate) {
+    @NotNull
+    public static BlockRaycastResult raycastBlock(Entity entity, Vec3d begin, Vec3d end, RaycastContext.FluidHandling fluidHandling, BiPredicate<BlockRaycastResult, World> blockPredicate) {
         World world = entity.getWorld();
         BlockHitResult blockHitResult;
         float strength = 1.0F;
         do {
-            blockHitResult = world.raycast(new RaycastContext(start, end, RaycastContext.ShapeType.OUTLINE, fluidHandling, entity));
+            blockHitResult = world.raycast(new RaycastContext(begin, end, RaycastContext.ShapeType.OUTLINE, fluidHandling, entity));
             Block block = world.getBlockState(blockHitResult.getBlockPos()).getBlock();
-            if (blockPredicate == null) return new BlockRaycastResult(blockHitResult, start, end, strength);
+            if (blockPredicate == null) return new BlockRaycastResult(entity, blockHitResult, begin, end, strength);
             else {
-                if (blockPredicate.apply(blockHitResult, world)) {
-                    return new BlockRaycastResult(blockHitResult, start, end, strength);
+                if (blockPredicate.test(new BlockRaycastResult(entity, blockHitResult, begin, end, strength), world)) {
+                    return new BlockRaycastResult(entity, blockHitResult, begin, end, strength);
                 } else {
-                    double distance = end.distanceTo(start);
-                    double x = (end.x - start.x) / distance / RAYCAST_ACCURATE;
-                    double y = (end.y - start.y) / distance / RAYCAST_ACCURATE;
-                    double z = (end.z - start.z) / distance / RAYCAST_ACCURATE;
-                    start = blockHitResult.getPos().add(x, y, z);
+                    double distance = end.distanceTo(begin);
+                    double x = (end.x - begin.x) / distance / RAYCAST_ACCURATE;
+                    double y = (end.y - begin.y) / distance / RAYCAST_ACCURATE;
+                    double z = (end.z - begin.z) / distance / RAYCAST_ACCURATE;
+                    begin = blockHitResult.getPos().add(x, y, z);
                     strength *= TRANSPARENT_STRENGTH_FUNCTION.apply(block);
                 }
             }
-        } while (end.distanceTo(start) > 1 / RAYCAST_ACCURATE);
-        return new BlockRaycastResult(blockHitResult, start, end, strength);
+        } while (end.distanceTo(begin) > 1 / RAYCAST_ACCURATE);
+        return new BlockRaycastResult(entity, blockHitResult, begin, end, strength);
     }
 }

@@ -9,8 +9,9 @@ public class RootConfig {
     public BorderConfig border = new BorderConfig();
 
     public static class CooldownConfig {
-        public long discussionCooldownTicks = 30 * 20;
+        public long startGameVoteCooldownTicks = 30 * 20;
         public long randomTpCooldownTicks = 2 * 60 * 20;
+        public long randomTpDamagedCooldownTicks = 20 * 20;
     }
 
     public static class TimeoutConfig {

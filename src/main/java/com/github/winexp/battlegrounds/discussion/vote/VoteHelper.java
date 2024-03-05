@@ -1,4 +1,4 @@
-package com.github.winexp.battlegrounds.helper;
+package com.github.winexp.battlegrounds.discussion.vote;
 
 import com.github.winexp.battlegrounds.events.vote.PlayerVotedCallback;
 import com.github.winexp.battlegrounds.events.vote.VoteCompletedCallback;
@@ -13,7 +13,8 @@ import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class VoteHelper {
+//@Deprecated(forRemoval = true)
+public class VoteHelper implements AutoCloseable {
     private final HashMap<GameProfile, Boolean> voteMap = new HashMap<>();
     private boolean voting = false;
     private TaskLater timeoutTask = TaskLater.NONE_TASK;
@@ -34,7 +35,7 @@ public class VoteHelper {
         ensureIsVoting();
         AtomicBoolean result = new AtomicBoolean(true);
         voteMap.forEach((key, value) -> {
-            if (!value) {
+            if (!value && result.get()) {
                 result.set(false);
             }
         });
@@ -104,7 +105,14 @@ public class VoteHelper {
         voting = false;
         timeoutTask.cancel();
         cooldownTask.cancel();
-        cooldownTask = new TaskLater(Task.NONE_RUNNABLE, Variables.config.cooldown.discussionCooldownTicks);
+        cooldownTask = new TaskLater(Task.NONE_RUNNABLE, Variables.config.cooldown.startGameVoteCooldownTicks);
         TaskScheduler.INSTANCE.runTask(cooldownTask);
+    }
+
+    @Override
+    public void close() {
+        voting = false;
+        timeoutTask.cancel();
+        cooldownTask.cancel();
     }
 }

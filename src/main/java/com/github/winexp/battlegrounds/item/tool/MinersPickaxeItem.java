@@ -19,9 +19,12 @@ import java.util.Map;
 public class MinersPickaxeItem extends PickaxeItem implements NbtCrafting, EnchantRestrict {
     public final static Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
             Enchantments.FORTUNE, 3,
-            Enchantments.EFFICIENCY, 4,
+            Enchantments.EFFICIENCY, 5,
             Enchantments.SMELTING, 1,
-            Enchantments.MENDING, 1
+            Enchantments.MENDING, 1,
+            Enchantments.UNBREAKING, 3,
+            Enchantments.FIRE_ASPECT, 2,
+            Enchantments.KNOCKBACK, 2
     );
 
     public MinersPickaxeItem(ToolMaterial material, int attackDamage, float attackSpeed, Settings settings) {

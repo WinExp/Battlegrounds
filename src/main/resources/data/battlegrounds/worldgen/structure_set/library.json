@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 52198353,
+    "separation": 6,
+    "spacing": 25
+  },
+  "structures": [
+    {
+      "structure": "battlegrounds:library",
+      "weight": 1
+    }
+  ]
+}

@@ -9,7 +9,8 @@ import java.util.function.Supplier;
 @SuppressWarnings("SameParameterValue")
 public enum ToolMaterials implements ToolMaterial {
     PVP_PRO(2573, 9.0F, 4.0F + PVPProSwordItem.DAMAGE_BONUS, 4, 0, Ingredient::empty),
-    MINERS_PICKAXE(998, 8.0F, 3.0F, 3, 0, Ingredient::empty);
+    MINERS_PICKAXE(998, 8.0F, 3.0F, 3, 0, Ingredient::empty),
+    RUPERTS_TEAR(20, 0, 0, 0, 0, Ingredient::empty);
 
     private final int durability;
     private final float miningSpeed;

@@ -6,15 +6,15 @@ import com.github.winexp.battlegrounds.helper.task.TaskCountdown;
 import com.github.winexp.battlegrounds.helper.task.TaskScheduler;
 import com.github.winexp.battlegrounds.helper.task.TaskTimer;
 import com.github.winexp.battlegrounds.util.*;
-import com.mojang.authlib.GameProfile;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.boss.BossBarManager;
 import net.minecraft.entity.boss.CommandBossBar;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.projectile.FireworkRocketEntity;
@@ -24,7 +24,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.math.BlockPos;
@@ -36,6 +35,7 @@ import net.minecraft.world.World;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -57,6 +57,7 @@ public class GameHelper {
     private MinecraftServer server;
 
     private GameHelper() {
+        ServerTickEvents.END_SERVER_TICK.register(this::onTick);
     }
 
     public MinecraftServer getServer() {
@@ -84,10 +85,20 @@ public class GameHelper {
         }
     }
 
-    public void onPlayerRespawn(ServerPlayerEntity player) {
-        if (Variables.progress.gameStage.isStarted()) {
-            PlayerUtil.setGameModeWithMap(player);
+    private void onTick(MinecraftServer server) {
+        for (UUID uuid : Variables.progress.players.keySet()) {
+            GameProgress.PlayerPermission permission = Variables.progress.players.get(uuid);
+            ServerPlayerEntity player = server.getPlayerManager().getPlayer(uuid);
+            if (player == null || !permission.inGame || !permission.hasEffects) continue;
+            this.addEffects(player);
         }
+    }
+
+    private void addEffects(LivingEntity livingEntity) {
+        livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 2, 0));
+        livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 2, 1));
+        livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 2, 1));
+        livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 2, 1));
     }
 
     public void onPlayerDeath(ServerPlayerEntity player) {
@@ -124,21 +135,6 @@ public class GameHelper {
         }
     }
 
-    public ActionResult onPlayerDamaged(DamageSource source, ServerPlayerEntity player) {
-        if (Variables.progress.pvpMode == GameProgress.PVPMode.PEACEFUL) {
-            return ActionResult.FAIL;
-        } else if (Variables.progress.pvpMode == GameProgress.PVPMode.NO_PVP) {
-            if (source.getSource() != null && source.getSource().isPlayer()) {
-                return ActionResult.FAIL;
-            }
-        }
-        if (source.getSource() != null && source.getSource().isPlayer()) {
-            ServerPlayerEntity attacker = (ServerPlayerEntity) source.getSource();
-            attacker.isTeammate(player);
-        }
-        return ActionResult.PASS;
-    }
-
     public void prepareStartGame() {
         this.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
                 "battlegrounds.game.already.broadcast",
@@ -158,7 +154,7 @@ public class GameHelper {
         TaskScheduler.INSTANCE.runTask(startTask);
     }
 
-    public void prepareResetWorlds(VoteHelper voter) {
+    public void prepareResetWorlds(Collection<UUID> participants) {
         this.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
                 "battlegrounds.game.start.broadcast", TextUtil.GREEN, Variables.config.delay.serverCloseDelaySeconds), false);
         stopTask = new TaskCountdown(
@@ -179,12 +175,12 @@ public class GameHelper {
                 this.server.getSavePath(WorldSavePath.ROOT).toString()
         );
         HashMap<UUID, GameProgress.PlayerPermission> playerList = new HashMap<>();
-        for (GameProfile profile : voter.getPlayerProfiles()) {
+        for (UUID uuid : participants) {
             GameProgress.PlayerPermission permission = new GameProgress.PlayerPermission();
             permission.gameMode = GameMode.ADVENTURE;
             permission.inGame = true;
             playerList.put(
-                    profile.getId(),
+                    uuid,
                     permission
             );
         }
@@ -267,14 +263,17 @@ public class GameHelper {
 
         for (UUID uuid : Variables.progress.players.keySet()) {
             ServerPlayerEntity player = this.server.getPlayerManager().getPlayer(uuid);
-            if (player != null) {
+            if (player != null && Variables.progress.isInGame(uuid)) {
                 EntityAttributeInstance attribute = player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
                 assert attribute != null;
                 EffectUtil.addAttribute(attribute, healthModifierId, Variables.config.attributes.genericAdditionHealth, EntityAttributeModifier.Operation.ADDITION);
                 player.setHealth(player.getMaxHealth());
                 player.addStatusEffect(new StatusEffectInstance(StatusEffects.SATURATION, 15 * 20, 3));
                 player.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 15 * 20, 3));
-                Variables.progress.players.get(uuid).hasEffects = true;
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.ABSORPTION, -1, 4));
+                GameProgress.PlayerPermission permission = Variables.progress.players.get(uuid);
+                permission.hasEffects = true;
+                permission.naturalRegen = false;
 
                 player.getInventory().clear();
                 PlayerUtil.setGameMode(player, GameMode.SURVIVAL);

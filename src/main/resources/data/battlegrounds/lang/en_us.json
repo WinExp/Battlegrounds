@@ -22,7 +22,6 @@
   "battlegrounds.vote.manual.broadcast": "Voting is terminated by the administrator.",
   "battlegrounds.vote.already_voting.feedback": "There is already a vote in progress!",
   "battlegrounds.vote.not_voting.feedback": "There isn't any vote in progress!",
-  "battlegrounds.vote.cooldown.feedback": "Vote is cooling down with %d seconds remaining.",
   "battlegrounds.vote.button.accept": "[Accept Vote]",
   "battlegrounds.vote.button.accept.description": "Accept the vote.",
   "battlegrounds.vote.button.deny": "[Deny Vote]",
@@ -39,5 +38,7 @@
   "battlegrounds.game.border.reduce.broadcast": "The arena is shrinking!",
   "battlegrounds.game.end.broadcast": "Game over! %s is the final winner!",
 
-  "battlegrounds.border.bar": "%d seconds to next lap"
+  "battlegrounds.border.bar": "%d seconds to next lap",
+
+  "item.battlegrounds.ruperts_tear.use_failed": "Can't get you here"
 }

@@ -9,5 +9,14 @@
   "item.battlegrounds.miners_pickaxe": "⛏采矿者之镐",
   "item.battlegrounds.flash_bang": "闪光震撼弹",
   "item.battlegrounds.flash_bang.fuse": "引信时间：%fs",
-  "item.battlegrounds.flash_bang.velocity": "投掷速度: %fm/s"
+  "item.battlegrounds.flash_bang.velocity": "投掷速度: %fm/s",
+  "item.battlegrounds.ruperts_tear": "鲁伯特之泪",
+  "item.battlegrounds.ruperts_tear.cooldown": "冷却时间：%fs",
+  "item.battlegrounds.ruperts_tear.max_distance": "最大距离: %d 格",
+
+  "gui.battlegrounds.vote.accept": "赞成",
+  "gui.battlegrounds.vote.deny": "反对",
+
+  "key.battlegrounds.vote_screen": "打开投票界面",
+  "key.categories.battlegrounds": "Battlegrounds"
 }

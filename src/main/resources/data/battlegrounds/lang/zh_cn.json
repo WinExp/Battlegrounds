@@ -22,7 +22,6 @@
   "battlegrounds.vote.manual.broadcast": "投票被管理员终止。",
   "battlegrounds.vote.already_voting.feedback": "已有投票正在进行！",
   "battlegrounds.vote.not_voting.feedback": "现在没有正在进行的投票！",
-  "battlegrounds.vote.cooldown.feedback": "投票正在冷却，剩余 %d 秒。",
   "battlegrounds.vote.button.accept": "[赞成]",
   "battlegrounds.vote.button.accept.description": "赞成票",
   "battlegrounds.vote.button.deny": "[反对]",
@@ -39,5 +38,7 @@
   "battlegrounds.game.border.reduce.broadcast": "正在缩小竞技场！",
   "battlegrounds.game.end.broadcast": "游戏结束！%s 是最后的赢家！",
 
-  "battlegrounds.border.bar": "距离下一个圈还有 %d 秒"
+  "battlegrounds.border.bar": "距离下一个圈还有 %d 秒",
+
+  "item.battlegrounds.ruperts_tear.use_failed": "无法将你传送到此处"
 }

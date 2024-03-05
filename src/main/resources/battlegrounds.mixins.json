@@ -8,15 +8,11 @@
     "customRecipe_RecipeManagerMixin",
     "deny_EnchantmentMixin",
     "deny_GrindstoneScreenHandlerMixin",
-    "MinecraftServerMixin",
-    "naturalRegen_PlayerEntityMixin",
-    "PlayerManagerMixin",
-    "ServerPlayerEntityMixin"
+    "naturalRegen_PlayerEntityMixin"
   ],
   "client": [
     "client.flash_BackgroundRendererMixin",
-    "client.flash_InGameHudMixin",
-    "client.MinecraftClientMixin"
+    "client.flash_InGameHudMixin"
   ],
   "server": [
   ],

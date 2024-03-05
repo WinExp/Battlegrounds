@@ -1,13 +1,16 @@
 package com.github.winexp.battlegrounds.enchantment;
 
 import com.github.winexp.battlegrounds.util.EffectUtil;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.EnchantmentTarget;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.item.ItemStack;
 
 public class VitalityEnchantment extends Enchantment {
     private final String healthModifierId = "enchantment.vitality.health_modifier";
@@ -18,10 +21,18 @@ public class VitalityEnchantment extends Enchantment {
 
     protected VitalityEnchantment(Rarity rarity, EnchantmentTarget target, EquipmentSlot... slots) {
         super(rarity, target, slots);
+        ServerEntityEvents.EQUIPMENT_CHANGE.register(this::onEquipmentChange);
     }
 
-    public void modifyHealth(ServerPlayerEntity player, int level, boolean addition) {
-        EntityAttributeInstance attribute = player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
+    private void onEquipmentChange(LivingEntity livingEntity, EquipmentSlot equipmentSlot, ItemStack previousStack, ItemStack currentStack) {
+        if (equipmentSlot == EquipmentSlot.CHEST) {
+            int level = EnchantmentHelper.getLevel(Enchantments.VITALITY, currentStack);
+            this.modifyHealth(livingEntity, level, level > 0);
+        }
+    }
+
+    private void modifyHealth(LivingEntity livingEntity, int level, boolean addition) {
+        EntityAttributeInstance attribute = livingEntity.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
         assert attribute != null;
         if (addition) {
             EffectUtil.addAttribute(attribute, healthModifierId,
