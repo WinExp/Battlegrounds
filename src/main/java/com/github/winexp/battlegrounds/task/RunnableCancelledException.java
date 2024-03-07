@@ -1,4 +1,4 @@
-package com.github.winexp.battlegrounds.helper.task;
+package com.github.winexp.battlegrounds.task;
 
 public class RunnableCancelledException extends RuntimeException {
     private final boolean enforceCancel;

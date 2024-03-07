@@ -12,6 +12,9 @@
   "icon": "assets/battlegrounds/icon.png",
   "environment": "*",
   "entrypoints": {
+    "fabric-datagen": [
+      "com.github.winexp.battlegrounds.datagen.DataGeneration"
+    ],
     "client": [
       "com.github.winexp.battlegrounds.client.BattlegroundsClient"
     ],
@@ -26,6 +29,7 @@
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": "*",
-    "minecraft": "${minecraft_version}"
+    "minecraft": "${minecraft_version}",
+    "roughlyenoughitems": ">=14.0"
   }
 }

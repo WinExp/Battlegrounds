@@ -17,7 +17,8 @@ import net.minecraft.util.Identifier;
 import java.util.Map;
 
 public class MinersPickaxeItem extends PickaxeItem implements NbtCrafting, EnchantRestrict {
-    public final static Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
+    public static final Identifier IDENTIFIER = new Identifier("battlegrounds", "miners_pickaxe");
+    public static final Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
             Enchantments.FORTUNE, 3,
             Enchantments.EFFICIENCY, 5,
             Enchantments.SMELTING, 1,
@@ -43,7 +44,7 @@ public class MinersPickaxeItem extends PickaxeItem implements NbtCrafting, Encha
 
     @Override
     public Identifier getIdentifier() {
-        return new Identifier("battlegrounds", "miners_pickaxe");
+        return IDENTIFIER;
     }
 
     @Override

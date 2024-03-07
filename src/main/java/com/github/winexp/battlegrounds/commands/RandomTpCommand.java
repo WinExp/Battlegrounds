@@ -1,7 +1,7 @@
 package com.github.winexp.battlegrounds.commands;
 
-import com.github.winexp.battlegrounds.helper.task.TaskScheduler;
-import com.github.winexp.battlegrounds.helper.task.TaskTimer;
+import com.github.winexp.battlegrounds.task.TaskScheduler;
+import com.github.winexp.battlegrounds.task.TaskTimer;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
 import com.github.winexp.battlegrounds.util.TextUtil;
 import com.github.winexp.battlegrounds.util.Variables;
@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @SuppressWarnings("SameReturnValue")
 public class RandomTpCommand {
-    private final static HashMap<UUID, Long> cooldownTimers = new HashMap<>();
+    private static final HashMap<UUID, Long> cooldownTimers = new HashMap<>();
     private static TaskTimer coolDownUpdateTask = TaskTimer.NONE_TASK;
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {

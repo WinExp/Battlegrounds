@@ -31,7 +31,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class ChannelingArrowEntity extends PersistentProjectileEntity {
-    private final static ItemStack DEFAULT_STACK = new ItemStack(Items.ARROW);
+    private static final ItemStack DEFAULT_STACK = new ItemStack(Items.ARROW);
     private static final TrackedData<Integer> COLOR = DataTracker.registerData(ChannelingArrowEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private final Set<StatusEffectInstance> effects;
     private Potion potion;

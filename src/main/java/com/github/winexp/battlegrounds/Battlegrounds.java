@@ -4,18 +4,15 @@ import com.github.winexp.battlegrounds.commands.BattlegroundsCommand;
 import com.github.winexp.battlegrounds.commands.RandomTpCommand;
 import com.github.winexp.battlegrounds.configs.GameProgress;
 import com.github.winexp.battlegrounds.configs.RootConfig;
-import com.github.winexp.battlegrounds.discussion.vote.VoteInstance;
-import com.github.winexp.battlegrounds.discussion.vote.VoteSettings;
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.entity.EntityTypes;
-import com.github.winexp.battlegrounds.events.PlayerEvents;
-import com.github.winexp.battlegrounds.events.vote.PlayerVotedCallback;
-import com.github.winexp.battlegrounds.events.vote.VoteCompletedCallback;
+import com.github.winexp.battlegrounds.events.ModServerPlayerEvents;
 import com.github.winexp.battlegrounds.helper.GameHelper;
-import com.github.winexp.battlegrounds.discussion.vote.VoteHelper;
 import com.github.winexp.battlegrounds.item.Items;
+import com.github.winexp.battlegrounds.network.ModServerNetworkPlayHandler;
+import com.github.winexp.battlegrounds.network.packet.c2s.VoteC2SPacket;
+import com.github.winexp.battlegrounds.network.packet.c2s.VoteInfosC2SPacket;
 import com.github.winexp.battlegrounds.util.*;
-import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -24,6 +21,7 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -35,14 +33,13 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.WorldSavePath;
-
-import java.util.Arrays;
 
 @SuppressWarnings("SameReturnValue")
 public class Battlegrounds implements ModInitializer {
-    public static void saveConfigs() {
+    public static Battlegrounds INSTANCE;
+
+    public void saveConfigs() {
         ConfigUtil.saveConfig(Constants.CONFIG_PATH, "config", Variables.config);
         if (Variables.server != null) {
             if (GameHelper.INSTANCE.reduceTask.getDelay() >= 0) {
@@ -52,7 +49,7 @@ public class Battlegrounds implements ModInitializer {
         }
     }
 
-    public static void loadConfigs() {
+    public void loadConfigs() {
         Variables.config = ConfigUtil.createOrLoadConfig(Constants.CONFIG_PATH, "config", RootConfig.class);
         if (Variables.server != null) {
             Variables.progress = ConfigUtil.createOrLoadConfig(Variables.server.getSavePath(WorldSavePath.ROOT),
@@ -61,13 +58,18 @@ public class Battlegrounds implements ModInitializer {
         }
     }
 
-    public static void reload() {
-        loadConfigs();
+    public void reload() {
+        this.loadConfigs();
         Items.addRecipes();
         GameHelper.INSTANCE.reduceTask.cancel();
         if (Variables.progress.gameStage.isStarted() && !Variables.progress.gameStage.isDeathmatch()) {
             GameHelper.INSTANCE.runTasks();
         }
+    }
+
+    private void registerReceiver() {
+        ServerPlayNetworking.registerGlobalReceiver(VoteInfosC2SPacket.TYPE, ModServerNetworkPlayHandler::onGetVoteInfos);
+        ServerPlayNetworking.registerGlobalReceiver(VoteC2SPacket.TYPE, ModServerNetworkPlayHandler::onVote);
     }
 
     private void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
@@ -78,7 +80,7 @@ public class Battlegrounds implements ModInitializer {
     private void onServerStarting(MinecraftServer server) {
         Variables.server = server;
         GameHelper.INSTANCE.setServer(server);
-        loadConfigs();
+        this.loadConfigs();
     }
 
     private void onServerStarted(MinecraftServer server) {
@@ -86,7 +88,7 @@ public class Battlegrounds implements ModInitializer {
     }
 
     private void onSaving(MinecraftServer server, boolean flush, boolean force) {
-        saveConfigs();
+        this.saveConfigs();
     }
 
     private void onPlayerRespawn(ServerPlayerEntity oldPlayer, ServerPlayerEntity newPlayer, boolean alive) {
@@ -97,58 +99,6 @@ public class Battlegrounds implements ModInitializer {
         if (entity instanceof ServerPlayerEntity player) {
             GameHelper.INSTANCE.onPlayerDeath(player);
         }
-    }
-
-    public static void onStartGameVoteClosed(VoteInstance voteInstance, VoteSettings.CloseReason closeReason) {
-        if (closeReason == VoteSettings.CloseReason.TIMEOUT) {
-            Variables.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
-                    "battlegrounds.vote.timeout.broadcast", TextUtil.GOLD), false);
-        } else if (closeReason == VoteSettings.CloseReason.MANUAL) {
-            Variables.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
-                    "battlegrounds.vote.manual.broadcast", TextUtil.GOLD), false);
-        } else if (closeReason == VoteSettings.CloseReason.ACCEPTED) {
-            GameHelper.INSTANCE.prepareResetWorlds(voteInstance.getParticipants());
-        }
-    }
-
-    public static void onStartGamePlayerVoted(VoteInstance voteInstance, ServerPlayerEntity player, boolean result) {
-        if (result) {
-            Variables.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
-                    "battlegrounds.command.accept.broadcast", TextUtil.GREEN,
-                    player.getName(), voteInstance.getAcceptedNum(), voteInstance.getTotal()), false);
-        } else {
-            Variables.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
-                    "battlegrounds.command.deny.broadcast", TextUtil.GOLD,
-                    player.getName(), voteInstance.getAcceptedNum(), voteInstance.getTotal()), false);
-        }
-    }
-
-    private ActionResult onPlayerVote(VoteHelper voter, ServerPlayerEntity player, boolean result) {
-        if (result) {
-            Variables.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
-                    "battlegrounds.command.accept.broadcast", TextUtil.GREEN,
-                    player.getName(), voter.getAccepted(), voter.getTotal()), false);
-        } else {
-            Variables.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
-                    "battlegrounds.command.deny.broadcast", TextUtil.GOLD,
-                    player.getName(), voter.getAccepted(), voter.getTotal()), false);
-        }
-        return ActionResult.PASS;
-    }
-
-    private ActionResult onVoteStop(VoteHelper voter, VoteCompletedCallback.Reason reason) {
-        if (reason == VoteCompletedCallback.Reason.TIMEOUT) {
-            Variables.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
-                    "battlegrounds.vote.timeout.broadcast", TextUtil.GOLD), false);
-        } else if (reason == VoteCompletedCallback.Reason.MANUAL) {
-            Variables.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
-                    "battlegrounds.vote.manual.broadcast", TextUtil.GOLD), false);
-        } else if (reason == VoteCompletedCallback.Reason.ACCEPT) {
-            GameHelper.INSTANCE.prepareResetWorlds(Arrays.stream(voter.getPlayerProfiles())
-                    .map((GameProfile::getId)).toList());
-        }
-
-        return ActionResult.PASS;
     }
 
     private boolean allowLivingEntityDamaged(LivingEntity entity, DamageSource source, float amount) {
@@ -206,12 +156,13 @@ public class Battlegrounds implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        INSTANCE = this;
         Constants.LOGGER.info("Loading {}", Constants.MOD_ID);
 
         // 注册指令
         CommandRegistrationCallback.EVENT.register(this::registerCommands);
         // 加载配置
-        loadConfigs();
+        this.loadConfigs();
         // 注册事件
         // Fabric API
         ServerLifecycleEvents.SERVER_STARTING.register(this::onServerStarting);
@@ -222,9 +173,7 @@ public class Battlegrounds implements ModInitializer {
         ServerLivingEntityEvents.AFTER_DEATH.register(this::onLivingEntityDeath);
         ServerPlayerEvents.AFTER_RESPAWN.register(this::onPlayerRespawn);
         // 自定义
-        PlayerEvents.ALLOW_NATURAL_REGEN.register(this::allowPlayerNaturalRegen);
-        PlayerVotedCallback.EVENT.register(this::onPlayerVote);
-        VoteCompletedCallback.EVENT.register(this::onVoteStop);
+        ModServerPlayerEvents.ALLOW_NATURAL_REGEN.register(this::allowPlayerNaturalRegen);
 
         // 注册实体
         EntityTypes.registerEntities();
@@ -242,7 +191,10 @@ public class Battlegrounds implements ModInitializer {
         // 添加配方
         Items.addRecipes();
 
-        // 重置存档
+        // 注册网络包接收器
+        this.registerReceiver();
+
+        // 尝试重置存档
         GameHelper.INSTANCE.tryResetWorlds();
     }
 }

@@ -1,6 +1,7 @@
 package com.github.winexp.battlegrounds.enchantment;
 
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentLevelEntry;
 import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.ItemGroups;
@@ -9,23 +10,17 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
 public class Enchantments extends net.minecraft.enchantment.Enchantments {
-    public final static SmeltingEnchantment SMELTING = new SmeltingEnchantment();
-    public final static ChannelingProEnchantment CHANNELING_PRO = new ChannelingProEnchantment();
-    public final static StevesPainEnchantment STEVES_PAIN = new StevesPainEnchantment();
-    public final static VitalityEnchantment VITALITY = new VitalityEnchantment();
-    public final static LeachingEnchantment LEACHING = new LeachingEnchantment();
+    public static final SmeltingEnchantment SMELTING = (SmeltingEnchantment) register("smelting", new SmeltingEnchantment());
+    public static final ChannelingProEnchantment CHANNELING_PRO = (ChannelingProEnchantment) register("channeling_pro", new ChannelingProEnchantment());
+    public static final StevesPainEnchantment STEVES_PAIN = (StevesPainEnchantment) register("steves_pain", new StevesPainEnchantment());
+    public static final VitalityEnchantment VITALITY = (VitalityEnchantment) register("vitality", new VitalityEnchantment());
+    public static final LeachingEnchantment LEACHING = (LeachingEnchantment) register("leaching", new LeachingEnchantment());
+
+    private static Enchantment register(String name, Enchantment enchantment) {
+        return Registry.register(Registries.ENCHANTMENT, new Identifier("battlegrounds", name), enchantment);
+    }
 
     public static void registerEnchantments() {
-        Registry.register(Registries.ENCHANTMENT, new Identifier("battlegrounds", "smelting"),
-                SMELTING);
-        Registry.register(Registries.ENCHANTMENT, new Identifier("battlegrounds", "channeling_pro"),
-                CHANNELING_PRO);
-        Registry.register(Registries.ENCHANTMENT, new Identifier("battlegrounds", "steves_pain"),
-                STEVES_PAIN);
-        Registry.register(Registries.ENCHANTMENT, new Identifier("battlegrounds", "vitality"),
-                VITALITY);
-        Registry.register(Registries.ENCHANTMENT, new Identifier("battlegrounds", "leaching"),
-                LEACHING);
     }
 
     public static void registerItemGroup() {

@@ -1,7 +1,7 @@
-package com.github.winexp.battlegrounds.helper.task;
+package com.github.winexp.battlegrounds.task;
 
 public class TaskLater extends Task {
-    public final static TaskLater NONE_TASK = new TaskLater(Task.NONE_RUNNABLE, -1);
+    public static final TaskLater NONE_TASK = new TaskLater(Task.NONE_RUNNABLE, -1);
     private final Runnable fixedRunnable;
     protected long delay;
     protected Runnable preTriggerRunnable = () -> {

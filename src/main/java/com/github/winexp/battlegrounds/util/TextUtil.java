@@ -6,11 +6,11 @@ import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Formatting;
 
 public class TextUtil {
-    public final static TextColor GREEN = TextColor.fromFormatting(Formatting.GREEN);
-    public final static TextColor GOLD = TextColor.fromFormatting(Formatting.GOLD);
-    public final static TextColor RED = TextColor.fromFormatting(Formatting.RED);
-    public final static TextColor DARK_GRAY = TextColor.fromFormatting(Formatting.DARK_GRAY);
-    public final static TextColor GRAY = TextColor.fromFormatting(Formatting.GRAY);
+    public static final TextColor GREEN = TextColor.fromFormatting(Formatting.GREEN);
+    public static final TextColor GOLD = TextColor.fromFormatting(Formatting.GOLD);
+    public static final TextColor RED = TextColor.fromFormatting(Formatting.RED);
+    public static final TextColor DARK_GRAY = TextColor.fromFormatting(Formatting.DARK_GRAY);
+    public static final TextColor GRAY = TextColor.fromFormatting(Formatting.GRAY);
 
     public static MutableText withColor(MutableText text, TextColor color) {
         return text.styled(style -> style.withColor(color));

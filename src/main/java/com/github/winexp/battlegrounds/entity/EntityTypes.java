@@ -14,13 +14,13 @@ import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.util.Identifier;
 
 public class EntityTypes<T extends Entity> extends net.minecraft.entity.EntityType<T> {
-    public final static net.minecraft.entity.EntityType<ChannelingArrowEntity> CHANNELING_ARROW =
+    public static final net.minecraft.entity.EntityType<ChannelingArrowEntity> CHANNELING_ARROW =
             FabricEntityTypeBuilder.<ChannelingArrowEntity>create(SpawnGroup.MISC, ChannelingArrowEntity::new)
                     .dimensions(EntityDimensions.fixed(0.5F, 0.5F))
                     .trackRangeChunks(4)
                     .trackedUpdateRate(20)
                     .build();
-    public final static net.minecraft.entity.EntityType<FlashBangEntity> FLASH_BANG =
+    public static final net.minecraft.entity.EntityType<FlashBangEntity> FLASH_BANG =
             FabricEntityTypeBuilder.<FlashBangEntity>create(SpawnGroup.MISC, FlashBangEntity::new)
                     .dimensions(EntityDimensions.fixed(0.25F, 0.25F))
                     .trackRangeChunks(4)

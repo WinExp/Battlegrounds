@@ -15,9 +15,9 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 public class MathUtil {
-    private final static double RAYCAST_ACCURATE = 10;
+    private static final double RAYCAST_ACCURATE = 10;
 
-    private final static Function<Block, Float> TRANSPARENT_STRENGTH_FUNCTION = (block) -> {
+    private static final Function<Block, Float> TRANSPARENT_STRENGTH_FUNCTION = (block) -> {
         if (block instanceof LeavesBlock) {
             return 0.95F;
         } else if (block instanceof TintedGlassBlock) {

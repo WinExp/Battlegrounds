@@ -5,10 +5,10 @@ import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.entity.player.PlayerEntity;
 
 @FunctionalInterface
-public interface PlayerEvents {
-    Event<PlayerEvents> ALLOW_NATURAL_REGEN = EventFactory.createArrayBacked(PlayerEvents.class,
+public interface ModServerPlayerEvents {
+    Event<ModServerPlayerEvents> ALLOW_NATURAL_REGEN = EventFactory.createArrayBacked(ModServerPlayerEvents.class,
             (listeners) -> (instance) -> {
-                for (PlayerEvents listener : listeners) {
+                for (ModServerPlayerEvents listener : listeners) {
                     if (!listener.interact(instance)) return false;
                 }
                 return true;

@@ -9,7 +9,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 
 public class LeachingEnchantment extends Enchantment {
-    public final static int DURATION = 3 * 20;
+    public static final int DURATION = 3 * 20;
 
     public LeachingEnchantment() {
         this(Rarity.VERY_RARE, EnchantmentTarget.WEAPON, EquipmentSlot.MAINHAND);

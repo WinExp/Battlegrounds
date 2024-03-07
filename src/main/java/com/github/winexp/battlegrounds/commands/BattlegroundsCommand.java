@@ -1,12 +1,11 @@
 package com.github.winexp.battlegrounds.commands;
 
 import com.github.winexp.battlegrounds.Battlegrounds;
+import com.github.winexp.battlegrounds.discussion.vote.VoteManager;
+import com.github.winexp.battlegrounds.discussion.vote.VotePresets;
 import com.github.winexp.battlegrounds.entity.projectile.FlashBangEntity;
-import com.github.winexp.battlegrounds.events.vote.VoteCompletedCallback;
 import com.github.winexp.battlegrounds.helper.GameHelper;
-import com.github.winexp.battlegrounds.helper.TeamHelper;
-import com.github.winexp.battlegrounds.discussion.vote.VoteHelper;
-import com.github.winexp.battlegrounds.helper.task.TaskScheduler;
+import com.github.winexp.battlegrounds.task.TaskScheduler;
 import com.github.winexp.battlegrounds.util.*;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.ArgumentBuilder;
@@ -28,24 +27,16 @@ import static net.minecraft.server.command.CommandManager.literal;
 
 @SuppressWarnings("SameReturnValue")
 public class BattlegroundsCommand {
-    private final static TeamHelper teamHelper = new TeamHelper(null);
-    private final static VoteHelper voter = new VoteHelper();
-
     public static void registerRoot(CommandDispatcher<ServerCommandSource> dispatcher) {
         var cRoot = literal("battlegrounds");
         var cStart = literal("start").executes(BattlegroundsCommand::executeStart);
         var cStop = literal("stop").requires(source ->
                 source.hasPermissionLevel(2)).executes(BattlegroundsCommand::executeStop);
-        var cAccept = literal("accept").requires(
-                ServerCommandSource::isExecutedByPlayer).executes(BattlegroundsCommand::executeAccept);
-        var cDeny = literal("deny").requires(
-                ServerCommandSource::isExecutedByPlayer).executes(BattlegroundsCommand::executeDeny);
         var cReload = literal("reload").requires(source ->
                 source.hasPermissionLevel(2)).executes(BattlegroundsCommand::executeReload);
         var cFlash = registerSummonFlash();
         var cMode = registerGameMode();
-        var cNode = dispatcher.register(cRoot.then(cMode).then(cStart).then(cStop)
-                .then(cAccept).then(cDeny).then(cReload).then(cFlash));
+        var cNode = dispatcher.register(cRoot.then(cMode).then(cStart).then(cStop).then(cReload).then(cFlash));
         // 命令缩写
         var cRoot_redir = literal("bg").redirect(cNode);
         dispatcher.register(cRoot_redir);
@@ -102,16 +93,12 @@ public class BattlegroundsCommand {
 
     private static int executeStart(CommandContext<ServerCommandSource> context) {
         ServerCommandSource source = context.getSource();
-        if (voter.isVoting()) {
+        if (VoteManager.INSTANCE.containsVote(VotePresets.START_GAME.identifier())) {
             source.sendFeedback(() -> TextUtil.translatableWithColor(
                     "battlegrounds.vote.already_voting.feedback", TextUtil.RED), false);
             return 1;
-        } else if (voter.getCooldown() > 0) {
-            source.sendFeedback(() -> TextUtil.translatableWithColor(
-                    "battlegrounds.vote.cooldown.feedback", TextUtil.RED, voter.getCooldown() / 20), false);
-            return 1;
         }
-        voter.startVote(Variables.server.getPlayerManager().getPlayerList().toArray(new ServerPlayerEntity[0]));
+        VoteManager.INSTANCE.openVoteWithPreset(VotePresets.START_GAME, Variables.server.getPlayerManager().getPlayerList());
         Variables.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
                         "battlegrounds.command.start.broadcast", TextUtil.GREEN, source.getName())
                 .append(TextFactory.LINEFEED)
@@ -123,7 +110,7 @@ public class BattlegroundsCommand {
     }
 
     private static int executeStop(CommandContext<ServerCommandSource> context) {
-        voter.stopVote(VoteCompletedCallback.Reason.MANUAL);
+        VoteManager.INSTANCE.closeVote(VotePresets.START_GAME.identifier());
         TaskScheduler.INSTANCE.stopAllTask();
         GameHelper.INSTANCE.stopGame();
         Constants.LOGGER.info("已停止队列中所有任务");
@@ -131,36 +118,8 @@ public class BattlegroundsCommand {
         return 1;
     }
 
-    private static int executeAccept(CommandContext<ServerCommandSource> context) {
-        ServerCommandSource source = context.getSource();
-        ServerPlayerEntity player = source.getPlayer();
-        assert player != null;
-        if (!voter.isVoting()) {
-            source.sendFeedback(() -> TextUtil.translatableWithColor(
-                    "battlegrounds.vote.not_voting.feedback", TextUtil.RED), false);
-            return 1;
-        }
-        voter.acceptVote(player);
-
-        return 1;
-    }
-
-    private static int executeDeny(CommandContext<ServerCommandSource> context) {
-        ServerCommandSource source = context.getSource();
-        ServerPlayerEntity player = source.getPlayer();
-        assert player != null;
-        if (!voter.isVoting()) {
-            source.sendFeedback(() -> TextUtil.translatableWithColor(
-                    "battlegrounds.vote.not_voting.feedback", TextUtil.RED), false);
-            return 1;
-        }
-        voter.denyVote(player);
-
-        return 1;
-    }
-
     private static int executeReload(CommandContext<ServerCommandSource> context) {
-        Battlegrounds.reload();
+        Battlegrounds.INSTANCE.reload();
         context.getSource().sendFeedback(() -> TextUtil.translatableWithColor(
                 "battlegrounds.command.reload.success", TextUtil.GREEN), false);
 

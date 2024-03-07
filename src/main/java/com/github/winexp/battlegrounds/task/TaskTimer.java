@@ -1,9 +1,9 @@
-package com.github.winexp.battlegrounds.helper.task;
+package com.github.winexp.battlegrounds.task;
 
 import java.util.function.LongSupplier;
 
 public class TaskTimer extends TaskLater {
-    public final static TaskTimer NONE_TASK = new TaskTimer(Task.NONE_RUNNABLE, -1, -1);
+    public static final TaskTimer NONE_TASK = new TaskTimer(Task.NONE_RUNNABLE, -1, -1);
     private final Runnable fixedRunnable;
     private final LongSupplier ticks;
 

@@ -10,8 +10,8 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.util.math.random.Random;
 
 public class StevesPainEnchantment extends Enchantment {
-    public final static int BOUND = 25;
-    public final static int DURATION = 3 * 20;
+    public static final int BOUND = 25;
+    public static final int DURATION = 3 * 20;
 
     public StevesPainEnchantment() {
         this(Rarity.VERY_RARE, EnchantmentTarget.WEAPON, EquipmentSlot.MAINHAND);

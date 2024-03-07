@@ -1,10 +1,10 @@
 package com.github.winexp.battlegrounds.helper;
 
 import com.github.winexp.battlegrounds.configs.GameProgress;
-import com.github.winexp.battlegrounds.helper.task.RunnableCancelledException;
-import com.github.winexp.battlegrounds.helper.task.TaskCountdown;
-import com.github.winexp.battlegrounds.helper.task.TaskScheduler;
-import com.github.winexp.battlegrounds.helper.task.TaskTimer;
+import com.github.winexp.battlegrounds.task.RunnableCancelledException;
+import com.github.winexp.battlegrounds.task.TaskCountdown;
+import com.github.winexp.battlegrounds.task.TaskScheduler;
+import com.github.winexp.battlegrounds.task.TaskTimer;
 import com.github.winexp.battlegrounds.util.*;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
@@ -42,11 +42,11 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GameHelper {
-    public final static GameHelper INSTANCE = new GameHelper();
+    public static final GameHelper INSTANCE = new GameHelper();
     private final String healthModifierId = "game.health_modifier";
-    private final static Identifier BAR_ID = new Identifier("battlegrounds", "progress_bar");
-    private final static Path SAVE_PATH_TMP_FILE = FabricLoader.getInstance().getGameDir().resolve(Path.of("reset_world.session"));
-    private final static boolean KEEP_INVENTORY = false;
+    private static final Identifier BAR_ID = new Identifier("battlegrounds", "progress_bar");
+    private static final Path SAVE_PATH_TMP_FILE = FabricLoader.getInstance().getGameDir().resolve(Path.of("reset_world.session"));
+    private static final boolean KEEP_INVENTORY = false;
     private TeamHelper teamHelper;
     public TaskTimer reduceTask = TaskTimer.NONE_TASK;
     public TaskTimer barUpdateTask = TaskTimer.NONE_TASK;

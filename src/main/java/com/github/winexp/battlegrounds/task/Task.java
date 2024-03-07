@@ -1,9 +1,9 @@
-package com.github.winexp.battlegrounds.helper.task;
+package com.github.winexp.battlegrounds.task;
 
-import com.github.winexp.battlegrounds.events.task.TaskTriggerCallback;
+import com.github.winexp.battlegrounds.events.TaskEvents;
 
 public abstract class Task {
-    public final static Runnable NONE_RUNNABLE = () -> {
+    public static final Runnable NONE_RUNNABLE = () -> {
     };
     private final Runnable runnable;
     private boolean cancelled = false;
@@ -26,6 +26,6 @@ public abstract class Task {
 
     public void run() {
         runnable.run();
-        TaskTriggerCallback.EVENT.invoker().interact(this);
+        TaskEvents.TRIGGERED.invoker().interact(this);
     }
 }

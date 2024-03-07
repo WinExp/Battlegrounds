@@ -1,15 +1,15 @@
-package com.github.winexp.battlegrounds.events.task;
+package com.github.winexp.battlegrounds.events;
 
-import com.github.winexp.battlegrounds.helper.task.Task;
+import com.github.winexp.battlegrounds.task.Task;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.util.ActionResult;
 
 @FunctionalInterface
-public interface TaskTriggerCallback {
-    Event<TaskTriggerCallback> EVENT = EventFactory.createArrayBacked(TaskTriggerCallback.class,
+public interface TaskEvents {
+    Event<TaskEvents> TRIGGERED = EventFactory.createArrayBacked(TaskEvents.class,
             (listeners) -> (task) -> {
-                for (TaskTriggerCallback listener : listeners) {
+                for (TaskEvents listener : listeners) {
                     ActionResult actionResult = listener.interact(task);
                     if (actionResult != ActionResult.PASS) return actionResult;
                 }

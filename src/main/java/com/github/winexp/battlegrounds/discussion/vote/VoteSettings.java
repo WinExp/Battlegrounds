@@ -8,7 +8,7 @@ import java.util.function.BiPredicate;
 
 public record VoteSettings(BiConsumer<VoteInstance, CloseReason> voteClosedAction, TripleConsumer<VoteInstance, ServerPlayerEntity, Boolean> playerVotedAction,
                            VoteMode voteMode, long timeout) {
-    public final static long INFINITE_TIME = -1;
+    public static final long INFINITE_TIME = -1;
 
     public enum CloseReason {
         ACCEPTED, DENIED, TIMEOUT, MANUAL

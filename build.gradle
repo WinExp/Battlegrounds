@@ -12,11 +12,22 @@ repositories {
     // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
     // See https://docs.gradle.org/current/userguide/declaring_repositories.html
     // for more information about repositories.
-    maven { url 'https://maven.nucleoid.xyz' }
 }
 
 loom {
     accessWidenerPath = file("src/main/resources/battlegrounds.accesswidener")
+    runs {
+        // 这会添加一个运行数据生成 API 的新 gradle 任务："gradlew runDatagen"
+        datagen {
+            inherit server
+            name "Data Generation"
+            vmArg "-Dfabric-api.datagen"
+            vmArg "-Dfabric-api.datagen.output-dir=${file("src/main/generated")}"
+            vmArg "-Dfabric-api.datagen.modid=${mod_id}"
+
+            runDir "build/datagen"
+        }
+    }
 }
 
 dependencies {
@@ -28,9 +39,17 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation include("xyz.nucleoid:server-translations-api:${project.server_translations_version}")
-
     implementation "com.google.code.gson:gson:${project.gson_version}"
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs += [
+                    'src/main/generated'
+            ]
+        }
+    }
 }
 
 processResources {

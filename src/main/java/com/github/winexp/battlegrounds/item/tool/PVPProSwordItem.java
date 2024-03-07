@@ -24,8 +24,9 @@ import net.minecraft.util.Identifier;
 import java.util.Map;
 
 public class PVPProSwordItem extends SwordItem implements NbtCrafting, EnchantRestrict {
-    public final static float DAMAGE_BONUS = 1.0F;
-    public final static Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
+    public static final Identifier IDENTIFIER = new Identifier("battlegrounds", "pvp_pro_sword");
+    public static final float DAMAGE_BONUS = 1.0F;
+    public static final Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
             Enchantments.FIRE_ASPECT, 1,
             Enchantments.KNOCKBACK, 1,
             Enchantments.SWEEPING, 2,
@@ -62,7 +63,7 @@ public class PVPProSwordItem extends SwordItem implements NbtCrafting, EnchantRe
 
     @Override
     public Identifier getIdentifier() {
-        return new Identifier("battlegrounds", "pvp_pro_sword");
+        return IDENTIFIER;
     }
 
     @Override

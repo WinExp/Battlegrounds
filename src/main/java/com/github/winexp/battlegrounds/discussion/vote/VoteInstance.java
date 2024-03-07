@@ -1,10 +1,11 @@
 package com.github.winexp.battlegrounds.discussion.vote;
 
 import com.github.winexp.battlegrounds.events.VoteEvents;
-import com.github.winexp.battlegrounds.helper.task.TaskLater;
-import com.github.winexp.battlegrounds.helper.task.TaskScheduler;
+import com.github.winexp.battlegrounds.task.TaskLater;
+import com.github.winexp.battlegrounds.task.TaskScheduler;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,8 +15,8 @@ import java.util.UUID;
 
 public class VoteInstance implements AutoCloseable {
     private final Identifier identifier;
-    private final String name;
-    private final String description;
+    private final Text name;
+    private final Text description;
     private final VoteSettings settings;
     private boolean voting = false;
     private TaskLater timeoutTask = TaskLater.NONE_TASK;
@@ -23,23 +24,27 @@ public class VoteInstance implements AutoCloseable {
 
     public VoteInstance(Identifier identifier, VoteSettings settings) {
         this.identifier = identifier;
-        this.name = identifier.toString();
-        this.description = "";
+        this.name = Text.of(identifier);
+        this.description = Text.empty();
         this.settings = settings;
     }
 
-    public VoteInstance(Identifier identifier, String name, VoteSettings settings) {
+    public VoteInstance(Identifier identifier, Text name, VoteSettings settings) {
         this.identifier = identifier;
         this.name = name;
-        this.description = "";
+        this.description = Text.empty();
         this.settings = settings;
     }
 
-    public VoteInstance(Identifier identifier, String name, String description, VoteSettings settings) {
+    public VoteInstance(Identifier identifier, Text name, Text description, VoteSettings settings) {
         this.identifier = identifier;
         this.name = name;
         this.description = description;
         this.settings = settings;
+    }
+
+    public long getTimeLeft() {
+        return this.timeoutTask.getDelay();
     }
 
     public boolean isVoting() {
@@ -50,11 +55,11 @@ public class VoteInstance implements AutoCloseable {
         return identifier;
     }
 
-    public String getName() {
+    public Text getName() {
         return name;
     }
 
-    public String getDescription() {
+    public Text getDescription() {
         return description;
     }
 
@@ -64,6 +69,10 @@ public class VoteInstance implements AutoCloseable {
 
     public Collection<UUID> getParticipants() {
         return this.voteMap.keySet();
+    }
+
+    public boolean isPlayerParticipants(UUID uuid) {
+        return this.voteMap.get(uuid) != null;
     }
 
     public int getAcceptedNum() {
@@ -77,7 +86,7 @@ public class VoteInstance implements AutoCloseable {
     public boolean acceptVote(ServerPlayerEntity player) {
         UUID uuid = PlayerUtil.getUUID(player);
         if (!this.voting) return false;
-        if (!this.settings.voteMode().allowChangeVote && this.voteMap.containsKey(uuid)) return false;
+        if (!this.settings.voteMode().allowChangeVote && this.isPlayerParticipants(uuid)) return false;
         this.voteMap.put(uuid, true);
         this.settings.playerVotedAction().accept(this, player, true);
         if (this.settings.voteMode().acceptPredicate.test(this.voteMap.size(), this.getAcceptedNum())) {
@@ -90,7 +99,7 @@ public class VoteInstance implements AutoCloseable {
         UUID uuid = PlayerUtil.getUUID(player);
         if (!this.voting) return false;
         if (this.settings.voteMode().canDenyCancel) this.closeVote(VoteSettings.CloseReason.DENIED);
-        if (!this.settings.voteMode().allowChangeVote && this.voteMap.containsKey(uuid)) return false;
+        if (!this.settings.voteMode().allowChangeVote && this.isPlayerParticipants(uuid)) return false;
         this.voteMap.put(uuid, false);
         this.settings.playerVotedAction().accept(this, player, false);
         return true;
@@ -103,7 +112,7 @@ public class VoteInstance implements AutoCloseable {
             voteMap.put(PlayerUtil.getUUID(player), null);
         }
         this.timeoutTask = new TaskLater(() ->
-                settings.voteClosedAction().accept(this, VoteSettings.CloseReason.TIMEOUT), settings.timeout());
+                this.closeVote(VoteSettings.CloseReason.TIMEOUT), settings.timeout());
         TaskScheduler.INSTANCE.runTask(this.timeoutTask);
         this.voting = true;
         return true;

@@ -1,4 +1,4 @@
-package com.github.winexp.battlegrounds.helper.task;
+package com.github.winexp.battlegrounds.task;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.MinecraftServer;
@@ -7,7 +7,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @SuppressWarnings("SameReturnValue")
 public class TaskScheduler {
-    public final static TaskScheduler INSTANCE = new TaskScheduler();
+    public static final TaskScheduler INSTANCE = new TaskScheduler();
 
     private final CopyOnWriteArrayList<Task> tasks = new CopyOnWriteArrayList<>();
 

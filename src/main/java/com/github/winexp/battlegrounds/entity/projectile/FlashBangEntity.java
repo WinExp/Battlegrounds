@@ -2,11 +2,10 @@ package com.github.winexp.battlegrounds.entity.projectile;
 
 import com.github.winexp.battlegrounds.entity.EntityTypes;
 import com.github.winexp.battlegrounds.item.Items;
-import com.github.winexp.battlegrounds.util.WorldUtil;
-import com.github.winexp.battlegrounds.util.Constants;
+import com.github.winexp.battlegrounds.network.packet.s2c.FlashS2CPacket;
 import com.github.winexp.battlegrounds.util.MathUtil;
+import com.github.winexp.battlegrounds.util.WorldUtil;
 import com.github.winexp.battlegrounds.util.raycast.BlockRaycastResult;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -15,7 +14,6 @@ import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
@@ -33,14 +31,14 @@ import java.util.List;
 import java.util.function.BiPredicate;
 
 public class FlashBangEntity extends ThrownItemEntity {
-    public final static float MAX_FLASH_TICKS = 80;
-    public final static int MAX_DISTANCE = 32;
-    public final static float STRENGTH_LEFT_SPEED = 0.02F;
-    public final static float FOG_VISIBILITY = 3.0F;
-    public final static float DISTANCE_INCREMENT = 10;
+    public static final float MAX_FLASH_TICKS = 80;
+    public static final int MAX_DISTANCE = 32;
+    public static final float STRENGTH_LEFT_SPEED = 0.02F;
+    public static final float FOG_VISIBILITY = 3.0F;
+    public static final float DISTANCE_INCREMENT = 10;
     private int fuse = 0;
 
-    private final static BiPredicate<BlockRaycastResult, World> BLOCK_PREDICATE = (raycastResult, world) -> {
+    private static final BiPredicate<BlockRaycastResult, World> BLOCK_PREDICATE = (raycastResult, world) -> {
         BlockHitResult hitResult = raycastResult.hitResult();
         BlockPos blockPos = hitResult.getBlockPos();
 
@@ -92,11 +90,9 @@ public class FlashBangEntity extends ThrownItemEntity {
             ServerPlayerEntity player = (ServerPlayerEntity) player1;
             float distance = MathUtil.distanceTo(pos, player.getEyePos());
             if (distance <= MAX_DISTANCE + DISTANCE_INCREMENT) {
-                PacketByteBuf buf = PacketByteBufs.create();
                 float distanceStrength = (MAX_DISTANCE - distance + DISTANCE_INCREMENT) / MAX_DISTANCE;
-                buf.writeFloat(distanceStrength);
-                buf.writeVec3d(pos);
-                ServerPlayNetworking.send(player, Constants.FLASH_BANG_PACKET_ID, buf);
+                FlashS2CPacket packet = new FlashS2CPacket(pos, distanceStrength);
+                ServerPlayNetworking.send(player, packet);
             }
         }
     }

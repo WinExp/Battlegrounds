@@ -18,6 +18,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -32,11 +33,12 @@ import java.util.List;
 import java.util.function.BiPredicate;
 
 public class RupertsTearItem extends ToolItem {
-    private final static int DEFAULT_COOLDOWN = 60 * 20;
-    private final static int FAILED_COOLDOWN = 20;
-    private final static int DEFAULT_MAX_DISTANCE = 50;
+    public static final Identifier IDENTIFIER = new Identifier("battlegrounds", "ruperts_tear");
+    private static final int DEFAULT_COOLDOWN = 60 * 20;
+    private static final int FAILED_COOLDOWN = 20;
+    private static final int DEFAULT_MAX_DISTANCE = 50;
 
-    private final static BiPredicate<BlockRaycastResult, World> BLOCK_PREDICATE = (raycastResult, world) -> {
+    private static final BiPredicate<BlockRaycastResult, World> BLOCK_PREDICATE = (raycastResult, world) -> {
         BlockHitResult hitResult = raycastResult.hitResult();
         BlockPos blockPos = hitResult.getBlockPos();
 

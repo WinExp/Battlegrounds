@@ -25,8 +25,6 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RawShapedRecipe;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.Util;
@@ -38,32 +36,12 @@ import java.util.List;
 import java.util.Map;
 
 public class Items extends net.minecraft.item.Items {
-    public final static PVPProSwordItem PVP_PRO_SWORD = new PVPProSwordItem(ToolMaterials.PVP_PRO, 3, -2.4F, new Item.Settings().rarity(Rarity.RARE).fireproof());
-    public final static MinersPickaxeItem MINERS_PICKAXE = new MinersPickaxeItem(ToolMaterials.MINERS_PICKAXE, 1, -2.8F, new Item.Settings().rarity(Rarity.RARE));
-    public final static FlashBangItem FLASH_BANG = new FlashBangItem(new Item.Settings().maxCount(16).rarity(Rarity.UNCOMMON));
-    public final static RupertsTearItem RUPERTS_TEAR = new RupertsTearItem(ToolMaterials.RUPERTS_TEAR, new Item.Settings().maxCount(16).rarity(Rarity.UNCOMMON));
+    public static final PVPProSwordItem PVP_PRO_SWORD = (PVPProSwordItem) register(PVPProSwordItem.IDENTIFIER, new PVPProSwordItem(ToolMaterials.PVP_PRO, 3, -2.4F, new Item.Settings().rarity(Rarity.RARE).fireproof()));
+    public static final MinersPickaxeItem MINERS_PICKAXE = (MinersPickaxeItem) register(MinersPickaxeItem.IDENTIFIER, new MinersPickaxeItem(ToolMaterials.MINERS_PICKAXE, 1, -2.8F, new Item.Settings().rarity(Rarity.RARE)));
+    public static final FlashBangItem FLASH_BANG = (FlashBangItem) register(FlashBangItem.IDENTIFIER, new FlashBangItem(new Item.Settings().maxCount(16).rarity(Rarity.UNCOMMON)));
+    public static final RupertsTearItem RUPERTS_TEAR = (RupertsTearItem) register(RupertsTearItem.IDENTIFIER, new RupertsTearItem(ToolMaterials.RUPERTS_TEAR, new Item.Settings().maxCount(16).rarity(Rarity.UNCOMMON)));
 
-    public static void registerItems() {
-        Registry.register(Registries.ITEM,
-                PVP_PRO_SWORD.getIdentifier(),
-                PVP_PRO_SWORD
-        );
-        Registry.register(Registries.ITEM,
-                MINERS_PICKAXE.getIdentifier(),
-                MINERS_PICKAXE
-        );
-        Registry.register(Registries.ITEM,
-                new Identifier("battlegrounds", "flash_bang"),
-                FLASH_BANG
-        );
-        Registry.register(Registries.ITEM,
-                new Identifier("battlegrounds", "ruperts_tear"),
-                RUPERTS_TEAR
-        );
-        registerDispenserBehavior();
-    }
-
-    public static void registerDispenserBehavior() {
+    private static void registerDispenserBehavior() {
         DispenserBlock.registerBehavior(Items.FLASH_BANG, new ProjectileDispenserBehavior() {
             @Override
             protected ProjectileEntity createProjectile(World world, Position position, ItemStack stack) {
@@ -71,6 +49,10 @@ public class Items extends net.minecraft.item.Items {
                         entity.setItem(stack));
             }
         });
+    }
+
+    public static void registerItems() {
+        registerDispenserBehavior();
     }
 
     public static void registerItemGroup() {

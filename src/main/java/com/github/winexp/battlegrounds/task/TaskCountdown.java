@@ -1,9 +1,9 @@
-package com.github.winexp.battlegrounds.helper.task;
+package com.github.winexp.battlegrounds.task;
 
 import org.jetbrains.annotations.Range;
 
 public class TaskCountdown extends TaskLater {
-    public final static TaskCountdown NONE_TASK = new TaskCountdown(Task.NONE_RUNNABLE, Task.NONE_RUNNABLE, -1, 1, -1);
+    public static final TaskCountdown NONE_TASK = new TaskCountdown(Task.NONE_RUNNABLE, Task.NONE_RUNNABLE, -1, 1, -1);
     private final Runnable fixedRunnable;
     private final long unitTicks;
     private int count;

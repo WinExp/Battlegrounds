@@ -13,6 +13,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.UseAction;
 import net.minecraft.world.World;
@@ -22,9 +23,10 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public class FlashBangItem extends RangedWeaponItem {
-    public final static Predicate<ItemStack> PROJECTILES = (stack) -> stack.isOf(Items.FLASH_BANG);
-    public final static float DEFAULT_VELOCITY = 1.3F;
-    private final static int DEFAULT_FUSE = 30;
+    public static final Identifier IDENTIFIER = new Identifier("battlegrounds", "flash_bang");
+    public static final Predicate<ItemStack> PROJECTILES = (stack) -> stack.isOf(Items.FLASH_BANG);
+    public static final float DEFAULT_VELOCITY = 1.3F;
+    private static final int DEFAULT_FUSE = 30;
 
     public FlashBangItem(Settings settings) {
         super(settings);
