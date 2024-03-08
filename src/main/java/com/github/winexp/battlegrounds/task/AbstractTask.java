@@ -2,13 +2,13 @@ package com.github.winexp.battlegrounds.task;
 
 import com.github.winexp.battlegrounds.events.TaskEvents;
 
-public abstract class Task {
+public abstract class AbstractTask {
     public static final Runnable NONE_RUNNABLE = () -> {
     };
     private final Runnable runnable;
     private boolean cancelled = false;
 
-    protected Task(Runnable runnable) {
+    protected AbstractTask(Runnable runnable) {
         this.runnable = runnable;
     }
 
@@ -26,6 +26,6 @@ public abstract class Task {
 
     public void run() {
         runnable.run();
-        TaskEvents.TRIGGERED.invoker().interact(this);
+        TaskEvents.TRIGGERED.invoker().triggered(this);
     }
 }

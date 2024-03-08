@@ -6,27 +6,27 @@ import net.minecraft.server.MinecraftServer;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @SuppressWarnings("SameReturnValue")
-public class TaskScheduler {
-    public static final TaskScheduler INSTANCE = new TaskScheduler();
+public class TaskExecutor {
+    public static final TaskExecutor INSTANCE = new TaskExecutor();
 
-    private final CopyOnWriteArrayList<Task> tasks = new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<AbstractTask> tasks = new CopyOnWriteArrayList<>();
 
-    public TaskScheduler() {
-        ServerTickEvents.END_SERVER_TICK.register(this::onTick);
+    public TaskExecutor() {
+        ServerTickEvents.END_SERVER_TICK.register(this::tick);
     }
 
-    private void onTick(MinecraftServer server) {
-        for (Task task : tasks) {
+    private void tick(MinecraftServer server) {
+        for (AbstractTask task : tasks) {
             if (task.isCancelled()) tasks.remove(task);
             try {
                 task.run();
-            } catch (RunnableCancelledException e) {
+            } catch (TaskCancelledException e) {
                 tasks.remove(task);
             }
         }
     }
 
-    public void runTask(Task task) {
+    public void execute(AbstractTask task) {
         if (tasks.contains(task)) return;
         tasks.add(task);
     }

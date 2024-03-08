@@ -21,7 +21,7 @@ public class StevesPainEnchantment extends Enchantment {
         super(rarity, target, slots);
     }
 
-    private void addEffects(LivingEntity source, LivingEntity target) {
+    private void giveEffects(LivingEntity source, LivingEntity target) {
         target.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, DURATION, 0), source);
         target.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, DURATION, 3), source);
         target.addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER, DURATION, 2), source);
@@ -33,7 +33,7 @@ public class StevesPainEnchantment extends Enchantment {
     public void onTargetDamaged(LivingEntity user, Entity target, int level) {
         Random random = user.getRandom();
         if (random.nextInt(100) + 1 <= BOUND && target instanceof LivingEntity livingEntity) {
-            addEffects(user, livingEntity);
+            this.giveEffects(user, livingEntity);
         }
     }
 

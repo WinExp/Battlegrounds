@@ -4,7 +4,7 @@ import com.github.winexp.battlegrounds.client.gui.screen.vote.VoteScreen;
 import com.github.winexp.battlegrounds.client.util.ClientVariables;
 import com.github.winexp.battlegrounds.entity.projectile.FlashBangEntity;
 import com.github.winexp.battlegrounds.network.packet.s2c.FlashS2CPacket;
-import com.github.winexp.battlegrounds.network.packet.s2c.VoteInfosS2CPacket;
+import com.github.winexp.battlegrounds.network.packet.s2c.SyncVoteInfoS2CPacket;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -26,7 +26,7 @@ public final class ModClientNetworkPlayHandler {
         });
     }
 
-    public static void onReturnVoteInfos(VoteInfosS2CPacket packet, ClientPlayerEntity player, PacketSender responseSender) {
+    public static void onReturnVoteInfos(SyncVoteInfoS2CPacket packet, ClientPlayerEntity player, PacketSender responseSender) {
         VoteScreen.voteInfoCallback(MinecraftClient.getInstance(), packet);
     }
 }

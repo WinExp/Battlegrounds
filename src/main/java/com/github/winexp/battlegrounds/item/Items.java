@@ -6,19 +6,14 @@ import com.github.winexp.battlegrounds.item.recipe.NbtCrafting;
 import com.github.winexp.battlegrounds.item.recipe.ShapedNbtCrafting;
 import com.github.winexp.battlegrounds.item.recipe.ShapelessNbtCrafting;
 import com.github.winexp.battlegrounds.item.thrown.FlashBangItem;
-import com.github.winexp.battlegrounds.item.tool.MinersPickaxeItem;
-import com.github.winexp.battlegrounds.item.tool.PVPProSwordItem;
-import com.github.winexp.battlegrounds.item.tool.RupertsTearItem;
-import com.github.winexp.battlegrounds.item.tool.ToolMaterials;
+import com.github.winexp.battlegrounds.item.tool.*;
 import com.github.winexp.battlegrounds.util.RecipeUtil;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.dispenser.ProjectileDispenserBehavior;
 import net.minecraft.enchantment.EnchantmentLevelEntry;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroups;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.Ingredient;
@@ -36,7 +31,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Items extends net.minecraft.item.Items {
-    public static final PVPProSwordItem PVP_PRO_SWORD = (PVPProSwordItem) register(PVPProSwordItem.IDENTIFIER, new PVPProSwordItem(ToolMaterials.PVP_PRO, 3, -2.4F, new Item.Settings().rarity(Rarity.RARE).fireproof()));
+    public static final PVPProSwordItem PVP_PRO_SWORD = (PVPProSwordItem) register(PVPProSwordItem.IDENTIFIER, new PVPProSwordItem(ToolMaterials.PVP_PRO_SWORD, 3, -2.4F, new Item.Settings().rarity(Rarity.RARE).fireproof()));
+    public static final SevenElevenSwordItem SEVEN_ELEVEN_SWORD = (SevenElevenSwordItem) register(SevenElevenSwordItem.IDENTIFIER, new SevenElevenSwordItem(ToolMaterials.SEVEN_ELEVEN_SWORD, 3, -2.4F, new Item.Settings().rarity(Rarity.RARE).fireproof()));
     public static final MinersPickaxeItem MINERS_PICKAXE = (MinersPickaxeItem) register(MinersPickaxeItem.IDENTIFIER, new MinersPickaxeItem(ToolMaterials.MINERS_PICKAXE, 1, -2.8F, new Item.Settings().rarity(Rarity.RARE)));
     public static final FlashBangItem FLASH_BANG = (FlashBangItem) register(FlashBangItem.IDENTIFIER, new FlashBangItem(new Item.Settings().maxCount(16).rarity(Rarity.UNCOMMON)));
     public static final RupertsTearItem RUPERTS_TEAR = (RupertsTearItem) register(RupertsTearItem.IDENTIFIER, new RupertsTearItem(ToolMaterials.RUPERTS_TEAR, new Item.Settings().maxCount(16).rarity(Rarity.UNCOMMON)));
@@ -45,27 +41,18 @@ public class Items extends net.minecraft.item.Items {
         DispenserBlock.registerBehavior(Items.FLASH_BANG, new ProjectileDispenserBehavior() {
             @Override
             protected ProjectileEntity createProjectile(World world, Position position, ItemStack stack) {
-                return Util.make(new FlashBangEntity(world, position.getX(), position.getY(), position.getZ(), FlashBangItem.getFuse(stack.getNbt())), (entity) ->
-                        entity.setItem(stack));
+                return Util.make(new FlashBangEntity(world, position.getX(), position.getY(), position.getZ()), (entity) -> {
+                    entity.setItem(stack);
+                    if (stack.getNbt() != null && stack.getNbt().contains("fuse")) {
+                        entity.setFuse(stack.getNbt().getInt("fuse"));
+                    }
+                });
             }
         });
     }
 
     public static void registerItems() {
         registerDispenserBehavior();
-    }
-
-    public static void registerItemGroup() {
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(content -> {
-            // 战斗用品
-            content.add(PVP_PRO_SWORD.getDefaultStack());
-        });
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(content -> {
-            // 工具与实用物品
-            content.add(MINERS_PICKAXE.getDefaultStack());
-            content.add(FLASH_BANG.getDefaultStack());
-            content.add(RUPERTS_TEAR.getDefaultStack());
-        });
     }
 
     public static void addRecipes() {
@@ -111,11 +98,8 @@ public class Items extends net.minecraft.item.Items {
                                 "bcb",
                                 " c "),
                         CraftingRecipeCategory.EQUIPMENT,
-                        () -> {
-                            ItemStack stack = new ItemStack(Items.IRON_PICKAXE, 1);
-                            stack.addEnchantment(Enchantments.SMELTING, 1);
-                            return stack;
-                        }
+                        Util.make(new ItemStack(Items.IRON_PICKAXE, 1), (stack) ->
+                                stack.addEnchantment(Enchantments.SMELTING, 1))
                 ),
                 // 史蒂夫の痛
                 new ShapedNbtCrafting(
@@ -189,7 +173,7 @@ public class Items extends net.minecraft.item.Items {
         );
 
         ArrayList<NbtCrafting> items = new ArrayList<>(List.of(
-                PVP_PRO_SWORD, MINERS_PICKAXE
+                PVP_PRO_SWORD, SEVEN_ELEVEN_SWORD, MINERS_PICKAXE
         ));
         items.addAll(shapedRecipes);
         items.addAll(shapelessRecipes);

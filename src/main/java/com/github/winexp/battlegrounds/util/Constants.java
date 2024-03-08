@@ -10,5 +10,6 @@ public class Constants {
     public static final String MOD_ID = "Battlegrounds";
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
     public static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve(MOD_ID);
+    public static final Path SAVE_PATH_TMP_FILE = FabricLoader.getInstance().getGameDir().resolve(Path.of("reset_world.session"));
 }
 

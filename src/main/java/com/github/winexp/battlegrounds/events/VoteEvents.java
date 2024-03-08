@@ -5,14 +5,16 @@ import com.github.winexp.battlegrounds.discussion.vote.VoteSettings;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 
-@FunctionalInterface
 public interface VoteEvents {
-    Event<VoteEvents> CLOSED = EventFactory.createArrayBacked(VoteEvents.class,
+    Event<Closed> CLOSED = EventFactory.createArrayBacked(Closed.class,
             (listeners) -> (voteInstance, reason) -> {
-                for (VoteEvents listener : listeners) {
-                    listener.interact(voteInstance, reason);
+                for (Closed listener : listeners) {
+                    listener.closed(voteInstance, reason);
                 }
             });
 
-    void interact(VoteInstance voteInstance, VoteSettings.CloseReason reason);
+    @FunctionalInterface
+    interface Closed {
+        void closed(VoteInstance voteInstance, VoteSettings.CloseReason reason);
+    }
 }

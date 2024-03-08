@@ -2,28 +2,28 @@ package com.github.winexp.battlegrounds.task;
 
 import org.jetbrains.annotations.Range;
 
-public class TaskCountdown extends TaskLater {
-    public static final TaskCountdown NONE_TASK = new TaskCountdown(Task.NONE_RUNNABLE, Task.NONE_RUNNABLE, -1, 1, -1);
+public class LimitRepeatTask extends ScheduledTask {
+    public static final LimitRepeatTask NONE_TASK = new LimitRepeatTask(AbstractTask.NONE_RUNNABLE, AbstractTask.NONE_RUNNABLE, -1, 1, -1);
     private final Runnable fixedRunnable;
     private final long unitTicks;
     private int count;
 
-    public TaskCountdown(Runnable trigger, Runnable triggerEnd, long delay, @Range(from = 1, to = Long.MAX_VALUE) long unitTicks, int count) {
+    public LimitRepeatTask(Runnable trigger, Runnable triggerEnd, long delay, @Range(from = 1, to = Long.MAX_VALUE) long unitTicks, int count) {
         super(trigger, delay);
         fixedRunnable = () -> {
             if (this.count < 0) {
-                throw new RunnableCancelledException(true);
+                throw new TaskCancelledException(true);
             }
 
             try {
                 if (this.count == 0) {
                     this.preTriggerRunnable = () -> {
                         triggerEnd.run();
-                        throw new RunnableCancelledException(false);
+                        throw new TaskCancelledException(false);
                     };
                 }
                 super.run();
-            } catch (RunnableCancelledException e) {
+            } catch (TaskCancelledException e) {
                 if (e.getEnforceCancel()) {
                     throw e;
                 }
@@ -32,7 +32,7 @@ public class TaskCountdown extends TaskLater {
             }
 
             if (this.count < 0) {
-                throw new RunnableCancelledException(false);
+                throw new TaskCancelledException(false);
             }
         };
 

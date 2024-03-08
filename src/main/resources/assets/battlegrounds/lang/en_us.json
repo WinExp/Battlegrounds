@@ -40,6 +40,7 @@
   "enchantment.battlegrounds.leaching": "Leaching",
 
   "item.battlegrounds.pvp_pro_sword": "PVP Pro",
+  "item.battlegrounds.seven_eleven_sword": "Seven-Eleven",
   "item.battlegrounds.miners_pickaxe": "Miner's Pickaxe",
   "item.battlegrounds.flash_bang": "Flash Bang",
   "item.battlegrounds.flash_bang.fuse": "Fuse: %fs",
@@ -48,6 +49,8 @@
   "item.battlegrounds.ruperts_tear.cooldown": "Cooldown Time：%fs",
   "item.battlegrounds.ruperts_tear.max_distance": "Max Distance: %d blocks",
   "item.battlegrounds.ruperts_tear.use_failed": "Can't get you here",
+
+  "itemGroup.battlegrounds.root": "Battlegrounds",
 
   "gui.battlegrounds.vote.accept": "Accept",
   "gui.battlegrounds.vote.deny": "Deny",

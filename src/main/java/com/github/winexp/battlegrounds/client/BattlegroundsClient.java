@@ -7,7 +7,7 @@ import com.github.winexp.battlegrounds.client.util.ClientVariables;
 import com.github.winexp.battlegrounds.entity.EntityTypes;
 import com.github.winexp.battlegrounds.entity.projectile.FlashBangEntity;
 import com.github.winexp.battlegrounds.network.packet.s2c.FlashS2CPacket;
-import com.github.winexp.battlegrounds.network.packet.s2c.VoteInfosS2CPacket;
+import com.github.winexp.battlegrounds.network.packet.s2c.SyncVoteInfoS2CPacket;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -24,7 +24,7 @@ public class BattlegroundsClient implements ClientModInitializer {
 
     private void registerReceiver() {
         ClientPlayNetworking.registerGlobalReceiver(FlashS2CPacket.TYPE, ModClientNetworkPlayHandler::onFlash);
-        ClientPlayNetworking.registerGlobalReceiver(VoteInfosS2CPacket.TYPE, ModClientNetworkPlayHandler::onReturnVoteInfos);
+        ClientPlayNetworking.registerGlobalReceiver(SyncVoteInfoS2CPacket.TYPE, ModClientNetworkPlayHandler::onReturnVoteInfos);
     }
 
     private void tick(MinecraftClient client) {

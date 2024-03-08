@@ -1,8 +1,8 @@
 package com.github.winexp.battlegrounds.discussion.vote;
 
 import com.github.winexp.battlegrounds.events.VoteEvents;
-import com.github.winexp.battlegrounds.task.TaskLater;
-import com.github.winexp.battlegrounds.task.TaskScheduler;
+import com.github.winexp.battlegrounds.task.ScheduledTask;
+import com.github.winexp.battlegrounds.task.TaskExecutor;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -19,7 +19,7 @@ public class VoteInstance implements AutoCloseable {
     private final Text description;
     private final VoteSettings settings;
     private boolean voting = false;
-    private TaskLater timeoutTask = TaskLater.NONE_TASK;
+    private ScheduledTask timeoutTask = ScheduledTask.NONE_TASK;
     private final HashMap<UUID, @Nullable Boolean> voteMap = new HashMap<>();
 
     public VoteInstance(Identifier identifier, VoteSettings settings) {
@@ -111,9 +111,9 @@ public class VoteInstance implements AutoCloseable {
         for (ServerPlayerEntity player : participants) {
             voteMap.put(PlayerUtil.getUUID(player), null);
         }
-        this.timeoutTask = new TaskLater(() ->
+        this.timeoutTask = new ScheduledTask(() ->
                 this.closeVote(VoteSettings.CloseReason.TIMEOUT), settings.timeout());
-        TaskScheduler.INSTANCE.runTask(this.timeoutTask);
+        TaskExecutor.INSTANCE.execute(this.timeoutTask);
         this.voting = true;
         return true;
     }
@@ -123,7 +123,7 @@ public class VoteInstance implements AutoCloseable {
         this.timeoutTask.cancel();
         this.voting = false;
         this.settings.voteClosedAction().accept(this, closeReason);
-        VoteEvents.CLOSED.invoker().interact(this, closeReason);
+        VoteEvents.CLOSED.invoker().closed(this, closeReason);
         return true;
     }
 

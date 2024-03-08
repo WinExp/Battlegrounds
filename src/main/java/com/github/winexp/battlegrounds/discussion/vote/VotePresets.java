@@ -1,6 +1,6 @@
 package com.github.winexp.battlegrounds.discussion.vote;
 
-import com.github.winexp.battlegrounds.helper.GameHelper;
+import com.github.winexp.battlegrounds.game.GameManager;
 import com.github.winexp.battlegrounds.util.TextUtil;
 import com.github.winexp.battlegrounds.util.Variables;
 import net.minecraft.text.Text;
@@ -20,7 +20,7 @@ public class VotePresets {
                             Variables.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
                                     "battlegrounds.vote.manual.broadcast", TextUtil.GOLD), false);
                         } else if (closeReason == VoteSettings.CloseReason.ACCEPTED) {
-                            GameHelper.INSTANCE.prepareResetWorlds(voteInstance.getParticipants());
+                            GameManager.INSTANCE.prepareResetWorlds(voteInstance.getParticipants());
                         }
                     },
                     (voteInstance, player, result) -> {

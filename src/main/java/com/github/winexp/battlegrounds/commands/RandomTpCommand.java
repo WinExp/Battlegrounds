@@ -1,7 +1,7 @@
 package com.github.winexp.battlegrounds.commands;
 
-import com.github.winexp.battlegrounds.task.TaskScheduler;
-import com.github.winexp.battlegrounds.task.TaskTimer;
+import com.github.winexp.battlegrounds.task.TaskExecutor;
+import com.github.winexp.battlegrounds.task.RepeatTask;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
 import com.github.winexp.battlegrounds.util.TextUtil;
 import com.github.winexp.battlegrounds.util.Variables;
@@ -18,7 +18,7 @@ import java.util.UUID;
 @SuppressWarnings("SameReturnValue")
 public class RandomTpCommand {
     private static final HashMap<UUID, Long> cooldownTimers = new HashMap<>();
-    private static TaskTimer coolDownUpdateTask = TaskTimer.NONE_TASK;
+    private static RepeatTask coolDownUpdateTask = RepeatTask.NONE_TASK;
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         var cRoot = CommandManager.literal("randomtp").requires(ServerCommandSource::isExecutedByPlayer)
@@ -41,13 +41,13 @@ public class RandomTpCommand {
     }
 
     private static int randomtp(CommandContext<ServerCommandSource> context) {
-        if (coolDownUpdateTask == TaskTimer.NONE_TASK) {
-            coolDownUpdateTask = new TaskTimer(() -> cooldownTimers.forEach((uuid, ticks) -> {
+        if (coolDownUpdateTask == RepeatTask.NONE_TASK) {
+            coolDownUpdateTask = new RepeatTask(() -> cooldownTimers.forEach((uuid, ticks) -> {
                 if (ticks <= 0) return;
                 cooldownTimers.put(uuid, ticks - 1);
             }), 0, 1);
         }
-        TaskScheduler.INSTANCE.runTask(coolDownUpdateTask);
+        TaskExecutor.INSTANCE.execute(coolDownUpdateTask);
 
         ServerCommandSource source = context.getSource();
         assert source.getPlayer() != null;

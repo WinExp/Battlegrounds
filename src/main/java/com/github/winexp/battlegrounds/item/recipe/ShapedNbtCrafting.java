@@ -7,19 +7,10 @@ import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.util.Identifier;
 
-import java.util.function.Supplier;
-
 public class ShapedNbtCrafting implements NbtCrafting {
     private final ItemStack result;
     private final ShapedRecipe recipe;
     private final Identifier identifier;
-
-    public ShapedNbtCrafting(Identifier identifier,
-                             RawShapedRecipe raw,
-                             CraftingRecipeCategory category,
-                             Supplier<ItemStack> result) {
-        this(identifier, raw, category, result.get());
-    }
 
     public ShapedNbtCrafting(Identifier identifier,
                              RawShapedRecipe raw,

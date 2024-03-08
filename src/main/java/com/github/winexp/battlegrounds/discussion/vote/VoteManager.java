@@ -1,7 +1,7 @@
 package com.github.winexp.battlegrounds.discussion.vote;
 
 import com.github.winexp.battlegrounds.events.VoteEvents;
-import com.github.winexp.battlegrounds.network.packet.s2c.VoteInfosS2CPacket;
+import com.github.winexp.battlegrounds.network.packet.s2c.SyncVoteInfoS2CPacket;
 import com.github.winexp.battlegrounds.util.Variables;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -35,13 +35,13 @@ public class VoteManager {
 
     public void updateVoteInfosToAllPlayers() {
         for (ServerPlayerEntity player : Variables.server.getPlayerManager().getPlayerList()) {
-            this.updateVoteInfos(player);
+            this.updateVoteInfos(player, true);
         }
     }
 
-    public void updateVoteInfos(ServerPlayerEntity player) {
+    public void updateVoteInfos(ServerPlayerEntity player, boolean changed) {
         Collection<VoteInfo> voteInfos = this.getVoteInfos();
-        VoteInfosS2CPacket packet = new VoteInfosS2CPacket(voteInfos);
+        SyncVoteInfoS2CPacket packet = new SyncVoteInfoS2CPacket(changed, voteInfos);
         ServerPlayNetworking.send(player, packet);
     }
 

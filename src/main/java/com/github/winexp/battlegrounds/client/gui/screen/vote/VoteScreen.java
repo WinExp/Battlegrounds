@@ -2,8 +2,8 @@ package com.github.winexp.battlegrounds.client.gui.screen.vote;
 
 import com.github.winexp.battlegrounds.discussion.vote.VoteInfo;
 import com.github.winexp.battlegrounds.network.packet.c2s.VoteC2SPacket;
-import com.github.winexp.battlegrounds.network.packet.c2s.VoteInfosC2SPacket;
-import com.github.winexp.battlegrounds.network.packet.s2c.VoteInfosS2CPacket;
+import com.github.winexp.battlegrounds.network.packet.c2s.SyncVoteInfoC2SPacket;
+import com.github.winexp.battlegrounds.network.packet.s2c.SyncVoteInfoS2CPacket;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -52,10 +52,10 @@ public class VoteScreen extends Screen {
     }
 
     public static void getVoteInfos() {
-        ClientPlayNetworking.send(new VoteInfosC2SPacket());
+        ClientPlayNetworking.send(new SyncVoteInfoC2SPacket());
     }
 
-    public static void voteInfoCallback(MinecraftClient client, VoteInfosS2CPacket packet) {
+    public static void voteInfoCallback(MinecraftClient client, SyncVoteInfoS2CPacket packet) {
         voteInfosCache.clear();
         voteInfosCache.addAll(packet.voteInfos());
         if (client.currentScreen instanceof VoteScreen voteScreen) {
@@ -75,12 +75,13 @@ public class VoteScreen extends Screen {
             ClientPlayNetworking.send(new VoteC2SPacket(identifier, result));
             voteEntry.setSelectable(false);
         }
+        this.updateButtonState();
     }
 
     private void refresh() {
         getVoteInfos();
-        this.refreshButton.active = false;
         lastRefreshTime = System.currentTimeMillis();
+        this.updateButtonState();
     }
 
     @Override
@@ -92,7 +93,6 @@ public class VoteScreen extends Screen {
     protected void init() {
         this.voteList = this.addDrawableChild(new VoteListWidget(this, this.client, this.width, this.height / 2 - 20, 50, 36));
         this.voteList.setRenderBackground(false);
-        this.updateVotesGUI();
         this.acceptButton = this.addDrawableChild(ButtonWidget
                 .builder(Text.translatable("gui.battlegrounds.vote.accept"),
                         button -> this.onVoteButtonClicked(true))
@@ -108,6 +108,7 @@ public class VoteScreen extends Screen {
                         button -> this.refresh())
                 .dimensions(this.width / 2 - 40, this.height / 2 + 80, 80, 20)
                 .build());
-        updateButtonState();
+        this.updateButtonState();
+        this.updateVotesGUI();
     }
 }

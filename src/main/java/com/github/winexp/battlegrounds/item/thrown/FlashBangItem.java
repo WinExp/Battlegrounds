@@ -50,8 +50,9 @@ public class FlashBangItem extends RangedWeaponItem {
                 world.playSound(null, user.getX(), user.getY(), user.getZ(), SoundEvents.ENTITY_SNOWBALL_THROW, SoundCategory.NEUTRAL, 0.5F, 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F));
                 if (!world.isClient) {
                     NbtCompound nbt = stack.getNbt();
-                    FlashBangEntity entity = new FlashBangEntity(player, world, getFuse(nbt));
+                    FlashBangEntity entity = new FlashBangEntity(player, world);
                     entity.setItem(stack);
+                    entity.setFuse(getFuse(nbt));
                     entity.setVelocity(player, player.getPitch(), player.getYaw(), 0.0F, progress * getVelocity(nbt), 1.0F);
                     world.spawnEntity(entity);
                 }

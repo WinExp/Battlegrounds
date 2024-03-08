@@ -7,11 +7,14 @@ import com.github.winexp.battlegrounds.configs.RootConfig;
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.entity.EntityTypes;
 import com.github.winexp.battlegrounds.events.ModServerPlayerEvents;
-import com.github.winexp.battlegrounds.helper.GameHelper;
+import com.github.winexp.battlegrounds.game.GameManager;
+import com.github.winexp.battlegrounds.item.ItemGroups;
 import com.github.winexp.battlegrounds.item.Items;
+import com.github.winexp.battlegrounds.loot.LootTableModifier;
+import com.github.winexp.battlegrounds.loot.function.ReplaceDropLootFunction;
 import com.github.winexp.battlegrounds.network.ModServerNetworkPlayHandler;
 import com.github.winexp.battlegrounds.network.packet.c2s.VoteC2SPacket;
-import com.github.winexp.battlegrounds.network.packet.c2s.VoteInfosC2SPacket;
+import com.github.winexp.battlegrounds.network.packet.c2s.SyncVoteInfoC2SPacket;
 import com.github.winexp.battlegrounds.util.*;
 import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.api.ModInitializer;
@@ -19,9 +22,11 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.block.Blocks;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -42,8 +47,8 @@ public class Battlegrounds implements ModInitializer {
     public void saveConfigs() {
         ConfigUtil.saveConfig(Constants.CONFIG_PATH, "config", Variables.config);
         if (Variables.server != null) {
-            if (GameHelper.INSTANCE.reduceTask.getDelay() >= 0) {
-                Variables.progress.resizeLapTimer = GameHelper.INSTANCE.reduceTask.getDelay();
+            if (GameManager.INSTANCE.reduceTask.getDelay() >= 0) {
+                Variables.progress.resizeLapTimer = GameManager.INSTANCE.reduceTask.getDelay();
             }
             ConfigUtil.saveConfig(Variables.server.getSavePath(WorldSavePath.ROOT), "bg_progress", Variables.progress);
         }
@@ -61,14 +66,14 @@ public class Battlegrounds implements ModInitializer {
     public void reload() {
         this.loadConfigs();
         Items.addRecipes();
-        GameHelper.INSTANCE.reduceTask.cancel();
+        GameManager.INSTANCE.reduceTask.cancel();
         if (Variables.progress.gameStage.isStarted() && !Variables.progress.gameStage.isDeathmatch()) {
-            GameHelper.INSTANCE.runTasks();
+            GameManager.INSTANCE.runTasks();
         }
     }
 
     private void registerReceiver() {
-        ServerPlayNetworking.registerGlobalReceiver(VoteInfosC2SPacket.TYPE, ModServerNetworkPlayHandler::onGetVoteInfos);
+        ServerPlayNetworking.registerGlobalReceiver(SyncVoteInfoC2SPacket.TYPE, ModServerNetworkPlayHandler::onGetVoteInfos);
         ServerPlayNetworking.registerGlobalReceiver(VoteC2SPacket.TYPE, ModServerNetworkPlayHandler::onVote);
     }
 
@@ -79,12 +84,12 @@ public class Battlegrounds implements ModInitializer {
 
     private void onServerStarting(MinecraftServer server) {
         Variables.server = server;
-        GameHelper.INSTANCE.setServer(server);
+        GameManager.INSTANCE.setServer(server);
         this.loadConfigs();
     }
 
     private void onServerStarted(MinecraftServer server) {
-        GameHelper.INSTANCE.initialize();
+        GameManager.INSTANCE.initialize();
     }
 
     private void onSaving(MinecraftServer server, boolean flush, boolean force) {
@@ -93,12 +98,6 @@ public class Battlegrounds implements ModInitializer {
 
     private void onPlayerRespawn(ServerPlayerEntity oldPlayer, ServerPlayerEntity newPlayer, boolean alive) {
         PlayerUtil.setGameModeWithMap(newPlayer);
-    }
-
-    private void onLivingEntityDeath(LivingEntity entity, DamageSource damageSource) {
-        if (entity instanceof ServerPlayerEntity player) {
-            GameHelper.INSTANCE.onPlayerDeath(player);
-        }
     }
 
     private boolean allowLivingEntityDamaged(LivingEntity entity, DamageSource source, float amount) {
@@ -137,7 +136,7 @@ public class Battlegrounds implements ModInitializer {
                 );
                 Variables.server.getPlayerManager().getWhitelist().add(new WhitelistEntry(player.getGameProfile()));
                 if (Variables.server.getPlayerManager().getPlayerList().size() + 1 == Variables.progress.players.size()) {
-                    GameHelper.INSTANCE.prepareStartGame();
+                    GameManager.INSTANCE.prepareStartGame();
                 }
             }
         } else if (Variables.progress.gameStage.isDeathmatch()) {
@@ -154,11 +153,17 @@ public class Battlegrounds implements ModInitializer {
         return permission == null || permission.naturalRegen;
     }
 
+    private void registerSmeltableBlocks() {
+        Enchantments.SMELTING.registerSmeltable(Blocks.IRON_ORE, Blocks.DEEPSLATE_IRON_ORE);
+        Enchantments.SMELTING.registerSmeltable(Blocks.GOLD_ORE, Blocks.DEEPSLATE_GOLD_ORE);
+        Enchantments.SMELTING.registerSmeltable(Blocks.COPPER_ORE, Blocks.DEEPSLATE_COPPER_ORE);
+        Enchantments.SMELTING.registerSmeltable(Blocks.NETHER_GOLD_ORE, ReplaceDropLootFunction.builder(Items.GOLD_INGOT));
+    }
+
     @Override
     public void onInitialize() {
         INSTANCE = this;
         Constants.LOGGER.info("Loading {}", Constants.MOD_ID);
-
         // 注册指令
         CommandRegistrationCallback.EVENT.register(this::registerCommands);
         // 加载配置
@@ -170,31 +175,24 @@ public class Battlegrounds implements ModInitializer {
         ServerLifecycleEvents.AFTER_SAVE.register(this::onSaving);
         ServerPlayConnectionEvents.JOIN.register(this::onPlayerJoin);
         ServerLivingEntityEvents.ALLOW_DAMAGE.register(this::allowLivingEntityDamaged);
-        ServerLivingEntityEvents.AFTER_DEATH.register(this::onLivingEntityDeath);
         ServerPlayerEvents.AFTER_RESPAWN.register(this::onPlayerRespawn);
+        LootTableEvents.MODIFY.register(new LootTableModifier());
         // 自定义
         ModServerPlayerEvents.ALLOW_NATURAL_REGEN.register(this::allowPlayerNaturalRegen);
-
         // 注册实体
         EntityTypes.registerEntities();
-
         // 注册物品
         Items.registerItems();
-
         // 注册附魔
         Enchantments.registerEnchantments();
-
-        // 注册物品组
-        Items.registerItemGroup();
-        Enchantments.registerItemGroup();
-
+        this.registerSmeltableBlocks(); // 自动冶炼
         // 添加配方
         Items.addRecipes();
-
+        // 注册物品组
+        ItemGroups.registerItemGroups();
         // 注册网络包接收器
         this.registerReceiver();
-
         // 尝试重置存档
-        GameHelper.INSTANCE.tryResetWorlds();
+        GameManager.INSTANCE.tryResetWorlds();
     }
 }

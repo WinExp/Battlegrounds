@@ -1,13 +1,15 @@
-package com.github.winexp.battlegrounds.helper;
+package com.github.winexp.battlegrounds.game;
 
 import com.github.winexp.battlegrounds.configs.GameProgress;
-import com.github.winexp.battlegrounds.task.RunnableCancelledException;
-import com.github.winexp.battlegrounds.task.TaskCountdown;
-import com.github.winexp.battlegrounds.task.TaskScheduler;
-import com.github.winexp.battlegrounds.task.TaskTimer;
+import com.github.winexp.battlegrounds.helper.TeamHelper;
+import com.github.winexp.battlegrounds.helper.WorldHelper;
+import com.github.winexp.battlegrounds.task.LimitRepeatTask;
+import com.github.winexp.battlegrounds.task.TaskCancelledException;
+import com.github.winexp.battlegrounds.task.TaskExecutor;
+import com.github.winexp.battlegrounds.task.RepeatTask;
 import com.github.winexp.battlegrounds.util.*;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
@@ -15,6 +17,7 @@ import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.boss.BossBarManager;
 import net.minecraft.entity.boss.CommandBossBar;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.projectile.FireworkRocketEntity;
@@ -41,23 +44,23 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class GameHelper {
-    public static final GameHelper INSTANCE = new GameHelper();
-    private final String healthModifierId = "game.health_modifier";
+public class GameManager {
+    public static final GameManager INSTANCE = new GameManager();
+    private final String healthModifierId = "game/health_modifier";
     private static final Identifier BAR_ID = new Identifier("battlegrounds", "progress_bar");
-    private static final Path SAVE_PATH_TMP_FILE = FabricLoader.getInstance().getGameDir().resolve(Path.of("reset_world.session"));
     private static final boolean KEEP_INVENTORY = false;
     private TeamHelper teamHelper;
-    public TaskTimer reduceTask = TaskTimer.NONE_TASK;
-    public TaskTimer barUpdateTask = TaskTimer.NONE_TASK;
-    public TaskCountdown stopTask = TaskCountdown.NONE_TASK;
-    public TaskCountdown startTask = TaskCountdown.NONE_TASK;
+    public RepeatTask reduceTask = RepeatTask.NONE_TASK;
+    public RepeatTask barUpdateTask = RepeatTask.NONE_TASK;
+    public LimitRepeatTask stopTask = LimitRepeatTask.NONE_TASK;
+    public LimitRepeatTask startTask = LimitRepeatTask.NONE_TASK;
     private WorldHelper worldHelper;
     private CommandBossBar bossBar;
     private MinecraftServer server;
 
-    private GameHelper() {
-        ServerTickEvents.END_SERVER_TICK.register(this::onTick);
+    private GameManager() {
+        ServerLivingEntityEvents.ALLOW_DAMAGE.register(this::onLivingEntityDeath);
+        ServerTickEvents.END_SERVER_TICK.register(this::tick);
     }
 
     public MinecraftServer getServer() {
@@ -85,7 +88,7 @@ public class GameHelper {
         }
     }
 
-    private void onTick(MinecraftServer server) {
+    private void tick(MinecraftServer server) {
         for (UUID uuid : Variables.progress.players.keySet()) {
             GameProgress.PlayerPermission permission = Variables.progress.players.get(uuid);
             ServerPlayerEntity player = server.getPlayerManager().getPlayer(uuid);
@@ -101,49 +104,51 @@ public class GameHelper {
         livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 2, 1));
     }
 
-    public void onPlayerDeath(ServerPlayerEntity player) {
+    public boolean onLivingEntityDeath(LivingEntity entity, DamageSource source, float damageAmount) {
+        if (!(entity instanceof ServerPlayerEntity player)) {
+            return true;
+        }
         if (Variables.progress.gameStage.isStarted()
                 && Variables.progress.isInGame(PlayerUtil.getUUID(player))) {
             PlayerUtil.setGameModeMap(player, GameMode.SPECTATOR);
             GameProgress.PlayerPermission permission = new GameProgress.PlayerPermission();
             Variables.progress.players.put(PlayerUtil.getUUID(player), permission);
-            if (this.getInGamePlayersNum() == 1) {
-                ServerPlayerEntity p = this.getLastInGamePlayer();
-                this.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
-                        "battlegrounds.game.end.broadcast", TextUtil.GOLD, p.getName()), false);
-
-                Random random = p.getWorld().getRandom();
-                int amount = random.nextInt(4) + 1;
-                for (int i = 0; i < amount; i++) {
-                    int fireworkOffset = 4;
-                    FireworkRocketEntity firework = EntityType.FIREWORK_ROCKET.create(this.server.getOverworld());
-                    if (firework != null) {
-                        Vec3d pos = p.getPos();
-                        Vec3d offset = new Vec3d(
-                                random.nextDouble() * (fireworkOffset * 2) - fireworkOffset,
-                                1,
-                                random.nextDouble() * (fireworkOffset * 2) - fireworkOffset
-                        );
-                        firework.refreshPositionAfterTeleport(pos.add(offset));
-                        p.getWorld().spawnEntity(firework);
-                    }
-                }
-
-                this.stopGame();
+            if (this.getInGamePlayersNum() != 1) {
+                return true;
             }
-            this.server.getPlayerManager().getWhitelist().remove(player.getGameProfile());
+            ServerPlayerEntity p = this.getLastInGamePlayer();
+            this.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
+                    "battlegrounds.game.end.broadcast", TextUtil.GOLD, p.getName()), false);
+            Random random = p.getWorld().getRandom();
+            int amount = random.nextInt(4) + 1;
+            for (int i = 0; i < amount; i++) {
+                int fireworkOffset = 4;
+                FireworkRocketEntity firework = EntityType.FIREWORK_ROCKET.create(this.server.getOverworld());
+                assert firework != null;
+                Vec3d pos = p.getPos();
+                Vec3d offset = new Vec3d(
+                        random.nextDouble() * (fireworkOffset * 2) - fireworkOffset,
+                        1,
+                        random.nextDouble() * (fireworkOffset * 2) - fireworkOffset
+                );
+                firework.refreshPositionAfterTeleport(pos.add(offset));
+                p.getWorld().spawnEntity(firework);
+            }
+
+            this.stopGame();
         }
+        return true;
     }
 
     public void prepareStartGame() {
         this.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
                 "battlegrounds.game.already.broadcast",
                 TextUtil.GREEN), false);
-        this.startTask = new TaskCountdown(
+        this.startTask = new LimitRepeatTask(
                 () -> {
                     for (ServerPlayerEntity player1 : server.getPlayerManager().getPlayerList()) {
                         PlayerUtil.sendTitle(player1, TextUtil.withColor(
-                                Text.literal(String.valueOf(startTask.getCount())), TextUtil.GREEN));
+                                Text.literal(String.valueOf(this.startTask.getCount())), TextUtil.GREEN));
                         player1.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HAT.value(), SoundCategory.NEUTRAL, 0.7f, 1.0f);
                     }
                 },
@@ -151,17 +156,17 @@ public class GameHelper {
                 0, 20,
                 Variables.config.delay.gameStartDelaySeconds
         );
-        TaskScheduler.INSTANCE.runTask(startTask);
+        TaskExecutor.INSTANCE.execute(this.startTask);
     }
 
     public void prepareResetWorlds(Collection<UUID> participants) {
         this.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
                 "battlegrounds.game.start.broadcast", TextUtil.GREEN, Variables.config.delay.serverCloseDelaySeconds), false);
-        stopTask = new TaskCountdown(
+        this.stopTask = new LimitRepeatTask(
                 () -> {
                     for (ServerPlayerEntity player : this.server.getPlayerManager().getPlayerList()) {
                         PlayerUtil.sendTitle(player, TextUtil.withColor(
-                                Text.literal(String.valueOf(stopTask.getCount())), TextUtil.GREEN));
+                                Text.literal(String.valueOf(this.stopTask.getCount())), TextUtil.GREEN));
                         player.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HAT.value(), SoundCategory.NEUTRAL, 0.7f, 1.0f);
                     }
                 },
@@ -169,9 +174,9 @@ public class GameHelper {
                         "battlegrounds.game.server.stop", TextUtil.GREEN)),
                 0, 20, Variables.config.delay.serverCloseDelaySeconds
         );
-        TaskScheduler.INSTANCE.runTask(stopTask);
+        TaskExecutor.INSTANCE.execute(this.stopTask);
         FileUtil.writeString(
-                SAVE_PATH_TMP_FILE,
+                Constants.SAVE_PATH_TMP_FILE,
                 this.server.getSavePath(WorldSavePath.ROOT).toString()
         );
         HashMap<UUID, GameProgress.PlayerPermission> playerList = new HashMap<>();
@@ -190,15 +195,15 @@ public class GameHelper {
     }
 
     public void tryResetWorlds() {
-        if (Files.isRegularFile(SAVE_PATH_TMP_FILE)) {
+        if (Files.isRegularFile(Constants.SAVE_PATH_TMP_FILE)) {
             this.resetWorlds();
-            FileUtil.delete(SAVE_PATH_TMP_FILE, true);
+            FileUtil.delete(Constants.SAVE_PATH_TMP_FILE, true);
             Constants.LOGGER.info("已重置地图");
         }
     }
 
     private void resetWorlds() {
-        Path savePath = Path.of(FileUtil.readString(SAVE_PATH_TMP_FILE).trim());
+        Path savePath = Path.of(FileUtil.readString(Constants.SAVE_PATH_TMP_FILE).trim());
         FileUtil.delete(savePath, false, "bg_progress.json");
     }
 
@@ -306,9 +311,9 @@ public class GameHelper {
                             this.reduceTask.getDelay() / 20)
             );
         }
-        this.barUpdateTask = new TaskTimer(() -> {
+        this.barUpdateTask = new RepeatTask(() -> {
             if (this.bossBar == null) {
-                throw new RunnableCancelledException();
+                throw new TaskCancelledException();
             }
             this.bossBar.addPlayers(this.server.getPlayerManager().getPlayerList());
             this.bossBar.setMaxValue((int) (Variables.config.border.time.resizeDelayTicks + Variables.config.border.time.resizeSpendTicks));
@@ -317,7 +322,7 @@ public class GameHelper {
                     TextUtil.GREEN,
                     this.reduceTask.getDelay() / 20));
         }, this.reduceTask.getDelay() % 20, 20);
-        TaskScheduler.INSTANCE.runTask(barUpdateTask);
+        TaskExecutor.INSTANCE.execute(barUpdateTask);
     }
 
     private void removeBossBar() {
@@ -331,7 +336,7 @@ public class GameHelper {
     }
 
     public void runTasks() {
-        this.reduceTask = new TaskTimer(() -> {
+        this.reduceTask = new RepeatTask(() -> {
             // 启用 PVP
             if (Variables.progress.currentLap + 1
                     == Variables.config.border.borderOrdinal.pvpEnabledBorderOrdinal) {
@@ -386,7 +391,7 @@ public class GameHelper {
             if (Variables.progress.currentLap
                     >= Variables.config.border.totalNum) {
                 this.removeBossBar();
-                throw new RunnableCancelledException();
+                throw new TaskCancelledException();
             }
             for (ServerPlayerEntity player : this.server.getPlayerManager().getPlayerList()) {
                 player.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 0.7F, 1);
@@ -396,7 +401,7 @@ public class GameHelper {
             Variables.progress.currentLap++;
         }, Variables.progress.resizeLapTimer,
                 () -> Variables.config.border.time.resizeDelayTicks + Variables.config.border.time.resizeSpendTicks);
-        TaskScheduler.INSTANCE.runTask(this.reduceTask);
+        TaskExecutor.INSTANCE.execute(this.reduceTask);
     }
 
     public void stopGame() {

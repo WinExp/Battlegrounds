@@ -9,6 +9,9 @@ import com.github.winexp.battlegrounds.util.raycast.BlockRaycastResult;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
 import net.minecraft.item.Item;
@@ -36,7 +39,15 @@ public class FlashBangEntity extends ThrownItemEntity {
     public static final float STRENGTH_LEFT_SPEED = 0.02F;
     public static final float FOG_VISIBILITY = 3.0F;
     public static final float DISTANCE_INCREMENT = 10;
-    private int fuse = 0;
+    private static final TrackedData<Integer> FUSE = DataTracker.registerData(FlashBangEntity.class, TrackedDataHandlerRegistry.INTEGER);
+
+    public int getFuse() {
+        return this.getDataTracker().get(FUSE);
+    }
+
+    public void setFuse(int fuse) {
+        this.getDataTracker().set(FUSE, fuse);
+    }
 
     private static final BiPredicate<BlockRaycastResult, World> BLOCK_PREDICATE = (raycastResult, world) -> {
         BlockHitResult hitResult = raycastResult.hitResult();
@@ -51,14 +62,12 @@ public class FlashBangEntity extends ThrownItemEntity {
         super(entityType, world);
     }
 
-    public FlashBangEntity(World world, double d, double e, double f, int fuse) {
+    public FlashBangEntity(World world, double d, double e, double f) {
         super(EntityTypes.FLASH_BANG, d, e, f, world);
-        this.fuse = fuse;
     }
 
-    public FlashBangEntity(LivingEntity livingEntity, World world, int fuse) {
+    public FlashBangEntity(LivingEntity livingEntity, World world) {
         super(EntityTypes.FLASH_BANG, livingEntity, world);
-        this.fuse = fuse;
     }
 
     private ParticleEffect getParticleParameters() {
@@ -98,10 +107,16 @@ public class FlashBangEntity extends ThrownItemEntity {
     }
 
     @Override
+    protected void initDataTracker() {
+        super.initDataTracker();
+        this.getDataTracker().startTracking(FUSE, 0);
+    }
+
+    @Override
     public void tick() {
-        if (fuse >= 0) {
-            this.fuse--;
-            if (fuse <= 0) {
+        if (this.getFuse() >= 0) {
+            this.setFuse(this.getFuse() - 1);
+            if (this.getFuse() <= 0) {
                 BlockHitResult hitResult = BlockHitResult.createMissed(this.getPos(), Direction.UP, this.getBlockPos());
                 this.onCollision(hitResult);
             }
@@ -123,12 +138,12 @@ public class FlashBangEntity extends ThrownItemEntity {
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
-        if (nbt.contains("fuse")) this.fuse = nbt.getInt("fuse");
+        if (nbt.contains("fuse")) this.setFuse(nbt.getInt("fuse"));
     }
 
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
-        nbt.putInt("fuse", this.fuse < 0 ? -1 : this.fuse);
+        nbt.putInt("fuse", this.getFuse() < 0 ? -1 : this.getFuse());
     }
 
     @Override

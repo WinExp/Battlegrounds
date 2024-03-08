@@ -33,10 +33,10 @@ import java.util.Set;
 public class ChannelingArrowEntity extends PersistentProjectileEntity {
     private static final ItemStack DEFAULT_STACK = new ItemStack(Items.ARROW);
     private static final TrackedData<Integer> COLOR = DataTracker.registerData(ChannelingArrowEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    private static final TrackedData<Boolean> CHANNELING = DataTracker.registerData(ChannelingArrowEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private final Set<StatusEffectInstance> effects;
     private Potion potion;
     private boolean colorSet;
-    private boolean channeling = false;
 
     public ChannelingArrowEntity(net.minecraft.entity.EntityType<? extends ChannelingArrowEntity> entityType, World world) {
         super(entityType, world, DEFAULT_STACK);
@@ -103,6 +103,7 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
     protected void initDataTracker() {
         super.initDataTracker();
         this.dataTracker.startTracking(COLOR, -1);
+        this.dataTracker.startTracking(CHANNELING, false);
     }
 
     private void spawnParticlesWithOffset(ParticleEffect particle, int amount, double speedOffset) {
@@ -210,7 +211,7 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
         } else {
             this.initColor();
         }
-        if (nbt.contains("Channeling", NbtElement.BYTE_TYPE)) channeling = nbt.getBoolean("Channeling");
+        if (nbt.contains("Channeling", NbtElement.BYTE_TYPE)) this.setChanneling(nbt.getBoolean("Channeling"));
     }
 
     @Override
@@ -233,7 +234,7 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
 
             nbt.put("custom_potion_effects", nbtList);
         }
-        nbt.putBoolean("Channeling", channeling);
+        nbt.putBoolean("Channeling", this.getChanneling());
     }
 
     protected ItemStack asItemStack() {
@@ -272,10 +273,10 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
     }
 
     public boolean getChanneling() {
-        return channeling;
+        return this.getDataTracker().get(CHANNELING);
     }
 
-    public void setChanneling(boolean bl) {
-        channeling = bl;
+    public void setChanneling(boolean channeling) {
+        this.getDataTracker().set(CHANNELING, channeling);
     }
 }

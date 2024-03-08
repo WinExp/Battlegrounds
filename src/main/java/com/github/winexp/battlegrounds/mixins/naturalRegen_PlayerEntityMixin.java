@@ -13,14 +13,14 @@ public abstract class naturalRegen_PlayerEntityMixin {
     @Inject(method = "canFoodHeal", at = @At("HEAD"), cancellable = true)
     private void canHeal(CallbackInfoReturnable<Boolean> cir) {
         PlayerEntity player = (PlayerEntity) (Object) this;
-        boolean result = ModServerPlayerEvents.ALLOW_NATURAL_REGEN.invoker().interact(player);
+        boolean result = ModServerPlayerEvents.ALLOW_NATURAL_REGEN.invoker().allow(player);
         cir.setReturnValue(result);
     }
 
     @Redirect(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;heal(F)V"))
     private void peacefulHeal(PlayerEntity instance, float v) {
         PlayerEntity player = (PlayerEntity) (Object) this;
-        boolean result = ModServerPlayerEvents.ALLOW_NATURAL_REGEN.invoker().interact(player);
+        boolean result = ModServerPlayerEvents.ALLOW_NATURAL_REGEN.invoker().allow(player);
         if (result) {
             player.heal(v);
         }

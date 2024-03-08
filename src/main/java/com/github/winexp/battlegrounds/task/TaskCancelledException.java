@@ -1,13 +1,13 @@
 package com.github.winexp.battlegrounds.task;
 
-public class RunnableCancelledException extends RuntimeException {
+public class TaskCancelledException extends RuntimeException {
     private final boolean enforceCancel;
 
-    public RunnableCancelledException() {
+    public TaskCancelledException() {
         this(true);
     }
 
-    public RunnableCancelledException(boolean enforceCancel) {
+    public TaskCancelledException(boolean enforceCancel) {
         super();
         this.enforceCancel = enforceCancel;
     }

@@ -4,8 +4,8 @@ import com.github.winexp.battlegrounds.Battlegrounds;
 import com.github.winexp.battlegrounds.discussion.vote.VoteManager;
 import com.github.winexp.battlegrounds.discussion.vote.VotePresets;
 import com.github.winexp.battlegrounds.entity.projectile.FlashBangEntity;
-import com.github.winexp.battlegrounds.helper.GameHelper;
-import com.github.winexp.battlegrounds.task.TaskScheduler;
+import com.github.winexp.battlegrounds.game.GameManager;
+import com.github.winexp.battlegrounds.task.TaskExecutor;
 import com.github.winexp.battlegrounds.util.*;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.ArgumentBuilder;
@@ -111,8 +111,8 @@ public class BattlegroundsCommand {
 
     private static int executeStop(CommandContext<ServerCommandSource> context) {
         VoteManager.INSTANCE.closeVote(VotePresets.START_GAME.identifier());
-        TaskScheduler.INSTANCE.stopAllTask();
-        GameHelper.INSTANCE.stopGame();
+        TaskExecutor.INSTANCE.stopAllTask();
+        GameManager.INSTANCE.stopGame();
         Constants.LOGGER.info("已停止队列中所有任务");
 
         return 1;

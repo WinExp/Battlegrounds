@@ -2,18 +2,18 @@ package com.github.winexp.battlegrounds.task;
 
 import java.util.function.LongSupplier;
 
-public class TaskTimer extends TaskLater {
-    public static final TaskTimer NONE_TASK = new TaskTimer(Task.NONE_RUNNABLE, -1, -1);
+public class RepeatTask extends ScheduledTask {
+    public static final RepeatTask NONE_TASK = new RepeatTask(AbstractTask.NONE_RUNNABLE, -1, -1);
     private final Runnable fixedRunnable;
     private final LongSupplier ticks;
 
-    public TaskTimer(Runnable runnable, long delay, LongSupplier ticks) {
+    public RepeatTask(Runnable runnable, long delay, LongSupplier ticks) {
         super(runnable, delay);
 
         fixedRunnable = () -> {
             try {
                 super.run();
-            } catch (RunnableCancelledException e) {
+            } catch (TaskCancelledException e) {
                 if (e.getEnforceCancel()) {
                     throw e;
                 }
@@ -27,7 +27,7 @@ public class TaskTimer extends TaskLater {
         this.ticks = ticks;
     }
 
-    public TaskTimer(Runnable runnable, long delay, long ticks) {
+    public RepeatTask(Runnable runnable, long delay, long ticks) {
         this(runnable, delay, () -> ticks);
     }
 
