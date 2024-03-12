@@ -13,7 +13,7 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.ItemStack;
 
 public class VitalityEnchantment extends Enchantment {
-    private final String healthModifierId = "enchantment.vitality.health_modifier";
+    private final static String HEALTH_MODIFIER_ID = "enchantment.vitality.health_modifier";
 
     public VitalityEnchantment() {
         this(Rarity.VERY_RARE, EnchantmentTarget.ARMOR_CHEST, EquipmentSlot.CHEST);
@@ -27,19 +27,24 @@ public class VitalityEnchantment extends Enchantment {
     private void onEquipmentChange(LivingEntity livingEntity, EquipmentSlot equipmentSlot, ItemStack previousStack, ItemStack currentStack) {
         if (equipmentSlot == EquipmentSlot.CHEST) {
             int level = EnchantmentHelper.getLevel(Enchantments.VITALITY, currentStack);
-            this.modifyHealth(livingEntity, level, level > 0);
+            this.modifyHealth(livingEntity, level);
         }
     }
 
-    private void modifyHealth(LivingEntity livingEntity, int level, boolean addition) {
+    private void modifyHealth(LivingEntity livingEntity, int level) {
         EntityAttributeInstance attribute = livingEntity.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
         assert attribute != null;
-        if (addition) {
-            EffectUtil.addAttribute(attribute, healthModifierId,
+        if (level > 0) {
+            EffectUtil.addAttribute(attribute, HEALTH_MODIFIER_ID,
                     level * 4, EntityAttributeModifier.Operation.ADDITION);
         } else {
-            EffectUtil.removeAttribute(attribute, healthModifierId);
+            EffectUtil.removeAttribute(attribute, HEALTH_MODIFIER_ID);
         }
+    }
+
+    @Override
+    public boolean isTreasure() {
+        return true;
     }
 
     @Override
@@ -49,11 +54,11 @@ public class VitalityEnchantment extends Enchantment {
 
     @Override
     public int getMinPower(int level) {
-        return 30;
+        return 15;
     }
 
     @Override
     public int getMaxPower(int level) {
-        return super.getMaxPower(level) + 40;
+        return super.getMaxPower(level) + 30;
     }
 }

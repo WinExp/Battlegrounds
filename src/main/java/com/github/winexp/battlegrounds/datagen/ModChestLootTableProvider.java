@@ -27,26 +27,30 @@ public class ModChestLootTableProvider extends SimpleFabricLootTableProvider {
     public void accept(BiConsumer<Identifier, LootTable.Builder> exporter) {
         // metals
         exporter.accept(new Identifier("battlegrounds", "chests/metals"),
-                LootTable.builder().type(LootContextTypes.CHEST).randomSequenceId(new Identifier("battlegrounds", "loot_table/chests/metals"))
+                LootTable.builder().randomSequenceId(new Identifier("battlegrounds", "loot_table/chests/metals"))
                         .pool(LootPool.builder().rolls(UniformLootNumberProvider.create(2.0F, 3.0F))
                                 .with(ItemEntry.builder(Items.IRON_NUGGET).weight(1)
                                         .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(5.0F, 32.0F))))
                                 .with(ItemEntry.builder(Items.GOLD_NUGGET).weight(1)
-                                        .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(5.0F, 32.0F)))))
+                                        .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(5.0F, 32.0F))))
+                        )
                         .pool(LootPool.builder().rolls(UniformLootNumberProvider.create(2.0F, 3.0F))
                                 .with(ItemEntry.builder(Items.IRON_INGOT).weight(1)
                                         .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(2.0F, 4.0F))))
                                 .with(ItemEntry.builder(Items.GOLD_INGOT).weight(1)
-                                        .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(3.0F, 8.0F)))))
+                                        .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(3.0F, 8.0F))))
+                        )
                         .pool(LootPool.builder().rolls(UniformLootNumberProvider.create(1.0F, 2.0F))
-                                .with(ItemEntry.builder(Items.FLASH_BANG).weight(2)
-                                        .apply(SetCountLootFunction.builder(ConstantLootNumberProvider.create(1.0F))))
-                                .with(ItemEntry.builder(Items.RUPERTS_TEAR).weight(1)
-                                        .apply(SetCountLootFunction.builder(ConstantLootNumberProvider.create(1.0F))))
-                                .with(EmptyEntry.builder().weight(20))));
+                                .with(ItemEntry.builder(Items.FLASH_BANG).weight(7))
+                                .with(EmptyEntry.builder().weight(30))
+                        )
+                        .pool(LootPool.builder().rolls(ConstantLootNumberProvider.create(1.0F))
+                                .with(ItemEntry.builder(Items.BUTCHERS_AXE).weight(1))
+                                .with(EmptyEntry.builder().weight(30))
+                        ));
         // crops
         exporter.accept(new Identifier("battlegrounds", "chests/crops"),
-                LootTable.builder().type(LootContextTypes.CHEST).randomSequenceId(new Identifier("battlegrounds", "loot_table/chests/crops"))
+                LootTable.builder().randomSequenceId(new Identifier("battlegrounds", "loot_table/chests/crops"))
                         .pool(LootPool.builder().rolls(UniformLootNumberProvider.create(4.0F, 6.0F))
                                 .with(ItemEntry.builder(Items.CARROT).weight(1)
                                         .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(3.0F, 8.0F))))
@@ -59,7 +63,7 @@ public class ModChestLootTableProvider extends SimpleFabricLootTableProvider {
                         ));
         // wine_shop
         exporter.accept(new Identifier("battlegrounds", "chests/wine_shop"),
-                LootTable.builder().type(LootContextTypes.CHEST).randomSequenceId(new Identifier("battlegrounds", "loot_table/chests/wine_shop"))
+                LootTable.builder().randomSequenceId(new Identifier("battlegrounds", "loot_table/chests/wine_shop"))
                         .pool(LootPool.builder().rolls(UniformLootNumberProvider.create(3.0F, 4.0F))
                                 .with(ItemEntry.builder(Items.GLASS_BOTTLE).weight(8)
                                         .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(3.0F, 6.0F))))
@@ -97,10 +101,12 @@ public class ModChestLootTableProvider extends SimpleFabricLootTableProvider {
                                         .apply(SetPotionLootFunction.builder(Potions.AWKWARD)))
                                 .with(ItemEntry.builder(Items.POTION).weight(1)
                                         .apply(SetPotionLootFunction.builder(Potions.WATER)))
-                                .with(EmptyEntry.builder().weight(2)))
+                                .with(EmptyEntry.builder().weight(2))
+                        )
                         .pool(LootPool.builder().rolls(UniformLootNumberProvider.create(2.0F, 3.0F))
                                 .with(ItemEntry.builder(Items.AMETHYST_SHARD).weight(1)
                                         .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(1.0F, 15.0F))))
-                                .with(EmptyEntry.builder().weight(2))));
+                                .with(EmptyEntry.builder().weight(2))
+                        ));
     }
 }

@@ -14,12 +14,27 @@ public class ChannelingProEnchantment extends Enchantment {
     }
 
     @Override
+    public boolean isTreasure() {
+        return true;
+    }
+
+    @Override
+    public boolean isAvailableForEnchantedBookOffer() {
+        return false;
+    }
+
+    @Override
+    public boolean isAvailableForRandomSelection() {
+        return false;
+    }
+
+    @Override
     public int getMinPower(int level) {
         return 30;
     }
 
     @Override
     public int getMaxPower(int level) {
-        return 60;
+        return this.getMinPower(level) + 40;
     }
 }

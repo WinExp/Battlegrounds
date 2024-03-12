@@ -50,7 +50,7 @@ public class MinersPickaxeItem extends PickaxeItem implements NbtCrafting, Encha
     @Override
     public ItemStack getDefaultStack() {
         ItemStack stack = new ItemStack(this, 1);
-        ENCHANTMENTS.forEach((stack::addEnchantment));
+        ENCHANTMENTS.forEach(stack::addEnchantment);
         return stack;
     }
 
@@ -63,10 +63,10 @@ public class MinersPickaxeItem extends PickaxeItem implements NbtCrafting, Encha
                 "aaa",
                 "aba",
                 "aaa");
-        return new ShapedRecipe("battlegrounds.miners_pickaxe",
+        return new ShapedRecipe(this.getIdentifier().toString(),
                 CraftingRecipeCategory.EQUIPMENT,
                 rawShaped,
-                Items.MINERS_PICKAXE.getDefaultStack()
+                this.getDefaultStack()
         );
     }
 }

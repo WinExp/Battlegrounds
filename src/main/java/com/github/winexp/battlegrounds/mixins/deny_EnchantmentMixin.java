@@ -14,7 +14,7 @@ public abstract class deny_EnchantmentMixin {
     private boolean isAcceptable(EnchantmentTarget instance, Item item) {
         boolean bl = true;
         if (item instanceof EnchantRestrict restrict) {
-            bl = restrict.isAnvilEnchantable();
+            bl = restrict.isEnchantable((Enchantment) (Object) this, instance);
         }
         return bl && instance.isAcceptableItem(item);
     }

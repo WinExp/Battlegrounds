@@ -2,7 +2,6 @@ package com.github.winexp.battlegrounds.item.tool;
 
 import com.github.winexp.battlegrounds.util.WorldUtil;
 import com.github.winexp.battlegrounds.util.MathUtil;
-import com.github.winexp.battlegrounds.util.TextUtil;
 import com.github.winexp.battlegrounds.util.raycast.BlockRaycastResult;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.EquipmentSlot;
@@ -17,6 +16,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
@@ -58,6 +58,11 @@ public class RupertsTearItem extends ToolItem {
     private void onUseFailed(PlayerEntity player) {
         player.getItemCooldownManager().set(this, FAILED_COOLDOWN);
         player.sendMessage(Text.translatable("item.battlegrounds.ruperts_tear.use_failed"), true);
+    }
+
+    @Override
+    public boolean isEnchantable(ItemStack stack) {
+        return false;
     }
 
     @Override
@@ -105,8 +110,10 @@ public class RupertsTearItem extends ToolItem {
         NbtCompound nbt = stack.getNbt();
         float cooldownSeconds =  (float) getCooldown(nbt) / 20;
         int maxDistance = getMaxDistance(nbt);
-        tooltip.add(TextUtil.translatableWithColor("item.battlegrounds.ruperts_tear.cooldown", TextUtil.GRAY, cooldownSeconds));
-        tooltip.add(TextUtil.translatableWithColor("item.battlegrounds.ruperts_tear.max_distance", TextUtil.GRAY, maxDistance));
+        tooltip.add(Text.translatable("item.battlegrounds.ruperts_tear.cooldown", cooldownSeconds)
+                .formatted(Formatting.GRAY));
+        tooltip.add(Text.translatable("item.battlegrounds.ruperts_tear.max_distance", maxDistance)
+                .formatted(Formatting.GRAY));
     }
 
     public static int getMaxDistance(NbtCompound nbt) {

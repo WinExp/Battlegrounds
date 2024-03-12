@@ -5,7 +5,6 @@ import net.minecraft.server.MinecraftServer;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
-@SuppressWarnings("SameReturnValue")
 public class TaskExecutor {
     public static final TaskExecutor INSTANCE = new TaskExecutor();
 

@@ -40,23 +40,38 @@
   "enchantment.battlegrounds.leaching": "浸毒",
 
   "item.battlegrounds.pvp_pro_sword": "🗡PVP 大佬",
+  "item.battlegrounds.pvp_pro_sword.tooltip.1": "「那是一个传奇的故事，",
+  "item.battlegrounds.pvp_pro_sword.tooltip.2": "伟大的 GRW 团队召唤了 PVP 大佬...",
+  "item.battlegrounds.pvp_pro_sword.tooltip.3": "还是 PVP 大佬？」",
   "item.battlegrounds.seven_eleven_sword": "🗡7-11",
+  "item.battlegrounds.seven_eleven_sword.tooltip.1": "「在一个阳光明媚的下午，",
+  "item.battlegrounds.seven_eleven_sword.tooltip.2": "有 3 人踏上了寻找 7-11 的传奇之旅...」",
+  "item.battlegrounds.steves_pain_sword": "🗡史蒂夫の痛",
+  "item.battlegrounds.leaching_sword": "🗡浸毒剑",
   "item.battlegrounds.miners_pickaxe": "⛏采矿者之镐",
+  "item.battlegrounds.butchers_axe": "🪓屠夫的斧头",
+  "item.battlegrounds.channeling_bow": "🏹引雷弓",
   "item.battlegrounds.flash_bang": "闪光震撼弹",
   "item.battlegrounds.flash_bang.fuse": "引信时间：%fs",
-  "item.battlegrounds.flash_bang.velocity": "投掷速度: %fm/s",
   "item.battlegrounds.ruperts_tear": "鲁伯特之泪",
   "item.battlegrounds.ruperts_tear.cooldown": "冷却时间：%fs",
   "item.battlegrounds.ruperts_tear.max_distance": "最大距离: %d 格",
   "item.battlegrounds.ruperts_tear.use_failed": "无法将你传送到此处",
+  "item.battlegrounds.knockback_stick": "击退棒",
 
   "itemGroup.battlegrounds.root": "Battlegrounds",
 
   "gui.battlegrounds.vote.accept": "赞成",
   "gui.battlegrounds.vote.deny": "反对",
   "gui.battlegrounds.vote.refresh": "刷新",
-  "gui.battlegrounds.vote.time_left": "剩余 %d 秒结束投票",
+  "gui.battlegrounds.vote.time_left": "剩余 %d 秒关闭投票",
+  "gui.battlegrounds.vote.opened.toast.title": "\"%s\" 投票正在进行！",
+  "gui.battlegrounds.vote.opened.toast.subtitle": "可打开投票界面查看",
+  "gui.battlegrounds.vote.closed.toast.title": "\"%s\" 投票因 %s 而关闭！",
+  "gui.battlegrounds.vote.closed.toast.subtitle": "可打开投票界面查看",
 
   "key.battlegrounds.vote_screen": "打开投票界面",
-  "key.categories.battlegrounds": "Battlegrounds"
+  "key.categories.battlegrounds": "Battlegrounds",
+
+  "subtitles.battlegrounds.tube_fall": "钢管：落地"
 }

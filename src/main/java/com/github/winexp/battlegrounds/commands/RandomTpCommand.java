@@ -3,19 +3,19 @@ package com.github.winexp.battlegrounds.commands;
 import com.github.winexp.battlegrounds.task.TaskExecutor;
 import com.github.winexp.battlegrounds.task.RepeatTask;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
-import com.github.winexp.battlegrounds.util.TextUtil;
 import com.github.winexp.battlegrounds.util.Variables;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
 
-@SuppressWarnings("SameReturnValue")
 public class RandomTpCommand {
     private static final HashMap<UUID, Long> cooldownTimers = new HashMap<>();
     private static RepeatTask coolDownUpdateTask = RepeatTask.NONE_TASK;
@@ -55,11 +55,11 @@ public class RandomTpCommand {
         if (!cooldownTimers.containsKey(uuid)) cooldownTimers.put(uuid, 0L);
         Long cooldown = cooldownTimers.get(uuid);
         if (cooldown > 0) {
-            source.sendFeedback(() -> TextUtil.translatableWithColor("battlegrounds.command.randomtp.delay.feedback",
-                    TextUtil.RED, cooldown / 20), false);
+            source.sendFeedback(() -> Text.translatable("battlegrounds.command.randomtp.delay.feedback", cooldown / 20)
+                    .formatted(Formatting.RED), false);
         } else {
-            source.sendFeedback(() -> TextUtil.translatableWithColor("battlegrounds.command.randomtp.feedback",
-                    TextUtil.GOLD), false);
+            source.sendFeedback(() -> Text.translatable("battlegrounds.command.randomtp.feedback")
+                    .formatted(Formatting.GOLD), false);
             PlayerUtil.randomTeleport(Variables.server.getOverworld(), Objects.requireNonNull(source.getPlayer()));
             cooldownTimers.put(uuid, Variables.config.cooldown.randomTpCooldownTicks);
         }

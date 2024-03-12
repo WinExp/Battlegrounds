@@ -1,0 +1,8 @@
+{
+  "tube_fall": {
+    "subtitle": "subtitles.battlegrounds.tube_fall",
+    "sounds": [
+      "battlegrounds:tube_fall"
+    ]
+  }
+}

@@ -39,24 +39,39 @@
   "enchantment.battlegrounds.vitality": "Vitality",
   "enchantment.battlegrounds.leaching": "Leaching",
 
-  "item.battlegrounds.pvp_pro_sword": "PVP Pro",
-  "item.battlegrounds.seven_eleven_sword": "Seven-Eleven",
-  "item.battlegrounds.miners_pickaxe": "Miner's Pickaxe",
+  "item.battlegrounds.pvp_pro_sword": "🗡PVP Pro",
+  "item.battlegrounds.pvp_pro_sword.tooltip.1": "「It's a story of legend.",
+  "item.battlegrounds.pvp_pro_sword.tooltip.2": "The great GRW team called in the PVP pro...",
+  "item.battlegrounds.pvp_pro_sword.tooltip.3": "Or PVP pro?\"",
+  "item.battlegrounds.seven_eleven_sword": "🗡Seven-Eleven",
+  "item.battlegrounds.seven_eleven_sword.tooltip.1": "「On a sunny afternoon,",
+  "item.battlegrounds.seven_eleven_sword.tooltip.2": "the three men set out on a legendary journey to find 7-11...」",
+  "item.battlegrounds.steves_pain_sword": "🗡Steve's Pain",
+  "item.battlegrounds.leaching_sword": "🗡Leaching Sword",
+  "item.battlegrounds.miners_pickaxe": "⛏Miner's Pickaxe",
+  "item.battlegrounds.butchers_axe": "🪓Butcher's Axe",
+  "item.battlegrounds.channeling_bow": "🏹Channeling Bow",
   "item.battlegrounds.flash_bang": "Flash Bang",
   "item.battlegrounds.flash_bang.fuse": "Fuse: %fs",
-  "item.battlegrounds.flash_bang.velocity": "Throwing Velocity: %fm/s",
   "item.battlegrounds.ruperts_tear": "Rupert's Tear",
   "item.battlegrounds.ruperts_tear.cooldown": "Cooldown Time：%fs",
   "item.battlegrounds.ruperts_tear.max_distance": "Max Distance: %d blocks",
   "item.battlegrounds.ruperts_tear.use_failed": "Can't get you here",
+  "item.battlegrounds.knockback_stick": "Knockback Stick",
 
   "itemGroup.battlegrounds.root": "Battlegrounds",
 
   "gui.battlegrounds.vote.accept": "Accept",
   "gui.battlegrounds.vote.deny": "Deny",
   "gui.battlegrounds.vote.refresh": "Refresh",
-  "gui.battlegrounds.vote.time_left": "Voting ends with %d seconds remaining",
+  "gui.battlegrounds.vote.time_left": "%d seconds remaining to close the vote",
+  "gui.battlegrounds.vote.opened.toast.title": "\"%s\" vote is ongoing!",
+  "gui.battlegrounds.vote.opened.toast.subtitle": "You can open the voting screen to view",
+  "gui.battlegrounds.vote.closed.toast.title": "\"%s\" The vote is closed because of %s!",
+  "gui.battlegrounds.vote.closed.toast.subtitle": "You can open the voting screen to view",
 
   "key.battlegrounds.vote_screen": "Voting Screen",
-  "key.categories.battlegrounds": "Battlegrounds"
+  "key.categories.battlegrounds": "Battlegrounds",
+
+  "subtitles.battlegrounds.tube_fall": "Tube: Landing"
 }

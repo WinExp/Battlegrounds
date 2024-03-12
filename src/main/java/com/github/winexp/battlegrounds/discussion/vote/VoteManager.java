@@ -1,11 +1,12 @@
 package com.github.winexp.battlegrounds.discussion.vote;
 
 import com.github.winexp.battlegrounds.events.VoteEvents;
-import com.github.winexp.battlegrounds.network.packet.s2c.SyncVoteInfoS2CPacket;
+import com.github.winexp.battlegrounds.network.packet.s2c.SyncVoteInfosS2CPacket;
+import com.github.winexp.battlegrounds.network.packet.s2c.VoteClosedPacket;
+import com.github.winexp.battlegrounds.network.packet.s2c.VoteOpenedPacket;
 import com.github.winexp.battlegrounds.util.Variables;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,19 +30,16 @@ public class VoteManager {
         try (voteInstance) {
             Identifier identifier = voteInstance.getIdentifier();
             this.voteMap.remove(identifier);
-            this.updateVoteInfosToAllPlayers();
+            for (ServerPlayerEntity player : Variables.server.getPlayerManager().getPlayerList()) {
+                VoteClosedPacket packet = new VoteClosedPacket(voteInstance.getVoteInfo(), reason);
+                ServerPlayNetworking.send(player, packet);
+            }
         }
     }
 
-    public void updateVoteInfosToAllPlayers() {
-        for (ServerPlayerEntity player : Variables.server.getPlayerManager().getPlayerList()) {
-            this.updateVoteInfos(player, true);
-        }
-    }
-
-    public void updateVoteInfos(ServerPlayerEntity player, boolean changed) {
-        Collection<VoteInfo> voteInfos = this.getVoteInfos();
-        SyncVoteInfoS2CPacket packet = new SyncVoteInfoS2CPacket(changed, voteInfos);
+    public void syncVoteInfos(ServerPlayerEntity player) {
+        Collection<VoteInfo> voteInfos = this.getVoteInfoList();
+        SyncVoteInfosS2CPacket packet = new SyncVoteInfosS2CPacket(voteInfos);
         ServerPlayNetworking.send(player, packet);
     }
 
@@ -53,14 +51,9 @@ public class VoteManager {
         return this.containsVote(identifier) && this.voteMap.get(identifier).isVoting();
     }
 
-    public Collection<VoteInfo> getVoteInfos() {
+    public List<VoteInfo> getVoteInfoList() {
         List<VoteInfo> voteInfos = new ArrayList<>();
-        this.forEach((key, value) -> {
-            Text name = value.getName();
-            Text description = value.getDescription();
-            VoteInfo voteInfo = new VoteInfo(key, name, description, value.getTimeLeft());
-            voteInfos.add(voteInfo);
-        });
+        this.forEach((key, value) -> voteInfos.add(value.getVoteInfo()));
         return voteInfos;
     }
 
@@ -73,7 +66,8 @@ public class VoteManager {
         this.voteMap.forEach(consumer);
     }
 
-    public boolean openVoteWithPreset(VotePresets.Preset preset, Collection<ServerPlayerEntity> participants) {
+
+    public boolean openVoteWithPreset(VotePreset preset, Collection<ServerPlayerEntity> participants) {
         VoteInstance instance = new VoteInstance(preset.identifier(), preset.name(), preset.description(), preset.voteSettings());
         return this.openVote(instance, participants);
     }
@@ -83,7 +77,10 @@ public class VoteManager {
         if (this.isVoting(identifier)) return false;
         if (!voteInstance.openVote(participants)) return false;
         this.voteMap.put(identifier, voteInstance);
-        this.updateVoteInfosToAllPlayers();
+        for (ServerPlayerEntity player : Variables.server.getPlayerManager().getPlayerList()) {
+            VoteOpenedPacket packet = new VoteOpenedPacket(voteInstance.getVoteInfo());
+            ServerPlayNetworking.send(player, packet);
+        }
         return true;
     }
 

@@ -1,0 +1,6 @@
+{
+    "parent": "battlegrounds:item/channeling_bow",
+    "textures": {
+        "layer0": "battlegrounds:item/channeling_bow_pulling_1"
+    }
+}

@@ -1,6 +1,9 @@
 package com.github.winexp.battlegrounds.enchantment;
 
+import com.github.winexp.battlegrounds.item.Items;
+import com.github.winexp.battlegrounds.loot.function.ReplaceDropLootFunction;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentTarget;
 import net.minecraft.entity.EquipmentSlot;
@@ -37,6 +40,13 @@ public class SmeltingEnchantment extends Enchantment {
         return this.smeltableBlocks.get(lootTableId);
     }
 
+    public void registerDefaultSmeltable() {
+        this.registerSmeltable(Blocks.IRON_ORE, Blocks.DEEPSLATE_IRON_ORE);
+        this.registerSmeltable(Blocks.GOLD_ORE, Blocks.DEEPSLATE_GOLD_ORE);
+        this.registerSmeltable(Blocks.COPPER_ORE, Blocks.DEEPSLATE_COPPER_ORE);
+        this.registerSmeltable(Blocks.NETHER_GOLD_ORE, ReplaceDropLootFunction.builder(Items.GOLD_INGOT));
+    }
+
     public void registerSmeltable(Block... blocks) {
         for (Block block : blocks) {
             this.registerSmeltable(block, DEFAULT_SMELTABLE_FUNCTION);
@@ -59,6 +69,6 @@ public class SmeltingEnchantment extends Enchantment {
 
     @Override
     public int getMaxPower(int level) {
-        return super.getMinPower(level) + 50;
+        return super.getMinPower(level) + 30;
     }
 }

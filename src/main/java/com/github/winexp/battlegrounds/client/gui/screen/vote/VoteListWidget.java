@@ -85,7 +85,7 @@ public class VoteListWidget extends AlwaysSelectedEntryListWidget<VoteListWidget
             MutableText text = Text.empty();
             text.append(Text.translatable("narrator.select", this.voteInfo.name));
             text.append(ScreenTexts.SENTENCE_SEPARATOR);
-            text.append(Text.of(this.voteInfo.description));
+            text.append(this.voteInfo.description);
             return text;
         }
 

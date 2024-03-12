@@ -15,6 +15,7 @@ import java.util.UUID;
 
 public class VoteInstance implements AutoCloseable {
     private final Identifier identifier;
+    private final UUID uuid = UUID.randomUUID();
     private final Text name;
     private final Text description;
     private final VoteSettings settings;
@@ -41,6 +42,14 @@ public class VoteInstance implements AutoCloseable {
         this.name = name;
         this.description = description;
         this.settings = settings;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public VoteInfo getVoteInfo() {
+        return new VoteInfo(this.identifier, this.uuid, this.name, this.description, this.getTimeLeft());
     }
 
     public long getTimeLeft() {
@@ -125,6 +134,18 @@ public class VoteInstance implements AutoCloseable {
         this.settings.voteClosedAction().accept(this, closeReason);
         VoteEvents.CLOSED.invoker().closed(this, closeReason);
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return 12 * this.identifier.hashCode() + 42 * this.uuid.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof VoteInstance voteInstance)) return false;
+        else if (!this.identifier.equals(voteInstance.identifier)) return false;
+        else return this.uuid.equals(voteInstance.uuid);
     }
 
     @Override
