@@ -11,11 +11,12 @@ import com.github.winexp.battlegrounds.game.GameManager;
 import com.github.winexp.battlegrounds.item.ItemGroups;
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.loot.LootTableModifier;
-import com.github.winexp.battlegrounds.loot.function.ReplaceDropLootFunction;
 import com.github.winexp.battlegrounds.network.ModServerNetworkPlayHandler;
-import com.github.winexp.battlegrounds.network.packet.c2s.VoteC2SPacket;
-import com.github.winexp.battlegrounds.network.packet.c2s.SyncVoteInfoC2SPacket;
-import com.github.winexp.battlegrounds.util.*;
+import com.github.winexp.battlegrounds.sound.SoundEvents;
+import com.github.winexp.battlegrounds.util.ConfigUtil;
+import com.github.winexp.battlegrounds.util.Constants;
+import com.github.winexp.battlegrounds.util.PlayerUtil;
+import com.github.winexp.battlegrounds.util.Variables;
 import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -25,8 +26,6 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.block.Blocks;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -38,9 +37,9 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.WorldSavePath;
 
-@SuppressWarnings("SameReturnValue")
 public class Battlegrounds implements ModInitializer {
     public static Battlegrounds INSTANCE;
 
@@ -70,11 +69,6 @@ public class Battlegrounds implements ModInitializer {
         if (Variables.progress.gameStage.isStarted() && !Variables.progress.gameStage.isDeathmatch()) {
             GameManager.INSTANCE.runTasks();
         }
-    }
-
-    private void registerReceiver() {
-        ServerPlayNetworking.registerGlobalReceiver(SyncVoteInfoC2SPacket.TYPE, ModServerNetworkPlayHandler::onGetVoteInfos);
-        ServerPlayNetworking.registerGlobalReceiver(VoteC2SPacket.TYPE, ModServerNetworkPlayHandler::onVote);
     }
 
     private void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
@@ -123,25 +117,20 @@ public class Battlegrounds implements ModInitializer {
         if (Variables.progress.gameStage.isPreparing()) {
             GameProgress.PlayerPermission permission = Variables.progress.players.get(PlayerUtil.getUUID(player));
             if (permission != null && !permission.inGame) {
-                joinText = TextUtil.translatableWithColor("battlegrounds.game.join.spectator.broadcast",
-                        TextUtil.DARK_GRAY, player.getName());
+                joinText = Text.translatable("battlegrounds.game.join.spectator.broadcast", player.getDisplayName())
+                        .formatted(Formatting.DARK_GRAY);
             } else {
-                joinText = TextUtil.translatableWithColor(
-                        "battlegrounds.game.join.broadcast",
-                        TextUtil.GREEN,
-                        player.getName(),
-                        Variables.server
-                                .getPlayerManager().getCurrentPlayerCount() + 1,
-                        Variables.progress.players.size()
-                );
+                joinText = Text.translatable("battlegrounds.game.join.broadcast", player.getDisplayName(),
+                        Variables.server.getPlayerManager().getCurrentPlayerCount() + 1, Variables.progress.players.size())
+                        .formatted(Formatting.GREEN);
                 Variables.server.getPlayerManager().getWhitelist().add(new WhitelistEntry(player.getGameProfile()));
                 if (Variables.server.getPlayerManager().getPlayerList().size() + 1 == Variables.progress.players.size()) {
                     GameManager.INSTANCE.prepareStartGame();
                 }
             }
         } else if (Variables.progress.gameStage.isDeathmatch()) {
-            player.sendMessage(TextUtil.translatableWithColor(
-                    "battlegrounds.game.deathmatch.start.broadcast", TextUtil.GOLD), false);
+            player.sendMessage(Text.translatable("battlegrounds.game.deathmatch.start.broadcast")
+                    .formatted(Formatting.GOLD), false);
         }
         server.getPlayerManager().broadcast(joinText, false);
         PlayerUtil.setGameModeWithMap(player);
@@ -153,19 +142,14 @@ public class Battlegrounds implements ModInitializer {
         return permission == null || permission.naturalRegen;
     }
 
-    private void registerSmeltableBlocks() {
-        Enchantments.SMELTING.registerSmeltable(Blocks.IRON_ORE, Blocks.DEEPSLATE_IRON_ORE);
-        Enchantments.SMELTING.registerSmeltable(Blocks.GOLD_ORE, Blocks.DEEPSLATE_GOLD_ORE);
-        Enchantments.SMELTING.registerSmeltable(Blocks.COPPER_ORE, Blocks.DEEPSLATE_COPPER_ORE);
-        Enchantments.SMELTING.registerSmeltable(Blocks.NETHER_GOLD_ORE, ReplaceDropLootFunction.builder(Items.GOLD_INGOT));
-    }
-
     @Override
     public void onInitialize() {
         INSTANCE = this;
         Constants.LOGGER.info("Loading {}", Constants.MOD_ID);
         // 注册指令
         CommandRegistrationCallback.EVENT.register(this::registerCommands);
+        // 注册网络包接收器
+        ModServerNetworkPlayHandler.registerReceivers();
         // 加载配置
         this.loadConfigs();
         // 注册事件
@@ -180,18 +164,18 @@ public class Battlegrounds implements ModInitializer {
         // 自定义
         ModServerPlayerEvents.ALLOW_NATURAL_REGEN.register(this::allowPlayerNaturalRegen);
         // 注册实体
-        EntityTypes.registerEntities();
+        EntityTypes.registerEntityTypes();
         // 注册物品
         Items.registerItems();
         // 注册附魔
         Enchantments.registerEnchantments();
-        this.registerSmeltableBlocks(); // 自动冶炼
+        Enchantments.SMELTING.registerDefaultSmeltable(); // 自动冶炼
         // 添加配方
         Items.addRecipes();
         // 注册物品组
         ItemGroups.registerItemGroups();
-        // 注册网络包接收器
-        this.registerReceiver();
+        // 注册声音事件
+        SoundEvents.registerSoundEvents();
         // 尝试重置存档
         GameManager.INSTANCE.tryResetWorlds();
     }

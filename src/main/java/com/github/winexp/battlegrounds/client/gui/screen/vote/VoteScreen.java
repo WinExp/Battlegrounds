@@ -2,8 +2,10 @@ package com.github.winexp.battlegrounds.client.gui.screen.vote;
 
 import com.github.winexp.battlegrounds.discussion.vote.VoteInfo;
 import com.github.winexp.battlegrounds.network.packet.c2s.VoteC2SPacket;
-import com.github.winexp.battlegrounds.network.packet.c2s.SyncVoteInfoC2SPacket;
-import com.github.winexp.battlegrounds.network.packet.s2c.SyncVoteInfoS2CPacket;
+import com.github.winexp.battlegrounds.network.packet.c2s.SyncVoteInfosC2SPacket;
+import com.github.winexp.battlegrounds.network.packet.s2c.SyncVoteInfosS2CPacket;
+import com.github.winexp.battlegrounds.network.packet.s2c.VoteClosedPacket;
+import com.github.winexp.battlegrounds.network.packet.s2c.VoteOpenedPacket;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -51,11 +53,25 @@ public class VoteScreen extends Screen {
         }
     }
 
-    public static void getVoteInfos() {
-        ClientPlayNetworking.send(new SyncVoteInfoC2SPacket());
+    public static void syncVoteInfos() {
+        ClientPlayNetworking.send(new SyncVoteInfosC2SPacket());
     }
 
-    public static void voteInfoCallback(MinecraftClient client, SyncVoteInfoS2CPacket packet) {
+    public static void onVoteOpened(MinecraftClient client, VoteOpenedPacket packet) {
+        voteInfosCache.add(packet.voteInfo());
+        if (client.currentScreen instanceof VoteScreen voteScreen) {
+            voteScreen.updateVotesGUI();
+        }
+    }
+
+    public static void onVoteClosed(MinecraftClient client, VoteClosedPacket packet) {
+        voteInfosCache.removeIf(voteInfo -> voteInfo.equals(packet.voteInfo()));
+        if (client.currentScreen instanceof VoteScreen voteScreen) {
+            voteScreen.updateVotesGUI();
+        }
+    }
+
+    public static void syncVoteInfoCallback(MinecraftClient client, SyncVoteInfosS2CPacket packet) {
         voteInfosCache.clear();
         voteInfosCache.addAll(packet.voteInfos());
         if (client.currentScreen instanceof VoteScreen voteScreen) {
@@ -79,7 +95,7 @@ public class VoteScreen extends Screen {
     }
 
     private void refresh() {
-        getVoteInfos();
+        syncVoteInfos();
         lastRefreshTime = System.currentTimeMillis();
         this.updateButtonState();
     }

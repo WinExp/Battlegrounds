@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "battlegrounds:item/steves_pain_sword"
+  }
+}

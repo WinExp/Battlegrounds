@@ -5,6 +5,7 @@ import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.item.recipe.NbtCrafting;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -13,15 +14,22 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SwordItem;
 import net.minecraft.item.ToolMaterial;
+import net.minecraft.potion.PotionUtil;
+import net.minecraft.potion.Potions;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RawShapedRecipe;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Map;
 
 public class SevenElevenSwordItem extends SwordItem implements NbtCrafting, EnchantRestrict {
@@ -55,9 +63,11 @@ public class SevenElevenSwordItem extends SwordItem implements NbtCrafting, Ench
     @Override
     public boolean postHit(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         super.postHit(stack, target, attacker);
-        Random random = attacker.getRandom();
-        if (random.nextInt(100) + 1 <= BOUND) {
-            this.giveEffects(attacker, target);
+        if (!attacker.getWorld().isClient) {
+            Random random = attacker.getRandom();
+            if (random.nextInt(100) + 1 <= BOUND) {
+                this.giveEffects(attacker, target);
+            }
         }
         return true;
     }
@@ -66,6 +76,16 @@ public class SevenElevenSwordItem extends SwordItem implements NbtCrafting, Ench
         livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 2, 0));
         livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.INVISIBILITY, 2, 0));
         livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 2, 0));
+    }
+
+    @Override
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        final int lines = 2;
+        for (int i = 1; i <= lines; i++) {
+            tooltip.add(Text.translatable("item.battlegrounds.seven_eleven_sword.tooltip." + i)
+                    .formatted(Formatting.GOLD)
+                    .styled(style -> style.withBold(true)));
+        }
     }
 
     @Override
@@ -93,16 +113,18 @@ public class SevenElevenSwordItem extends SwordItem implements NbtCrafting, Ench
     @Override
     public ShapedRecipe getRecipe() {
         RawShapedRecipe rawShaped = RawShapedRecipe.create(Map.of(
-                        'a', Ingredient.ofItems(Items.DIAMOND_BLOCK),
-                        'b', Ingredient.ofItems(Items.LAPIS_BLOCK),
-                        'c', Ingredient.ofItems(Items.GOLD_BLOCK),
+                        'a', Ingredient.ofItems(Items.DIAMOND),
+                        'b', Ingredient.ofItems(Items.AMETHYST_SHARD),
+                        'c', Ingredient.ofStacks(PotionUtil.setPotion(Items.SPLASH_POTION.getDefaultStack(), Potions.TURTLE_MASTER)),
                         'd', Ingredient.ofItems(Items.DIAMOND_SWORD),
-                        'e', Ingredient.ofItems(Items.DIAMOND)
+                        'e', Ingredient.ofStacks(PotionUtil.setPotion(Items.SPLASH_POTION.getDefaultStack(), Potions.STRONG_SWIFTNESS)),
+                        'f', Ingredient.ofItems(Items.DIAMOND_BLOCK),
+                        'g', Ingredient.ofItems(Items.EMERALD)
                 ),
                 "aba",
-                "cdc",
-                "ebe");
-        return new ShapedRecipe(getIdentifier().toString(),
+                "cde",
+                "fgf");
+        return new ShapedRecipe(this.getIdentifier().toString(),
                 CraftingRecipeCategory.EQUIPMENT,
                 rawShaped,
                 this.getDefaultStack()

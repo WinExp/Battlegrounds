@@ -20,7 +20,15 @@ public class LeachingEnchantment extends Enchantment {
     }
 
     private void addEffects(LivingEntity source, LivingEntity target) {
-        target.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, DURATION, 1), source);
+        target.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, DURATION, 3), source);
+        target.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, DURATION, 0), source);
+        target.addStatusEffect(new StatusEffectInstance(StatusEffects.HUNGER, DURATION, 2), source);
+        target.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, DURATION, 0), source);
+    }
+
+    @Override
+    public boolean isTreasure() {
+        return true;
     }
 
     @Override
@@ -31,12 +39,22 @@ public class LeachingEnchantment extends Enchantment {
     }
 
     @Override
+    public boolean isAvailableForEnchantedBookOffer() {
+        return false;
+    }
+
+    @Override
+    public boolean isAvailableForRandomSelection() {
+        return false;
+    }
+
+    @Override
     public int getMinPower(int level) {
-        return 30;
+        return 15;
     }
 
     @Override
     public int getMaxPower(int level) {
-        return 60;
+        return this.getMinPower(level) + 50;
     }
 }

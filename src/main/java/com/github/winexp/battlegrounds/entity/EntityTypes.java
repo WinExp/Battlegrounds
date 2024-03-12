@@ -31,7 +31,7 @@ public class EntityTypes<T extends Entity> extends net.minecraft.entity.EntityTy
         super(factory, spawnGroup, saveable, summonable, fireImmune, spawnableFarFromPlayer, canSpawnInside, dimensions, maxTrackDistance, trackTickInterval, requiredFeatures);
     }
 
-    public static void registerEntities() {
+    public static void registerEntityTypes() {
         Registry.register(
                 Registries.ENTITY_TYPE,
                 new Identifier("battlegrounds", "channeling_arrow"),

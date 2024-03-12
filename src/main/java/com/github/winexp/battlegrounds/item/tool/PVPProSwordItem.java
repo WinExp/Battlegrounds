@@ -5,6 +5,7 @@ import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.item.recipe.NbtCrafting;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -19,8 +20,13 @@ import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Map;
 
 public class PVPProSwordItem extends SwordItem implements NbtCrafting, EnchantRestrict {
@@ -47,7 +53,16 @@ public class PVPProSwordItem extends SwordItem implements NbtCrafting, EnchantRe
 
     private void addEffects(LivingEntity livingEntity) {
         livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 2, 0));
-        livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 2, 0));
+    }
+
+    @Override
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        final int lines = 3;
+        for (int i = 1; i <= lines; i++) {
+            tooltip.add(Text.translatable("item.battlegrounds.pvp_pro_sword.tooltip." + i)
+                    .formatted(Formatting.GOLD)
+                    .styled(style -> style.withBold(true)));
+        }
     }
 
     @Override
@@ -75,16 +90,16 @@ public class PVPProSwordItem extends SwordItem implements NbtCrafting, EnchantRe
     @Override
     public ShapedRecipe getRecipe() {
         RawShapedRecipe rawShaped = RawShapedRecipe.create(Map.of(
-                        'a', Ingredient.ofItems(Items.DIAMOND_BLOCK),
+                        'a', Ingredient.ofItems(Items.DIAMOND),
                         'b', Ingredient.ofItems(Items.GOLD_BLOCK),
                         'c', Ingredient.ofItems(Items.TOTEM_OF_UNDYING, Items.GOLDEN_APPLE),
                         'd', Ingredient.ofItems(Items.DIAMOND_SWORD),
-                        'e', Ingredient.ofItems(Items.DIAMOND)
+                        'e', Ingredient.ofItems(Items.DIAMOND_BLOCK)
                 ),
                 "aba",
                 "cdc",
                 "ebe");
-        return new ShapedRecipe(getIdentifier().toString(),
+        return new ShapedRecipe(this.getIdentifier().toString(),
                 CraftingRecipeCategory.EQUIPMENT,
                 rawShaped,
                 this.getDefaultStack()

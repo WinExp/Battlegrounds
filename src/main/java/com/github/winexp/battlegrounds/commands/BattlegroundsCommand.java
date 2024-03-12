@@ -2,7 +2,7 @@ package com.github.winexp.battlegrounds.commands;
 
 import com.github.winexp.battlegrounds.Battlegrounds;
 import com.github.winexp.battlegrounds.discussion.vote.VoteManager;
-import com.github.winexp.battlegrounds.discussion.vote.VotePresets;
+import com.github.winexp.battlegrounds.discussion.vote.VotePreset;
 import com.github.winexp.battlegrounds.entity.projectile.FlashBangEntity;
 import com.github.winexp.battlegrounds.game.GameManager;
 import com.github.winexp.battlegrounds.task.TaskExecutor;
@@ -16,6 +16,8 @@ import net.minecraft.command.argument.GameModeArgumentType;
 import net.minecraft.command.argument.Vec3ArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
@@ -25,7 +27,6 @@ import java.util.Collection;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
-@SuppressWarnings("SameReturnValue")
 public class BattlegroundsCommand {
     public static void registerRoot(CommandDispatcher<ServerCommandSource> dispatcher) {
         var cRoot = literal("battlegrounds");
@@ -93,14 +94,15 @@ public class BattlegroundsCommand {
 
     private static int executeStart(CommandContext<ServerCommandSource> context) {
         ServerCommandSource source = context.getSource();
-        if (VoteManager.INSTANCE.containsVote(VotePresets.START_GAME.identifier())) {
-            source.sendFeedback(() -> TextUtil.translatableWithColor(
-                    "battlegrounds.vote.already_voting.feedback", TextUtil.RED), false);
+        if (VoteManager.INSTANCE.containsVote(VotePreset.START_GAME.identifier())) {
+            source.sendFeedback(() -> Text.translatable("battlegrounds.vote.already_voting.feedback")
+                    .formatted(Formatting.RED), false);
             return 1;
         }
-        VoteManager.INSTANCE.openVoteWithPreset(VotePresets.START_GAME, Variables.server.getPlayerManager().getPlayerList());
-        Variables.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
-                        "battlegrounds.command.start.broadcast", TextUtil.GREEN, source.getName())
+        VoteManager.INSTANCE.openVoteWithPreset(VotePreset.START_GAME, Variables.server.getPlayerManager().getPlayerList());
+        Variables.server.getPlayerManager().broadcast(
+                Text.translatable("battlegrounds.command.start.broadcast", source.getName())
+                        .formatted(Formatting.GREEN)
                 .append(TextFactory.LINEFEED)
                 .append(TextFactory.ACCEPT_BUTTON)
                 .append("   ")
@@ -110,7 +112,7 @@ public class BattlegroundsCommand {
     }
 
     private static int executeStop(CommandContext<ServerCommandSource> context) {
-        VoteManager.INSTANCE.closeVote(VotePresets.START_GAME.identifier());
+        VoteManager.INSTANCE.closeVote(VotePreset.START_GAME.identifier());
         TaskExecutor.INSTANCE.stopAllTask();
         GameManager.INSTANCE.stopGame();
         Constants.LOGGER.info("已停止队列中所有任务");
@@ -120,8 +122,8 @@ public class BattlegroundsCommand {
 
     private static int executeReload(CommandContext<ServerCommandSource> context) {
         Battlegrounds.INSTANCE.reload();
-        context.getSource().sendFeedback(() -> TextUtil.translatableWithColor(
-                "battlegrounds.command.reload.success", TextUtil.GREEN), false);
+        context.getSource().sendFeedback(() -> Text.translatable("battlegrounds.command.reload.success")
+                .formatted(Formatting.GREEN), false);
 
         return 1;
     }

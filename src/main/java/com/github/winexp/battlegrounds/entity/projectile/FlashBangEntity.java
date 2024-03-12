@@ -40,15 +40,6 @@ public class FlashBangEntity extends ThrownItemEntity {
     public static final float FOG_VISIBILITY = 3.0F;
     public static final float DISTANCE_INCREMENT = 10;
     private static final TrackedData<Integer> FUSE = DataTracker.registerData(FlashBangEntity.class, TrackedDataHandlerRegistry.INTEGER);
-
-    public int getFuse() {
-        return this.getDataTracker().get(FUSE);
-    }
-
-    public void setFuse(int fuse) {
-        this.getDataTracker().set(FUSE, fuse);
-    }
-
     private static final BiPredicate<BlockRaycastResult, World> BLOCK_PREDICATE = (raycastResult, world) -> {
         BlockHitResult hitResult = raycastResult.hitResult();
         BlockPos blockPos = hitResult.getBlockPos();
@@ -57,6 +48,14 @@ public class FlashBangEntity extends ThrownItemEntity {
                 || (WorldUtil.isSolidBlock(world, blockPos)
                 && !WorldUtil.isTransparent(world, blockPos));
     };
+
+    public int getFuse() {
+        return this.getDataTracker().get(FUSE);
+    }
+
+    public void setFuse(int fuse) {
+        this.getDataTracker().set(FUSE, fuse);
+    }
 
     public FlashBangEntity(net.minecraft.entity.EntityType<? extends ThrownItemEntity> entityType, World world) {
         super(entityType, world);

@@ -5,9 +5,9 @@ import java.util.function.LongSupplier;
 public class RepeatTask extends ScheduledTask {
     public static final RepeatTask NONE_TASK = new RepeatTask(AbstractTask.NONE_RUNNABLE, -1, -1);
     private final Runnable fixedRunnable;
-    private final LongSupplier ticks;
+    private final LongSupplier repeatDelay;
 
-    public RepeatTask(Runnable runnable, long delay, LongSupplier ticks) {
+    public RepeatTask(Runnable runnable, long delay, LongSupplier repeatDelay) {
         super(runnable, delay);
 
         fixedRunnable = () -> {
@@ -20,15 +20,15 @@ public class RepeatTask extends ScheduledTask {
             }
 
             if (this.delay <= 0) {
-                this.delay = ticks.getAsLong();
+                this.delay = repeatDelay.getAsLong();
             }
         };
 
-        this.ticks = ticks;
+        this.repeatDelay = repeatDelay;
     }
 
-    public RepeatTask(Runnable runnable, long delay, long ticks) {
-        this(runnable, delay, () -> ticks);
+    public RepeatTask(Runnable runnable, long delay, long repeatDelay) {
+        this(runnable, delay, () -> repeatDelay);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class RepeatTask extends ScheduledTask {
         return fixedRunnable;
     }
 
-    public long getTicks() {
-        return ticks.getAsLong();
+    public long getRepeatDelay() {
+        return repeatDelay.getAsLong();
     }
 }

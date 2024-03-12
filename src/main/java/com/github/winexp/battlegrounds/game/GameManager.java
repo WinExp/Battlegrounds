@@ -27,6 +27,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.math.BlockPos;
@@ -117,8 +118,8 @@ public class GameManager {
                 return true;
             }
             ServerPlayerEntity p = this.getLastInGamePlayer();
-            this.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
-                    "battlegrounds.game.end.broadcast", TextUtil.GOLD, p.getName()), false);
+            this.server.getPlayerManager().broadcast(Text.translatable("battlegrounds.game.end.broadcast", p.getDisplayName())
+                    .formatted(Formatting.GOLD), false);
             Random random = p.getWorld().getRandom();
             int amount = random.nextInt(4) + 1;
             for (int i = 0; i < amount; i++) {
@@ -141,14 +142,13 @@ public class GameManager {
     }
 
     public void prepareStartGame() {
-        this.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
-                "battlegrounds.game.already.broadcast",
-                TextUtil.GREEN), false);
+        this.server.getPlayerManager().broadcast(Text.translatable("battlegrounds.game.already.broadcast")
+                .formatted(Formatting.GREEN), false);
         this.startTask = new LimitRepeatTask(
                 () -> {
                     for (ServerPlayerEntity player1 : server.getPlayerManager().getPlayerList()) {
-                        PlayerUtil.sendTitle(player1, TextUtil.withColor(
-                                Text.literal(String.valueOf(this.startTask.getCount())), TextUtil.GREEN));
+                        PlayerUtil.sendTitle(player1, Text.literal(String.valueOf(this.startTask.getCount()))
+                                .formatted(Formatting.GREEN));
                         player1.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HAT.value(), SoundCategory.NEUTRAL, 0.7f, 1.0f);
                     }
                 },
@@ -160,18 +160,19 @@ public class GameManager {
     }
 
     public void prepareResetWorlds(Collection<UUID> participants) {
-        this.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
-                "battlegrounds.game.start.broadcast", TextUtil.GREEN, Variables.config.delay.serverCloseDelaySeconds), false);
+        this.server.getPlayerManager().broadcast(Text.translatable("battlegrounds.game.start.broadcast",
+                Variables.config.delay.serverCloseDelaySeconds)
+                .formatted(Formatting.GREEN), false);
         this.stopTask = new LimitRepeatTask(
                 () -> {
                     for (ServerPlayerEntity player : this.server.getPlayerManager().getPlayerList()) {
-                        PlayerUtil.sendTitle(player, TextUtil.withColor(
-                                Text.literal(String.valueOf(this.stopTask.getCount())), TextUtil.GREEN));
+                        PlayerUtil.sendTitle(player, Text.literal(String.valueOf(this.stopTask.getCount()))
+                                .formatted(Formatting.GREEN));
                         player.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HAT.value(), SoundCategory.NEUTRAL, 0.7f, 1.0f);
                     }
                 },
-                () -> this.stopServer(TextUtil.translatableWithColor(
-                        "battlegrounds.game.server.stop", TextUtil.GREEN)),
+                () -> this.stopServer(Text.translatable("battlegrounds.game.server.stop")
+                        .formatted(Formatting.GREEN)),
                 0, 20, Variables.config.delay.serverCloseDelaySeconds
         );
         TaskExecutor.INSTANCE.execute(this.stopTask);
@@ -305,11 +306,9 @@ public class GameManager {
         if (manager.get(BAR_ID) != null) {
             this.bossBar = manager.get(BAR_ID);
         } else {
-            this.bossBar = manager.add(BAR_ID,
-                    TextUtil.translatableWithColor("battlegrounds.border.bar",
-                            TextUtil.GREEN,
-                            this.reduceTask.getDelay() / 20)
-            );
+            this.bossBar = manager.add(BAR_ID, Text.translatable("battlegrounds.border.bar",
+                            this.reduceTask.getDelay()/ 20)
+                    .formatted(Formatting.GREEN));
         }
         this.barUpdateTask = new RepeatTask(() -> {
             if (this.bossBar == null) {
@@ -318,9 +317,9 @@ public class GameManager {
             this.bossBar.addPlayers(this.server.getPlayerManager().getPlayerList());
             this.bossBar.setMaxValue((int) (Variables.config.border.time.resizeDelayTicks + Variables.config.border.time.resizeSpendTicks));
             this.bossBar.setValue((int) this.reduceTask.getDelay());
-            this.bossBar.setName(TextUtil.translatableWithColor("battlegrounds.border.bar",
-                    TextUtil.GREEN,
-                    this.reduceTask.getDelay() / 20));
+            this.bossBar.setName(Text.translatable("battlegrounds.border.bar",
+                            this.reduceTask.getDelay()/ 20)
+                    .formatted(Formatting.GREEN));
         }, this.reduceTask.getDelay() % 20, 20);
         TaskExecutor.INSTANCE.execute(barUpdateTask);
     }
@@ -347,8 +346,8 @@ public class GameManager {
                     }
                 }
 
-                this.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
-                        "battlegrounds.game.pvp.enable.broadcast", TextUtil.GOLD), false);
+                this.server.getPlayerManager().broadcast(Text.translatable("battlegrounds.game.pvp.enable.broadcast")
+                        .formatted(Formatting.GOLD), false);
                 this.worldHelper.setBorderSize(worldHelper.getBorderSize() - Variables.config.border.resizeBlocks,
                         Variables.config.border.time.resizeSpendTicks * 50);
             }
@@ -361,16 +360,16 @@ public class GameManager {
             // 死亡竞赛-提示
             if (Variables.progress.currentLap + 1
                     == Variables.config.border.borderOrdinal.deathmatchBeginBorderOrdinal) {
-                this.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
-                        "battlegrounds.game.deathmatch.already.broadcast", TextUtil.GOLD,
-                        (Variables.config.border.time.resizeDelayTicks + Variables.config.border.time.resizeSpendTicks) / 1200), false);
+                this.server.getPlayerManager().broadcast(Text.translatable("battlegrounds.game.deathmatch.already.broadcast",
+                                (Variables.config.border.time.resizeDelayTicks + Variables.config.border.time.resizeSpendTicks) / 1200)
+                        .formatted(Formatting.GOLD), false);
             }
             // 死亡竞赛-初始圈
             if (Variables.progress.currentLap
                     == Variables.config.border.borderOrdinal.deathmatchBeginBorderOrdinal) {
                 Variables.progress.gameStage = GameProgress.GameStage.DEATHMATCH;
-                this.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
-                        "battlegrounds.game.deathmatch.start.broadcast", TextUtil.GOLD), false);
+                this.server.getPlayerManager().broadcast(Text.translatable("battlegrounds.game.deathmatch.start.broadcast")
+                        .formatted(Formatting.GOLD), false);
                 this.worldHelper.setBorderSize(Variables.config.border.deathmatch.initialSize);
                 for (UUID uuid : Variables.progress.players.keySet()) {
                     if (Variables.progress.isInGame(uuid)) {
@@ -385,7 +384,7 @@ public class GameManager {
                     PlayerUtil.randomTeleport(this.server.getOverworld(), player);
                 }
                 this.worldHelper.setBorderSize(Variables.config.border.deathmatch.finalSize,
-                        Variables.config.border.deathmatch.resizeDelayTicks * 50);
+                        Variables.config.border.deathmatch.resizeSpendTicks * 50);
             }
             // 死亡竞赛-最终圈
             if (Variables.progress.currentLap
@@ -396,8 +395,8 @@ public class GameManager {
             for (ServerPlayerEntity player : this.server.getPlayerManager().getPlayerList()) {
                 player.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 0.7F, 1);
             }
-            this.server.getPlayerManager().broadcast(TextUtil.translatableWithColor(
-                    "battlegrounds.game.border.reduce.broadcast", TextUtil.GOLD), false);
+            this.server.getPlayerManager().broadcast(Text.translatable("battlegrounds.game.border.reduce.broadcast")
+                    .formatted(Formatting.GOLD), false);
             Variables.progress.currentLap++;
         }, Variables.progress.resizeLapTimer,
                 () -> Variables.config.border.time.resizeDelayTicks + Variables.config.border.time.resizeSpendTicks);

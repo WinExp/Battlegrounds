@@ -30,6 +30,11 @@ public class StevesPainEnchantment extends Enchantment {
     }
 
     @Override
+    public boolean isTreasure() {
+        return true;
+    }
+
+    @Override
     public void onTargetDamaged(LivingEntity user, Entity target, int level) {
         Random random = user.getRandom();
         if (random.nextInt(100) + 1 <= BOUND && target instanceof LivingEntity livingEntity) {
@@ -38,12 +43,22 @@ public class StevesPainEnchantment extends Enchantment {
     }
 
     @Override
+    public boolean isAvailableForEnchantedBookOffer() {
+        return false;
+    }
+
+    @Override
+    public boolean isAvailableForRandomSelection() {
+        return false;
+    }
+
+    @Override
     public int getMinPower(int level) {
-        return 30;
+        return 15;
     }
 
     @Override
     public int getMaxPower(int level) {
-        return 60;
+        return this.getMinPower(level) + 50;
     }
 }

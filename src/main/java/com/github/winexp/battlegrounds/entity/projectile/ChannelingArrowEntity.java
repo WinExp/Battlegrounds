@@ -211,7 +211,7 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
         } else {
             this.initColor();
         }
-        if (nbt.contains("Channeling", NbtElement.BYTE_TYPE)) this.setChanneling(nbt.getBoolean("Channeling"));
+        if (nbt.contains("channeling", NbtElement.BYTE_TYPE)) this.setChanneling(nbt.getBoolean("channeling"));
     }
 
     @Override
@@ -234,7 +234,7 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
 
             nbt.put("custom_potion_effects", nbtList);
         }
-        nbt.putBoolean("Channeling", this.getChanneling());
+        nbt.putBoolean("channeling", this.getChanneling());
     }
 
     protected ItemStack asItemStack() {

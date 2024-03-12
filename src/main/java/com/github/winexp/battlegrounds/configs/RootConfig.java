@@ -1,9 +1,7 @@
 package com.github.winexp.battlegrounds.configs;
 
-@SuppressWarnings("CanBeFinal")
 public class RootConfig {
     public CooldownConfig cooldown = new CooldownConfig();
-    public TimeoutConfig timeout = new TimeoutConfig();
     public DelayConfig delay = new DelayConfig();
     public AttributeConfig attributes = new AttributeConfig();
     public BorderConfig border = new BorderConfig();
@@ -12,10 +10,6 @@ public class RootConfig {
         public long startGameVoteCooldownTicks = 30 * 20;
         public long randomTpCooldownTicks = 2 * 60 * 20;
         public long randomTpDamagedCooldownTicks = 20 * 20;
-    }
-
-    public static class TimeoutConfig {
-        public long discussionTimeoutTicks = 30 * 20;
     }
 
     public static class DelayConfig {
@@ -37,7 +31,7 @@ public class RootConfig {
 
         public static class TimeConfig {
             public long resizeSpendTicks = 4 * 60 * 20;
-            public int resizeDelayTicks = 2 * 60 * 20;
+            public int resizeDelayTicks = 3 * 60 * 20;
         }
 
         public static class BorderOrdinalConfig {
@@ -48,7 +42,7 @@ public class RootConfig {
 
         public static class DeathmatchConfig {
             public int initialSize = 300;
-            public long resizeDelayTicks = 5 * 60 * 20;
+            public long resizeSpendTicks = 5 * 60 * 20;
             public int finalSize = 150;
         }
     }
