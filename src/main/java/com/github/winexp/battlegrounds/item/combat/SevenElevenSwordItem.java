@@ -1,9 +1,9 @@
-package com.github.winexp.battlegrounds.item.tool;
+package com.github.winexp.battlegrounds.item.combat;
 
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.item.Items;
-import com.github.winexp.battlegrounds.item.recipe.NbtCrafting;
+import com.github.winexp.battlegrounds.item.recipe.ItemNbtCrafting;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.enchantment.Enchantment;
@@ -24,7 +24,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -32,8 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Map;
 
-public class SevenElevenSwordItem extends SwordItem implements NbtCrafting, EnchantRestrict {
-    public static final Identifier IDENTIFIER = new Identifier("battlegrounds", "seven_eleven_sword");
+public class SevenElevenSwordItem extends SwordItem implements ItemNbtCrafting, EnchantRestrict {
     public static final Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
             Enchantments.FIRE_ASPECT, 2,
             Enchantments.SWEEPING, 3,
@@ -96,11 +94,6 @@ public class SevenElevenSwordItem extends SwordItem implements NbtCrafting, Ench
     @Override
     public boolean isEnchantable(ItemStack stack) {
         return false;
-    }
-
-    @Override
-    public Identifier getIdentifier() {
-        return IDENTIFIER;
     }
 
     @Override

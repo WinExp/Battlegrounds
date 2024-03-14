@@ -1,6 +1,7 @@
 package com.github.winexp.battlegrounds.game;
 
 import com.github.winexp.battlegrounds.configs.GameProgress;
+import com.github.winexp.battlegrounds.entity.EntityTypes;
 import com.github.winexp.battlegrounds.helper.TeamHelper;
 import com.github.winexp.battlegrounds.helper.WorldHelper;
 import com.github.winexp.battlegrounds.task.LimitRepeatTask;
@@ -10,7 +11,6 @@ import com.github.winexp.battlegrounds.task.RepeatTask;
 import com.github.winexp.battlegrounds.util.*;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
@@ -124,7 +124,7 @@ public class GameManager {
             int amount = random.nextInt(4) + 1;
             for (int i = 0; i < amount; i++) {
                 int fireworkOffset = 4;
-                FireworkRocketEntity firework = EntityType.FIREWORK_ROCKET.create(this.server.getOverworld());
+                FireworkRocketEntity firework = EntityTypes.FIREWORK_ROCKET.create(this.server.getOverworld());
                 assert firework != null;
                 Vec3d pos = p.getPos();
                 Vec3d offset = new Vec3d(

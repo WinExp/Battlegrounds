@@ -64,7 +64,7 @@ public class Battlegrounds implements ModInitializer {
 
     public void reload() {
         this.loadConfigs();
-        Items.addRecipes();
+        Items.addCustomRecipes();
         GameManager.INSTANCE.reduceTask.cancel();
         if (Variables.progress.gameStage.isStarted() && !Variables.progress.gameStage.isDeathmatch()) {
             GameManager.INSTANCE.runTasks();
@@ -146,13 +146,11 @@ public class Battlegrounds implements ModInitializer {
     public void onInitialize() {
         INSTANCE = this;
         Constants.LOGGER.info("Loading {}", Constants.MOD_ID);
-        // 注册指令
-        CommandRegistrationCallback.EVENT.register(this::registerCommands);
-        // 注册网络包接收器
-        ModServerNetworkPlayHandler.registerReceivers();
         // 加载配置
         this.loadConfigs();
         // 注册事件
+        // 指令
+        CommandRegistrationCallback.EVENT.register(this::registerCommands);
         // Fabric API
         ServerLifecycleEvents.SERVER_STARTING.register(this::onServerStarting);
         ServerLifecycleEvents.SERVER_STARTED.register(this::onServerStarted);
@@ -161,19 +159,19 @@ public class Battlegrounds implements ModInitializer {
         ServerLivingEntityEvents.ALLOW_DAMAGE.register(this::allowLivingEntityDamaged);
         ServerPlayerEvents.AFTER_RESPAWN.register(this::onPlayerRespawn);
         LootTableEvents.MODIFY.register(new LootTableModifier());
-        // 自定义
+        // 自定义事件
         ModServerPlayerEvents.ALLOW_NATURAL_REGEN.register(this::allowPlayerNaturalRegen);
-        // 注册实体
-        EntityTypes.registerEntityTypes();
+        // 注册网络包接收器
+        ModServerNetworkPlayHandler.registerReceivers();
         // 注册物品
         Items.registerItems();
-        // 注册附魔
-        Enchantments.registerEnchantments();
-        Enchantments.SMELTING.registerDefaultSmeltable(); // 自动冶炼
-        // 添加配方
-        Items.addRecipes();
         // 注册物品组
         ItemGroups.registerItemGroups();
+        // 注册实体
+        EntityTypes.registerEntityTypes();
+        // 注册附魔
+        Enchantments.registerEnchantments();
+        Enchantments.SMELTING.registerDefaultSmeltable(); // 注册自动冶炼方块
         // 注册声音事件
         SoundEvents.registerSoundEvents();
         // 尝试重置存档

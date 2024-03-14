@@ -1,5 +1,6 @@
 package com.github.winexp.battlegrounds.client.gui.screen.vote;
 
+import com.github.winexp.battlegrounds.client.KeyBindings;
 import com.github.winexp.battlegrounds.discussion.vote.VoteInfo;
 import com.github.winexp.battlegrounds.network.packet.c2s.VoteC2SPacket;
 import com.github.winexp.battlegrounds.network.packet.c2s.SyncVoteInfosC2SPacket;
@@ -33,11 +34,20 @@ public class VoteScreen extends Screen {
     }
 
     static {
-        ClientTickEvents.END_CLIENT_TICK.register((client) -> {
-            for (VoteInfo voteInfo : voteInfosCache) {
-                if (voteInfo.timeLeft > 0) voteInfo.timeLeft--;
-            }
-        });
+        ClientTickEvents.END_CLIENT_TICK.register(VoteScreen::timeLeftTick);
+        ClientTickEvents.END_CLIENT_TICK.register(VoteScreen::keyBindingTick);
+    }
+
+    private static void timeLeftTick(MinecraftClient client) {
+        for (VoteInfo voteInfo : voteInfosCache) {
+            if (voteInfo.timeLeft > 0) voteInfo.timeLeft--;
+        }
+    }
+
+    private static void keyBindingTick(MinecraftClient client) {
+        while (KeyBindings.VOTE_SCREEN.wasPressed()) {
+            client.setScreen(new VoteScreen());
+        }
     }
 
     public void updateButtonState() {

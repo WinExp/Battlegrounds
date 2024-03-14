@@ -1,50 +1,32 @@
-package com.github.winexp.battlegrounds.item.tool;
+package com.github.winexp.battlegrounds.item.combat;
 
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
-import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.item.Items;
-import com.github.winexp.battlegrounds.item.recipe.NbtCrafting;
+import com.github.winexp.battlegrounds.item.recipe.ItemNbtCrafting;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.PickaxeItem;
+import net.minecraft.item.SwordItem;
 import net.minecraft.item.ToolMaterial;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RawShapedRecipe;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
-import net.minecraft.util.Identifier;
 
 import java.util.Map;
 
-public class MinersPickaxeItem extends PickaxeItem implements NbtCrafting, EnchantRestrict {
-    public static final Identifier IDENTIFIER = new Identifier("battlegrounds", "miners_pickaxe");
+public class LeachingSwordItem extends SwordItem implements ItemNbtCrafting {
     public static final Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
-            Enchantments.FORTUNE, 3,
-            Enchantments.EFFICIENCY, 5,
-            Enchantments.SMELTING, 1,
-            Enchantments.MENDING, 1,
-            Enchantments.UNBREAKING, 3,
-            Enchantments.FIRE_ASPECT, 2,
-            Enchantments.KNOCKBACK, 2
+            Enchantments.LEACHING, 1,
+            Enchantments.KNOCKBACK, 3
     );
 
-    public MinersPickaxeItem(ToolMaterial material, int attackDamage, float attackSpeed, Settings settings) {
-        super(material, attackDamage, attackSpeed, settings);
+    public LeachingSwordItem(ToolMaterial toolMaterial, int attackDamage, float attackSpeed, Settings settings) {
+        super(toolMaterial, attackDamage, attackSpeed, settings);
     }
 
     @Override
     public boolean hasGlint(ItemStack stack) {
         return true;
-    }
-
-    @Override
-    public boolean isEnchantable(ItemStack stack) {
-        return false;
-    }
-
-    @Override
-    public Identifier getIdentifier() {
-        return IDENTIFIER;
     }
 
     @Override
@@ -58,11 +40,14 @@ public class MinersPickaxeItem extends PickaxeItem implements NbtCrafting, Encha
     public ShapedRecipe getRecipe() {
         RawShapedRecipe rawShaped = RawShapedRecipe.create(Map.of(
                         'a', Ingredient.ofItems(Items.DIAMOND),
-                        'b', Ingredient.ofItems(Items.IRON_PICKAXE)
+                        'b', Ingredient.ofItems(Items.COBWEB),
+                        'c', Ingredient.ofItems(Items.SPIDER_EYE),
+                        'd', Ingredient.ofItems(Items.DIAMOND_SWORD),
+                        'e', Ingredient.ofItems(Items.DIAMOND_BLOCK)
                 ),
-                "aaa",
-                "aba",
-                "aaa");
+                "abe",
+                "cdc",
+                "aba");
         return new ShapedRecipe(this.getIdentifier().toString(),
                 CraftingRecipeCategory.EQUIPMENT,
                 rawShaped,

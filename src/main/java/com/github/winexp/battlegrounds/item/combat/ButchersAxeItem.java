@@ -1,4 +1,4 @@
-package com.github.winexp.battlegrounds.item.tool;
+package com.github.winexp.battlegrounds.item.combat;
 
 import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.sound.SoundEvents;
@@ -10,10 +10,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ToolMaterial;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
 
 public class ButchersAxeItem extends AxeItem implements EnchantRestrict {
-    public static final Identifier IDENTIFIER = new Identifier("battlegrounds", "butchers_axe");
     private static final int PENALTY_DURATION = 3 * 20;
 
     public ButchersAxeItem(ToolMaterial material, float attackDamage, float attackSpeed, Settings settings) {

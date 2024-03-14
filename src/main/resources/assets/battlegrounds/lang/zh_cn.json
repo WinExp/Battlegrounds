@@ -52,10 +52,8 @@
   "item.battlegrounds.butchers_axe": "🪓屠夫的斧头",
   "item.battlegrounds.channeling_bow": "🏹引雷弓",
   "item.battlegrounds.flash_bang": "闪光震撼弹",
-  "item.battlegrounds.flash_bang.fuse": "引信时间：%fs",
+  "item.battlegrounds.molotov": "燃烧瓶",
   "item.battlegrounds.ruperts_tear": "鲁伯特之泪",
-  "item.battlegrounds.ruperts_tear.cooldown": "冷却时间：%fs",
-  "item.battlegrounds.ruperts_tear.max_distance": "最大距离: %d 格",
   "item.battlegrounds.ruperts_tear.use_failed": "无法将你传送到此处",
   "item.battlegrounds.knockback_stick": "击退棒",
 

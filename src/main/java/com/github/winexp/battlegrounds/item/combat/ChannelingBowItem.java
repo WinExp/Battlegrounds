@@ -1,9 +1,9 @@
-package com.github.winexp.battlegrounds.item.tool;
+package com.github.winexp.battlegrounds.item.combat;
 
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.item.Items;
-import com.github.winexp.battlegrounds.item.recipe.NbtCrafting;
+import com.github.winexp.battlegrounds.item.recipe.ItemNbtCrafting;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.BowItem;
 import net.minecraft.item.ItemStack;
@@ -11,12 +11,10 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RawShapedRecipe;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
-import net.minecraft.util.Identifier;
 
 import java.util.Map;
 
-public class ChannelingBowItem extends BowItem implements NbtCrafting, EnchantRestrict {
-    public static final Identifier IDENTIFIER = new Identifier("battlegrounds", "channeling_bow");
+public class ChannelingBowItem extends BowItem implements ItemNbtCrafting, EnchantRestrict {
     public static final int DURABILITY = 400;
     public static final Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
             Enchantments.CHANNELING_PRO, 1,
@@ -27,11 +25,6 @@ public class ChannelingBowItem extends BowItem implements NbtCrafting, EnchantRe
 
     public ChannelingBowItem(Settings settings) {
         super(settings);
-    }
-
-    @Override
-    public Identifier getIdentifier() {
-        return IDENTIFIER;
     }
 
     @Override

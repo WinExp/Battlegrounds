@@ -52,10 +52,8 @@
   "item.battlegrounds.butchers_axe": "🪓Butcher's Axe",
   "item.battlegrounds.channeling_bow": "🏹Channeling Bow",
   "item.battlegrounds.flash_bang": "Flash Bang",
-  "item.battlegrounds.flash_bang.fuse": "Fuse: %fs",
+  "item.battlegrounds.molotov": "Molotov",
   "item.battlegrounds.ruperts_tear": "Rupert's Tear",
-  "item.battlegrounds.ruperts_tear.cooldown": "Cooldown Time：%fs",
-  "item.battlegrounds.ruperts_tear.max_distance": "Max Distance: %d blocks",
   "item.battlegrounds.ruperts_tear.use_failed": "Can't get you here",
   "item.battlegrounds.knockback_stick": "Knockback Stick",
 

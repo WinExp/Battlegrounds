@@ -262,14 +262,12 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
                     this.getWorld().addParticle(ParticleTypes.ENTITY_EFFECT, this.getParticleX(0.5), this.getRandomBodyY(), this.getParticleZ(0.5), d, e, f);
                 }
             }
-        }
-        else if (status == 3) {
+        } else if (status == 3) {
             this.spawnParticlesWithOffset(ParticleTypes.FLASH, 20, 0);
             this.spawnParticlesWithOffset(ParticleTypes.END_ROD, 30, 0.3);
         } else {
             super.handleStatus(status);
         }
-
     }
 
     public boolean getChanneling() {

@@ -1,49 +1,49 @@
 package com.github.winexp.battlegrounds.configs;
 
 public class RootConfig {
-    public CooldownConfig cooldown = new CooldownConfig();
-    public DelayConfig delay = new DelayConfig();
-    public AttributeConfig attributes = new AttributeConfig();
-    public BorderConfig border = new BorderConfig();
+    public final CooldownConfig cooldown = new CooldownConfig();
+    public final DelayConfig delay = new DelayConfig();
+    public final AttributeConfig attributes = new AttributeConfig();
+    public final BorderConfig border = new BorderConfig();
 
     public static class CooldownConfig {
-        public long startGameVoteCooldownTicks = 30 * 20;
-        public long randomTpCooldownTicks = 2 * 60 * 20;
-        public long randomTpDamagedCooldownTicks = 20 * 20;
+        public final long startGameVoteCooldownTicks = 30 * 20;
+        public final long randomTpCooldownTicks = 2 * 60 * 20;
+        public final long randomTpDamagedCooldownTicks = 20 * 20;
     }
 
     public static class DelayConfig {
-        public int serverCloseDelaySeconds = 10;
-        public int gameStartDelaySeconds = 10;
+        public final int serverCloseDelaySeconds = 10;
+        public final int gameStartDelaySeconds = 10;
     }
 
     public static class AttributeConfig {
-        public int genericAdditionHealth = 20;
+        public final int genericAdditionHealth = 20;
     }
 
     public static class BorderConfig {
-        public int initialSize = 5000;
-        public int resizeBlocks = 500;
-        public int totalNum = 4;
-        public TimeConfig time = new TimeConfig();
-        public BorderOrdinalConfig borderOrdinal = new BorderOrdinalConfig();
-        public DeathmatchConfig deathmatch = new DeathmatchConfig();
+        public final int initialSize = 5000;
+        public final int resizeBlocks = 500;
+        public final int totalNum = 4;
+        public final TimeConfig time = new TimeConfig();
+        public final BorderOrdinalConfig borderOrdinal = new BorderOrdinalConfig();
+        public final DeathmatchConfig deathmatch = new DeathmatchConfig();
 
         public static class TimeConfig {
-            public long resizeSpendTicks = 4 * 60 * 20;
-            public int resizeDelayTicks = 3 * 60 * 20;
+            public final long resizeSpendTicks = 4 * 60 * 20;
+            public final int resizeDelayTicks = 3 * 60 * 20;
         }
 
         public static class BorderOrdinalConfig {
-            public int pvpEnabledBorderOrdinal = 2;
-            public int finalBorderOrdinal = 3;
-            public int deathmatchBeginBorderOrdinal = 3;
+            public final int pvpEnabledBorderOrdinal = 2;
+            public final int finalBorderOrdinal = 3;
+            public final int deathmatchBeginBorderOrdinal = 3;
         }
 
         public static class DeathmatchConfig {
-            public int initialSize = 300;
-            public long resizeSpendTicks = 5 * 60 * 20;
-            public int finalSize = 150;
+            public final int initialSize = 300;
+            public final long resizeSpendTicks = 5 * 60 * 20;
+            public final int finalSize = 150;
         }
     }
 }

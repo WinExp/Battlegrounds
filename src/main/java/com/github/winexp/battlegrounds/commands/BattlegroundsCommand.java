@@ -46,8 +46,8 @@ public class BattlegroundsCommand {
     public static ArgumentBuilder<ServerCommandSource, ?> registerSummonFlash() {
         var cSummon = literal("summonFlash").requires(source ->
                 source.hasPermissionLevel(2)).executes(context -> executeSummonFlash(context, true));
-        var aEntityType = argument("pos", Vec3ArgumentType.vec3()).executes(context -> executeSummonFlash(context, false));
-        return cSummon.then(aEntityType);
+        var aPos = argument("pos", Vec3ArgumentType.vec3()).executes(context -> executeSummonFlash(context, false));
+        return cSummon.then(aPos);
     }
 
     private static int executeSummonFlash(CommandContext<ServerCommandSource> context, boolean isSelf) throws CommandSyntaxException {
@@ -55,13 +55,13 @@ public class BattlegroundsCommand {
             ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
             World world = player.getWorld();
             Vec3d pos = player.getPos();
-            FlashBangEntity.sendFlash(world, pos);
+            FlashBangEntity.flash(world, pos);
         } else if (isSelf && !context.getSource().isExecutedByPlayer()) {
             throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument().create();
         } else {
             Vec3d pos = Vec3ArgumentType.getVec3(context, "pos");
             World world = Variables.server.getOverworld();
-            FlashBangEntity.sendFlash(world, pos);
+            FlashBangEntity.flash(world, pos);
         }
         return 1;
     }
@@ -97,17 +97,16 @@ public class BattlegroundsCommand {
         if (VoteManager.INSTANCE.containsVote(VotePreset.START_GAME.identifier())) {
             source.sendFeedback(() -> Text.translatable("battlegrounds.vote.already_voting.feedback")
                     .formatted(Formatting.RED), false);
-            return 1;
+        } else {
+            VoteManager.INSTANCE.openVoteWithPreset(VotePreset.START_GAME, Variables.server.getPlayerManager().getPlayerList());
+            Variables.server.getPlayerManager().broadcast(
+                    Text.translatable("battlegrounds.command.start.broadcast", source.getName())
+                            .formatted(Formatting.GREEN)
+                            .append(TextFactory.LINEFEED)
+                            .append(TextFactory.ACCEPT_BUTTON)
+                            .append("   ")
+                            .append(TextFactory.DENY_BUTTON), false);
         }
-        VoteManager.INSTANCE.openVoteWithPreset(VotePreset.START_GAME, Variables.server.getPlayerManager().getPlayerList());
-        Variables.server.getPlayerManager().broadcast(
-                Text.translatable("battlegrounds.command.start.broadcast", source.getName())
-                        .formatted(Formatting.GREEN)
-                .append(TextFactory.LINEFEED)
-                .append(TextFactory.ACCEPT_BUTTON)
-                .append("   ")
-                .append(TextFactory.DENY_BUTTON), false);
-
         return 1;
     }
 
