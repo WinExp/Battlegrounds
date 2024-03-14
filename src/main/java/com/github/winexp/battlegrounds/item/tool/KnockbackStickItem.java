@@ -3,7 +3,7 @@ package com.github.winexp.battlegrounds.item.tool;
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.item.Items;
-import com.github.winexp.battlegrounds.item.recipe.NbtCrafting;
+import com.github.winexp.battlegrounds.item.recipe.ItemNbtCrafting;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -17,13 +17,11 @@ import net.minecraft.recipe.RawShapedRecipe;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
 
 import java.util.Map;
 
-public class KnockbackStickItem extends ToolItem implements NbtCrafting, EnchantRestrict {
+public class KnockbackStickItem extends ToolItem implements ItemNbtCrafting, EnchantRestrict {
     private static final int DURATION = 3 * 20;
-    public static final Identifier IDENTIFIER = new Identifier("battlegrounds", "knockback_stick");
     public static final Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
             Enchantments.KNOCKBACK, 5
     );
@@ -49,11 +47,6 @@ public class KnockbackStickItem extends ToolItem implements NbtCrafting, Enchant
         ItemStack stack = new ItemStack(this, 1);
         ENCHANTMENTS.forEach(stack::addEnchantment);
         return stack;
-    }
-
-    @Override
-    public Identifier getIdentifier() {
-        return IDENTIFIER;
     }
 
     @Override

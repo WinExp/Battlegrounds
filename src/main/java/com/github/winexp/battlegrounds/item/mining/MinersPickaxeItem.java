@@ -1,30 +1,33 @@
-package com.github.winexp.battlegrounds.item.tool;
+package com.github.winexp.battlegrounds.item.mining;
 
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.item.Items;
-import com.github.winexp.battlegrounds.item.recipe.NbtCrafting;
+import com.github.winexp.battlegrounds.item.recipe.ItemNbtCrafting;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.SwordItem;
+import net.minecraft.item.PickaxeItem;
 import net.minecraft.item.ToolMaterial;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RawShapedRecipe;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
-import net.minecraft.util.Identifier;
 
 import java.util.Map;
 
-public class StevesPainSwordItem extends SwordItem implements NbtCrafting, EnchantRestrict {
-    public static final Identifier IDENTIFIER = new Identifier("battlegrounds", "steves_pain_sword");
+public class MinersPickaxeItem extends PickaxeItem implements ItemNbtCrafting, EnchantRestrict {
     public static final Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
-            Enchantments.STEVES_PAIN, 1,
-            Enchantments.MENDING, 1
+            Enchantments.FORTUNE, 3,
+            Enchantments.EFFICIENCY, 5,
+            Enchantments.SMELTING, 1,
+            Enchantments.MENDING, 1,
+            Enchantments.UNBREAKING, 3,
+            Enchantments.FIRE_ASPECT, 2,
+            Enchantments.KNOCKBACK, 2
     );
 
-    public StevesPainSwordItem(ToolMaterial toolMaterial, int attackDamage, float attackSpeed, Settings settings) {
-        super(toolMaterial, attackDamage, attackSpeed, settings);
+    public MinersPickaxeItem(ToolMaterial material, int attackDamage, float attackSpeed, Settings settings) {
+        super(material, attackDamage, attackSpeed, settings);
     }
 
     @Override
@@ -33,8 +36,8 @@ public class StevesPainSwordItem extends SwordItem implements NbtCrafting, Encha
     }
 
     @Override
-    public Identifier getIdentifier() {
-        return IDENTIFIER;
+    public boolean isEnchantable(ItemStack stack) {
+        return false;
     }
 
     @Override
@@ -47,16 +50,12 @@ public class StevesPainSwordItem extends SwordItem implements NbtCrafting, Encha
     @Override
     public ShapedRecipe getRecipe() {
         RawShapedRecipe rawShaped = RawShapedRecipe.create(Map.of(
-                        'a', Ingredient.ofItems(Items.DIAMOND_BLOCK),
-                        'b', Ingredient.ofItems(Items.GHAST_TEAR),
-                        'c', Ingredient.ofItems(Items.GOLDEN_APPLE),
-                        'd', Ingredient.ofItems(Items.NETHERITE_SWORD),
-                        'e', Ingredient.ofItems(Items.ENCHANTED_GOLDEN_APPLE),
-                        'f', Ingredient.ofItems(Items.BLAZE_POWDER)
+                        'a', Ingredient.ofItems(Items.DIAMOND),
+                        'b', Ingredient.ofItems(Items.IRON_PICKAXE)
                 ),
+                "aaa",
                 "aba",
-                "cde",
-                "afa");
+                "aaa");
         return new ShapedRecipe(this.getIdentifier().toString(),
                 CraftingRecipeCategory.EQUIPMENT,
                 rawShaped,

@@ -1,8 +1,9 @@
-package com.github.winexp.battlegrounds.item.tool;
+package com.github.winexp.battlegrounds.item.combat;
 
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
+import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.item.Items;
-import com.github.winexp.battlegrounds.item.recipe.NbtCrafting;
+import com.github.winexp.battlegrounds.item.recipe.ItemNbtCrafting;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SwordItem;
@@ -11,29 +12,22 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RawShapedRecipe;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
-import net.minecraft.util.Identifier;
 
 import java.util.Map;
 
-public class LeachingSwordItem extends SwordItem implements NbtCrafting {
-    public static final Identifier IDENTIFIER = new Identifier("battlegrounds", "leaching_sword");
+public class StevesPainSwordItem extends SwordItem implements ItemNbtCrafting, EnchantRestrict {
     public static final Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
-            Enchantments.LEACHING, 1,
-            Enchantments.KNOCKBACK, 3
+            Enchantments.STEVES_PAIN, 1,
+            Enchantments.MENDING, 1
     );
 
-    public LeachingSwordItem(ToolMaterial toolMaterial, int attackDamage, float attackSpeed, Settings settings) {
+    public StevesPainSwordItem(ToolMaterial toolMaterial, int attackDamage, float attackSpeed, Settings settings) {
         super(toolMaterial, attackDamage, attackSpeed, settings);
     }
 
     @Override
     public boolean hasGlint(ItemStack stack) {
         return true;
-    }
-
-    @Override
-    public Identifier getIdentifier() {
-        return IDENTIFIER;
     }
 
     @Override
@@ -46,15 +40,16 @@ public class LeachingSwordItem extends SwordItem implements NbtCrafting {
     @Override
     public ShapedRecipe getRecipe() {
         RawShapedRecipe rawShaped = RawShapedRecipe.create(Map.of(
-                        'a', Ingredient.ofItems(Items.DIAMOND),
-                        'b', Ingredient.ofItems(Items.COBWEB),
-                        'c', Ingredient.ofItems(Items.SPIDER_EYE),
-                        'd', Ingredient.ofItems(Items.DIAMOND_SWORD),
-                        'e', Ingredient.ofItems(Items.DIAMOND_BLOCK)
+                        'a', Ingredient.ofItems(Items.DIAMOND_BLOCK),
+                        'b', Ingredient.ofItems(Items.GHAST_TEAR),
+                        'c', Ingredient.ofItems(Items.GOLDEN_APPLE),
+                        'd', Ingredient.ofItems(Items.NETHERITE_SWORD),
+                        'e', Ingredient.ofItems(Items.ENCHANTED_GOLDEN_APPLE),
+                        'f', Ingredient.ofItems(Items.BLAZE_POWDER)
                 ),
-                "abe",
-                "cdc",
-                "aba");
+                "aba",
+                "cde",
+                "afa");
         return new ShapedRecipe(this.getIdentifier().toString(),
                 CraftingRecipeCategory.EQUIPMENT,
                 rawShaped,

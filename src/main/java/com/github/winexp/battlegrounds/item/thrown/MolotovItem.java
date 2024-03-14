@@ -1,6 +1,6 @@
 package com.github.winexp.battlegrounds.item.thrown;
 
-import com.github.winexp.battlegrounds.entity.projectile.FlashBangEntity;
+import com.github.winexp.battlegrounds.entity.projectile.MolotovEntity;
 import com.github.winexp.battlegrounds.item.Items;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -15,11 +15,11 @@ import net.minecraft.world.World;
 
 import java.util.function.Predicate;
 
-public class FlashBangItem extends RangedWeaponItem {
-    public static final Predicate<ItemStack> PROJECTILES = (stack) -> stack.isOf(Items.FLASH_BANG);
-    public static final int FUSE = 30;
+public class MolotovItem extends RangedWeaponItem {
+    public static final Predicate<ItemStack> PROJECTILES = (stack) -> stack.isOf(Items.MOLOTOV);
+    public static final int FUSE = 40;
 
-    public FlashBangItem(Settings settings) {
+    public MolotovItem(Settings settings) {
         super(settings);
     }
 
@@ -40,7 +40,7 @@ public class FlashBangItem extends RangedWeaponItem {
             if (progress >= 0.15F) {
                 world.playSound(null, user.getX(), user.getY(), user.getZ(), SoundEvents.ENTITY_SNOWBALL_THROW, SoundCategory.NEUTRAL, 0.5F, 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F));
                 if (!world.isClient) {
-                    FlashBangEntity entity = new FlashBangEntity(player, world);
+                    MolotovEntity entity = new MolotovEntity(player, world);
                     entity.setItem(stack);
                     entity.setFuse(FUSE);
                     entity.setVelocity(player, player.getPitch(), player.getYaw(), 0.0F, progress * 1.3F, 1.0F);

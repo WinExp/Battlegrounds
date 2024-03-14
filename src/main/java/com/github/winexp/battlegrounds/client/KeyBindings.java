@@ -6,14 +6,13 @@ import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
 
 public class KeyBindings {
-    public static KeyBinding VOTE_SCREEN;
+    public static final KeyBinding VOTE_SCREEN = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+            "key.battlegrounds.vote_screen",
+            InputUtil.Type.KEYSYM,
+            GLFW.GLFW_KEY_G,
+            "key.categories.battlegrounds"
+    ));
 
     public static void registerKeyBindings() {
-        VOTE_SCREEN = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.battlegrounds.vote_screen",
-                InputUtil.Type.KEYSYM,
-                GLFW.GLFW_KEY_G,
-                "key.categories.battlegrounds"
-        ));
     }
 }

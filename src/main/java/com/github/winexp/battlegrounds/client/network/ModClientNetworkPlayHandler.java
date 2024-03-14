@@ -30,7 +30,7 @@ public final class ModClientNetworkPlayHandler {
             if (entity != null) {
                 float tickDelta = client.getTickDelta();
                 ClientVariables.flashStrength = Math.max(ClientVariables.flashStrength,
-                        FlashBangEntity.getFlashStrength(entity, tickDelta, pos, distance));
+                        FlashBangEntity.getFlashStrength(entity, pos, distance, tickDelta));
             }
         });
     }

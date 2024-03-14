@@ -23,6 +23,7 @@ public class ItemGroups extends net.minecraft.item.ItemGroups {
                 entries.add(Items.BUTCHERS_AXE.getDefaultStack());
                 entries.add(Items.CHANNELING_BOW.getDefaultStack());
                 entries.add(Items.FLASH_BANG.getDefaultStack());
+                entries.add(Items.MOLOTOV.getDefaultStack());
                 entries.add(Items.RUPERTS_TEAR.getDefaultStack());
                 entries.add(Items.KNOCKBACK_STICK.getDefaultStack());
 

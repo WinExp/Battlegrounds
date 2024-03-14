@@ -2,10 +2,14 @@ package com.github.winexp.battlegrounds.item;
 
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.entity.projectile.FlashBangEntity;
+import com.github.winexp.battlegrounds.entity.projectile.MolotovEntity;
+import com.github.winexp.battlegrounds.item.combat.*;
+import com.github.winexp.battlegrounds.item.mining.MinersPickaxeItem;
 import com.github.winexp.battlegrounds.item.recipe.NbtCrafting;
 import com.github.winexp.battlegrounds.item.recipe.ShapedNbtCrafting;
 import com.github.winexp.battlegrounds.item.recipe.ShapelessNbtCrafting;
 import com.github.winexp.battlegrounds.item.thrown.FlashBangItem;
+import com.github.winexp.battlegrounds.item.thrown.MolotovItem;
 import com.github.winexp.battlegrounds.item.tool.*;
 import com.github.winexp.battlegrounds.util.RecipeUtil;
 import net.minecraft.block.DispenserBlock;
@@ -16,11 +20,11 @@ import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RawShapedRecipe;
-import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.Util;
@@ -32,46 +36,31 @@ import java.util.List;
 import java.util.Map;
 
 public class Items extends net.minecraft.item.Items {
-    public static final PVPProSwordItem PVP_PRO_SWORD = (PVPProSwordItem) register(PVPProSwordItem.IDENTIFIER, new PVPProSwordItem(ToolMaterials.PVP_PRO_SWORD, 3, -2.4F, new Item.Settings().rarity(Rarity.EPIC).fireproof()));
-    public static final SevenElevenSwordItem SEVEN_ELEVEN_SWORD = (SevenElevenSwordItem) register(SevenElevenSwordItem.IDENTIFIER, new SevenElevenSwordItem(ToolMaterials.SEVEN_ELEVEN_SWORD, 3, -2.4F, new Item.Settings().rarity(Rarity.EPIC).fireproof()));
-    public static final StevesPainSwordItem STEVES_PAIN_SWORD = (StevesPainSwordItem) register(StevesPainSwordItem.IDENTIFIER, new StevesPainSwordItem(ToolMaterials.STEVES_PAIN_SWORD, 3, -2.4F, new Item.Settings().rarity(Rarity.EPIC).fireproof()));
-    public static final LeachingSwordItem LEACHING_SWORD = (LeachingSwordItem) register(LeachingSwordItem.IDENTIFIER, new LeachingSwordItem(ToolMaterials.LEACHING_SWORD, 3, -2.4F, new Item.Settings().rarity(Rarity.UNCOMMON)));
-    public static final MinersPickaxeItem MINERS_PICKAXE = (MinersPickaxeItem) register(MinersPickaxeItem.IDENTIFIER, new MinersPickaxeItem(ToolMaterials.MINERS_PICKAXE, 1, -2.8F, new Item.Settings().rarity(Rarity.UNCOMMON)));
-    public static final ButchersAxeItem BUTCHERS_AXE = (ButchersAxeItem) register(ButchersAxeItem.IDENTIFIER, new ButchersAxeItem(ToolMaterials.BUTCHERS_AXE, 5, -3.0F, new Item.Settings().rarity(Rarity.EPIC).fireproof()));
-    public static final ChannelingBowItem CHANNELING_BOW = (ChannelingBowItem) register(ChannelingBowItem.IDENTIFIER, new ChannelingBowItem(new Item.Settings().rarity(Rarity.RARE).fireproof().maxDamage(ChannelingBowItem.DURABILITY)));
-    public static final FlashBangItem FLASH_BANG = (FlashBangItem) register(FlashBangItem.IDENTIFIER, new FlashBangItem(new Item.Settings().maxCount(16).rarity(Rarity.UNCOMMON)));
-    public static final RupertsTearItem RUPERTS_TEAR = (RupertsTearItem) register(RupertsTearItem.IDENTIFIER, new RupertsTearItem(ToolMaterials.RUPERTS_TEAR, new Item.Settings().maxCount(1).rarity(Rarity.RARE)));
-    public static final KnockbackStickItem KNOCKBACK_STICK = (KnockbackStickItem) register(KnockbackStickItem.IDENTIFIER, new KnockbackStickItem(ToolMaterials.KNOCKBACK_STICK, new Item.Settings().maxCount(1).rarity(Rarity.RARE)));
+    public static final PVPProSwordItem PVP_PRO_SWORD = registerItem("pvp_pro_sword", new PVPProSwordItem(ToolMaterials.PVP_PRO_SWORD, 3, -2.4F, new Item.Settings().rarity(Rarity.EPIC).fireproof()));
+    public static final SevenElevenSwordItem SEVEN_ELEVEN_SWORD = registerItem("seven_eleven_sword", new SevenElevenSwordItem(ToolMaterials.SEVEN_ELEVEN_SWORD, 3, -2.4F, new Item.Settings().rarity(Rarity.EPIC).fireproof()));
+    public static final StevesPainSwordItem STEVES_PAIN_SWORD = registerItem("steves_pain_sword", new StevesPainSwordItem(ToolMaterials.STEVES_PAIN_SWORD, 3, -2.4F, new Item.Settings().rarity(Rarity.EPIC).fireproof()));
+    public static final LeachingSwordItem LEACHING_SWORD = registerItem("leaching_sword", new LeachingSwordItem(ToolMaterials.LEACHING_SWORD, 3, -2.4F, new Item.Settings().rarity(Rarity.UNCOMMON)));
+    public static final MinersPickaxeItem MINERS_PICKAXE = registerItem("miners_pickaxe", new MinersPickaxeItem(ToolMaterials.MINERS_PICKAXE, 1, -2.8F, new Item.Settings().rarity(Rarity.UNCOMMON)));
+    public static final ButchersAxeItem BUTCHERS_AXE = registerItem("butchers_axe", new ButchersAxeItem(ToolMaterials.BUTCHERS_AXE, 5, -3.0F, new Item.Settings().rarity(Rarity.EPIC).fireproof()));
+    public static final ChannelingBowItem CHANNELING_BOW = registerItem("channeling_bow", new ChannelingBowItem(new Item.Settings().rarity(Rarity.RARE).fireproof().maxDamage(ChannelingBowItem.DURABILITY)));
+    public static final FlashBangItem FLASH_BANG = registerItem("flash_bang", new FlashBangItem(new Item.Settings().maxCount(16).rarity(Rarity.UNCOMMON)));
+    public static final MolotovItem MOLOTOV = registerItem("molotov", new MolotovItem(new Item.Settings().maxCount(16).rarity(Rarity.UNCOMMON)));
+    public static final RupertsTearItem RUPERTS_TEAR = registerItem("ruperts_tear", new RupertsTearItem(ToolMaterials.RUPERTS_TEAR, new Item.Settings().maxCount(1).rarity(Rarity.RARE)));
+    public static final KnockbackStickItem KNOCKBACK_STICK = registerItem("knockback_stick", new KnockbackStickItem(ToolMaterials.KNOCKBACK_STICK, new Item.Settings().maxCount(1).rarity(Rarity.RARE)));
 
-    private static void registerDispenserBehavior() {
-        DispenserBlock.registerBehavior(FLASH_BANG, new ProjectileDispenserBehavior() {
-            @Override
-            protected ProjectileEntity createProjectile(World world, Position position, ItemStack stack) {
-                return Util.make(new FlashBangEntity(world, position.getX(), position.getY(), position.getZ()), (entity) -> {
-                    entity.setItem(stack);
-                    entity.setFuse(FlashBangItem.getFuse(stack.getNbt()));
-                });
-            }
-        });
+    public static <T extends Item> T registerItem(String name, T item) {
+        T result = Registry.register(Registries.ITEM, new Identifier("battlegrounds", name), item);
+        if (item instanceof NbtCrafting nbtCrafting) {
+            addRecipe(nbtCrafting);
+        }
+        return result;
     }
 
-    private static void registerModelPredicate() {
-        ModelPredicateProviderRegistry.register(CHANNELING_BOW, new Identifier("pull"), (stack, clientWorld, entity, seed) -> {
-            if (entity == null) return 0.0F;
-            return entity.getActiveItem() != stack ? 0.0F : (float) (stack.getMaxUseTime() - entity.getItemUseTimeLeft()) / 20.0F;
-        });
-        ModelPredicateProviderRegistry.register(CHANNELING_BOW, new Identifier("pulling"), (stack, clientWorld, entity, seed) -> {
-            if (entity == null) return 0.0F;
-            return entity.isUsingItem() && entity.getActiveItem() == stack ? 1.0F : 0.0F;
-        });
+    private static void addRecipe(NbtCrafting item) {
+        RecipeUtil.addRecipe(item);
     }
 
-    public static void registerItems() {
-        registerDispenserBehavior();
-        registerModelPredicate();
-    }
-
-    public static void addRecipes() {
+    public static void addCustomRecipes() {
         List<ShapedNbtCrafting> shapedRecipes = List.of(
                 // 自动冶炼
                 new ShapedNbtCrafting(
@@ -156,20 +145,58 @@ public class Items extends net.minecraft.item.Items {
                 )
         );
 
-        ArrayList<NbtCrafting> items = new ArrayList<>(List.of(
-                PVP_PRO_SWORD, SEVEN_ELEVEN_SWORD, STEVES_PAIN_SWORD, LEACHING_SWORD,
-                MINERS_PICKAXE,
-                CHANNELING_BOW,
-                KNOCKBACK_STICK
-        ));
+        ArrayList<NbtCrafting> items = new ArrayList<>();
         items.addAll(shapedRecipes);
         items.addAll(shapelessRecipes);
         for (NbtCrafting item : items) {
-            RecipeEntry<CraftingRecipe> entry = new RecipeEntry<>(
-                    item.getIdentifier(),
-                    item.getRecipe()
-            );
-            RecipeUtil.addRecipe(entry);
+            RecipeUtil.addRecipe(item.toRecipeEntry());
         }
+    }
+
+    private static void registerDispenserBehaviors() {
+        DispenserBlock.registerBehavior(FLASH_BANG, new ProjectileDispenserBehavior() {
+            @Override
+            protected ProjectileEntity createProjectile(World world, Position position, ItemStack stack) {
+                return Util.make(new FlashBangEntity(world, position.getX(), position.getY(), position.getZ()), (entity) -> {
+                    entity.setItem(stack);
+                    entity.setFuse(FlashBangItem.FUSE);
+                });
+            }
+
+            @Override
+            protected float getForce() {
+                return 1.3F;
+            }
+        });
+        DispenserBlock.registerBehavior(MOLOTOV, new ProjectileDispenserBehavior() {
+            @Override
+            protected ProjectileEntity createProjectile(World world, Position position, ItemStack stack) {
+                return Util.make(new MolotovEntity(world, position.getX(), position.getY(), position.getZ()), (entity) -> {
+                    entity.setItem(stack);
+                    entity.setFuse(MolotovItem.FUSE);
+                });
+            }
+
+            @Override
+            protected float getForce() {
+                return 1.3F;
+            }
+        });
+    }
+
+    public static void registerModelPredicates() {
+        ModelPredicateProviderRegistry.register(CHANNELING_BOW, new Identifier("pull"), (stack, clientWorld, entity, seed) -> {
+            if (entity == null) return 0.0F;
+            return entity.getActiveItem() != stack ? 0.0F : (float) (stack.getMaxUseTime() - entity.getItemUseTimeLeft()) / 20.0F;
+        });
+        ModelPredicateProviderRegistry.register(CHANNELING_BOW, new Identifier("pulling"), (stack, clientWorld, entity, seed) -> {
+            if (entity == null) return 0.0F;
+            return entity.isUsingItem() && entity.getActiveItem() == stack ? 1.0F : 0.0F;
+        });
+    }
+
+    public static void registerItems() {
+        registerDispenserBehaviors();
+        addCustomRecipes();
     }
 }

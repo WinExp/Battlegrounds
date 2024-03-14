@@ -7,7 +7,7 @@ import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.util.Identifier;
 
-public class ShapedNbtCrafting implements NbtCrafting {
+public class ShapedNbtCrafting implements CustomNbtCrafting {
     private final ItemStack result;
     private final ShapedRecipe recipe;
     private final Identifier identifier;
