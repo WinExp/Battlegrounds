@@ -5,6 +5,15 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class WorldUtil {
+    public static int getOpacity(World world, BlockPos pos) {
+        BlockState state = world.getBlockState(pos);
+        return state.getOpacity(world, pos);
+    }
+
+    public static float getOpacityFloat(World world, BlockPos pos) {
+        return (float) getOpacity(world, pos) / 15;
+    }
+
     public static boolean isFullCube(World world, BlockPos pos) {
         BlockState state = world.getBlockState(pos);
         return state.isFullCube(world, pos);

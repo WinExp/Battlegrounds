@@ -1,12 +1,13 @@
 package com.github.winexp.battlegrounds;
 
-import com.github.winexp.battlegrounds.commands.BattlegroundsCommand;
-import com.github.winexp.battlegrounds.commands.RandomTpCommand;
-import com.github.winexp.battlegrounds.configs.GameProgress;
-import com.github.winexp.battlegrounds.configs.RootConfig;
+import com.github.winexp.battlegrounds.block.BlockSmeltableRegistry;
+import com.github.winexp.battlegrounds.command.BattlegroundsCommand;
+import com.github.winexp.battlegrounds.command.RandomTpCommand;
+import com.github.winexp.battlegrounds.config.GameProgress;
+import com.github.winexp.battlegrounds.config.RootConfig;
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.entity.EntityTypes;
-import com.github.winexp.battlegrounds.events.ModServerPlayerEvents;
+import com.github.winexp.battlegrounds.event.ModServerPlayerEvents;
 import com.github.winexp.battlegrounds.game.GameManager;
 import com.github.winexp.battlegrounds.item.ItemGroups;
 import com.github.winexp.battlegrounds.item.Items;
@@ -54,9 +55,9 @@ public class Battlegrounds implements ModInitializer {
     }
 
     public void loadConfigs() {
-        Variables.config = ConfigUtil.createOrLoadConfig(Constants.CONFIG_PATH, "config", RootConfig.class);
+        Variables.config = ConfigUtil.readOrCreateConfig(Constants.CONFIG_PATH, "config", RootConfig.class);
         if (Variables.server != null) {
-            Variables.progress = ConfigUtil.createOrLoadConfig(Variables.server.getSavePath(WorldSavePath.ROOT),
+            Variables.progress = ConfigUtil.readOrCreateConfig(Variables.server.getSavePath(WorldSavePath.ROOT),
                     "bg_progress",
                     GameProgress.class);
         }
@@ -91,21 +92,15 @@ public class Battlegrounds implements ModInitializer {
     }
 
     private void onPlayerRespawn(ServerPlayerEntity oldPlayer, ServerPlayerEntity newPlayer, boolean alive) {
-        PlayerUtil.setGameModeWithMap(newPlayer);
+        PlayerUtil.changeGameModeWithMap(newPlayer);
     }
 
-    private boolean allowLivingEntityDamaged(LivingEntity entity, DamageSource source, float amount) {
-        if (entity instanceof ServerPlayerEntity player) {
+    private boolean allowLivingEntityDamage(LivingEntity entity, DamageSource source, float amount) {
+        if (entity instanceof ServerPlayerEntity) {
             if (Variables.progress.pvpMode == GameProgress.PVPMode.PEACEFUL) {
                 return false;
             } else if (Variables.progress.pvpMode == GameProgress.PVPMode.NO_PVP) {
-                if (source.getSource() != null && source.getSource().isPlayer()) {
-                    return false;
-                }
-            }
-            if (Variables.progress.gameStage.isStarted() && source.getSource() != null
-                    && source.getSource().isPlayer() && Variables.progress.isInGame(PlayerUtil.getUUID(player))) {
-                RandomTpCommand.setCooldown(player, Variables.config.cooldown.randomTpDamagedCooldownTicks);
+                return source.getSource() == null || !source.getSource().isPlayer();
             }
         }
         return true;
@@ -133,7 +128,7 @@ public class Battlegrounds implements ModInitializer {
                     .formatted(Formatting.GOLD), false);
         }
         server.getPlayerManager().broadcast(joinText, false);
-        PlayerUtil.setGameModeWithMap(player);
+        PlayerUtil.changeGameModeWithMap(player);
     }
 
     private boolean allowPlayerNaturalRegen(PlayerEntity player) {
@@ -156,7 +151,7 @@ public class Battlegrounds implements ModInitializer {
         ServerLifecycleEvents.SERVER_STARTED.register(this::onServerStarted);
         ServerLifecycleEvents.AFTER_SAVE.register(this::onSaving);
         ServerPlayConnectionEvents.JOIN.register(this::onPlayerJoin);
-        ServerLivingEntityEvents.ALLOW_DAMAGE.register(this::allowLivingEntityDamaged);
+        ServerLivingEntityEvents.ALLOW_DAMAGE.register(this::allowLivingEntityDamage);
         ServerPlayerEvents.AFTER_RESPAWN.register(this::onPlayerRespawn);
         LootTableEvents.MODIFY.register(new LootTableModifier());
         // 自定义事件
@@ -171,7 +166,8 @@ public class Battlegrounds implements ModInitializer {
         EntityTypes.registerEntityTypes();
         // 注册附魔
         Enchantments.registerEnchantments();
-        Enchantments.SMELTING.registerDefaultSmeltable(); // 注册自动冶炼方块
+        // 自动冶炼
+        BlockSmeltableRegistry.registerDefaults();
         // 注册声音事件
         SoundEvents.registerSoundEvents();
         // 尝试重置存档

@@ -1,11 +1,12 @@
 package com.github.winexp.battlegrounds.client.network;
 
 import com.github.winexp.battlegrounds.client.gui.screen.vote.VoteScreen;
-import com.github.winexp.battlegrounds.client.toast.VoteClosedToast;
-import com.github.winexp.battlegrounds.client.toast.VoteOpenedToast;
 import com.github.winexp.battlegrounds.client.util.ClientVariables;
 import com.github.winexp.battlegrounds.entity.projectile.FlashBangEntity;
+import com.github.winexp.battlegrounds.event.ClientVoteEvents;
 import com.github.winexp.battlegrounds.network.packet.s2c.*;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
@@ -13,6 +14,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
 
+@Environment(EnvType.CLIENT)
 public final class ModClientNetworkPlayHandler {
     public static void registerReceivers() {
         ClientPlayNetworking.registerGlobalReceiver(FlashS2CPacket.TYPE, ModClientNetworkPlayHandler::onFlash);
@@ -36,15 +38,11 @@ public final class ModClientNetworkPlayHandler {
     }
 
     private static void onVoteOpened(VoteOpenedPacket packet, ClientPlayerEntity player, PacketSender responseSender) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        client.getToastManager().add(new VoteOpenedToast(packet));
-        VoteScreen.onVoteOpened(client, packet);
+        ClientVoteEvents.OPENED.invoker().onOpened(packet.voteInfo());
     }
 
     private static void onVoteClosed(VoteClosedPacket packet, ClientPlayerEntity player, PacketSender responseSender) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        client.getToastManager().add(new VoteClosedToast(packet));
-        VoteScreen.onVoteClosed(client, packet);
+        ClientVoteEvents.CLOSED.invoker().onClosed(packet.voteInfo(), packet.closeReason());
     }
 
     private static void onSyncVoteInfos(SyncVoteInfosS2CPacket packet, ClientPlayerEntity player, PacketSender responseSender) {

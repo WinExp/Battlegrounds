@@ -9,7 +9,7 @@ public enum ToolMaterials implements ToolMaterial {
     STEVES_PAIN_SWORD(1837, 9.0F, 3.0F, 4, 0, Ingredient.empty()),
     LEACHING_SWORD(1792, 8.0F, 3.0F, 3, 0, Ingredient.empty()),
     MINERS_PICKAXE(998, 8.0F, 3.0F, 3, 0, Ingredient.empty()),
-    BUTCHERS_AXE(1, 8.0F, 14.0F, 3, 0, Ingredient.empty()),
+    BUTCHERS_AXE(3, 8.0F, 14.0F, 3, 0, Ingredient.empty()),
     RUPERTS_TEAR(20, 0, 0, 0, 0, Ingredient.empty()),
     KNOCKBACK_STICK(15, 0, 0, 0, 0, Ingredient.empty());
 

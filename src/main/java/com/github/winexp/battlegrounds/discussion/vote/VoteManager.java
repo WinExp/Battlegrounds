@@ -1,6 +1,6 @@
 package com.github.winexp.battlegrounds.discussion.vote;
 
-import com.github.winexp.battlegrounds.events.VoteEvents;
+import com.github.winexp.battlegrounds.event.ServerVoteEvents;
 import com.github.winexp.battlegrounds.network.packet.s2c.SyncVoteInfosS2CPacket;
 import com.github.winexp.battlegrounds.network.packet.s2c.VoteClosedPacket;
 import com.github.winexp.battlegrounds.network.packet.s2c.VoteOpenedPacket;
@@ -11,10 +11,7 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 public class VoteManager {
@@ -23,17 +20,15 @@ public class VoteManager {
     private final HashMap<Identifier, @NotNull VoteInstance> voteMap = new HashMap<>();
 
     public VoteManager() {
-        VoteEvents.CLOSED.register(this::onVoteClosed);
+        ServerVoteEvents.CLOSED.register(this::onVoteClosed);
     }
 
-    private void onVoteClosed(VoteInstance voteInstance, VoteSettings.CloseReason reason) {
-        try (voteInstance) {
-            Identifier identifier = voteInstance.getIdentifier();
-            this.voteMap.remove(identifier);
-            for (ServerPlayerEntity player : Variables.server.getPlayerManager().getPlayerList()) {
-                VoteClosedPacket packet = new VoteClosedPacket(voteInstance.getVoteInfo(), reason);
-                ServerPlayNetworking.send(player, packet);
-            }
+    private void onVoteClosed(VoteInfo voteInfo, VoteSettings.CloseReason reason) {
+        Identifier identifier = voteInfo.identifier;
+        this.voteMap.remove(identifier);
+        for (ServerPlayerEntity player : Variables.server.getPlayerManager().getPlayerList()) {
+            VoteClosedPacket packet = new VoteClosedPacket(voteInfo, reason);
+            ServerPlayNetworking.send(player, packet);
         }
     }
 
@@ -53,23 +48,25 @@ public class VoteManager {
 
     public List<VoteInfo> getVoteInfoList() {
         List<VoteInfo> voteInfos = new ArrayList<>();
-        this.forEach((key, value) -> voteInfos.add(value.getVoteInfo()));
+        this.forEachVotes((key, value) -> voteInfos.add(value.getVoteInfo()));
         return voteInfos;
     }
 
-    @Nullable
-    public VoteInstance getVoteInstance(Identifier identifier) {
-        return this.voteMap.get(identifier);
+    public Optional<VoteInstance> getVoteInstance(Identifier identifier) {
+        return Optional.ofNullable(this.voteMap.get(identifier));
     }
 
-    public void forEach(BiConsumer<Identifier, VoteInstance> consumer) {
+    public void forEachVotes(BiConsumer<Identifier, VoteInstance> consumer) {
         this.voteMap.forEach(consumer);
     }
 
 
-    public boolean openVoteWithPreset(VotePreset preset, Collection<ServerPlayerEntity> participants) {
+    @Nullable
+    public VoteInstance openVoteWithPreset(VotePreset preset, Collection<ServerPlayerEntity> participants) {
         VoteInstance instance = new VoteInstance(preset.identifier(), preset.name(), preset.description(), preset.voteSettings());
-        return this.openVote(instance, participants);
+        if (this.openVote(instance, participants)) {
+            return instance;
+        } else return null;
     }
 
     public boolean openVote(VoteInstance voteInstance, Collection<ServerPlayerEntity> participants) {

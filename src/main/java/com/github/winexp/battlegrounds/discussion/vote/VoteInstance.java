@@ -1,6 +1,6 @@
 package com.github.winexp.battlegrounds.discussion.vote;
 
-import com.github.winexp.battlegrounds.events.VoteEvents;
+import com.github.winexp.battlegrounds.event.ServerVoteEvents;
 import com.github.winexp.battlegrounds.task.ScheduledTask;
 import com.github.winexp.battlegrounds.task.TaskExecutor;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
@@ -61,15 +61,15 @@ public class VoteInstance implements AutoCloseable {
     }
 
     public Identifier getIdentifier() {
-        return identifier;
+        return this.identifier;
     }
 
     public Text getName() {
-        return name;
+        return this.name;
     }
 
     public Text getDescription() {
-        return description;
+        return this.description;
     }
 
     public int getTotal() {
@@ -118,21 +118,26 @@ public class VoteInstance implements AutoCloseable {
         if (this.voting) return false;
         this.voteMap.clear();
         for (ServerPlayerEntity player : participants) {
-            voteMap.put(PlayerUtil.getUUID(player), null);
+            this.voteMap.put(PlayerUtil.getUUID(player), null);
         }
-        this.timeoutTask = new ScheduledTask(() ->
-                this.closeVote(VoteSettings.CloseReason.TIMEOUT), settings.timeout());
-        TaskExecutor.INSTANCE.execute(this.timeoutTask);
+        if (this.settings.timeout() == VoteSettings.INFINITE_TIME) {
+            this.timeoutTask = new ScheduledTask(() ->
+                    this.closeVote(VoteSettings.CloseReason.TIMEOUT), this.settings.timeout());
+            TaskExecutor.INSTANCE.execute(this.timeoutTask);
+        }
+        ServerVoteEvents.OPENED.invoker().onOpened(this.getVoteInfo());
         this.voting = true;
         return true;
     }
 
     public boolean closeVote(VoteSettings.CloseReason closeReason) {
         if (!this.voting) return false;
-        this.timeoutTask.cancel();
-        this.voting = false;
-        this.settings.voteClosedAction().accept(this, closeReason);
-        VoteEvents.CLOSED.invoker().closed(this, closeReason);
+        try (this) {
+            this.timeoutTask.cancel();
+            this.voting = false;
+            this.settings.voteClosedAction().accept(this, closeReason);
+            ServerVoteEvents.CLOSED.invoker().onClosed(this.getVoteInfo(), closeReason);
+        }
         return true;
     }
 

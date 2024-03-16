@@ -5,11 +5,8 @@ import com.github.winexp.battlegrounds.discussion.vote.VoteInfo;
 import com.github.winexp.battlegrounds.network.packet.c2s.VoteC2SPacket;
 import com.github.winexp.battlegrounds.network.packet.c2s.SyncVoteInfosC2SPacket;
 import com.github.winexp.battlegrounds.network.packet.s2c.SyncVoteInfosS2CPacket;
-import com.github.winexp.battlegrounds.network.packet.s2c.VoteClosedPacket;
-import com.github.winexp.battlegrounds.network.packet.s2c.VoteOpenedPacket;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -30,21 +27,15 @@ public class VoteScreen extends Screen {
     private ButtonWidget refreshButton;
 
     public VoteScreen() {
-        super(Text.literal("Vote Screen"));
+        super(Text.translatable("gui.battlegrounds.vote.title"));
     }
 
-    static {
-        ClientTickEvents.END_CLIENT_TICK.register(VoteScreen::timeLeftTick);
-        ClientTickEvents.END_CLIENT_TICK.register(VoteScreen::keyBindingTick);
-    }
-
-    private static void timeLeftTick(MinecraftClient client) {
+    public static void globalTick(MinecraftClient client) {
+        // 投票剩余时间
         for (VoteInfo voteInfo : voteInfosCache) {
             if (voteInfo.timeLeft > 0) voteInfo.timeLeft--;
         }
-    }
-
-    private static void keyBindingTick(MinecraftClient client) {
+        // 按键绑定
         while (KeyBindings.VOTE_SCREEN.wasPressed()) {
             client.setScreen(new VoteScreen());
         }
@@ -67,15 +58,15 @@ public class VoteScreen extends Screen {
         ClientPlayNetworking.send(new SyncVoteInfosC2SPacket());
     }
 
-    public static void onVoteOpened(MinecraftClient client, VoteOpenedPacket packet) {
-        voteInfosCache.add(packet.voteInfo());
+    public static void onVoteOpened(MinecraftClient client, VoteInfo voteInfo) {
+        voteInfosCache.add(voteInfo);
         if (client.currentScreen instanceof VoteScreen voteScreen) {
             voteScreen.updateVotesGUI();
         }
     }
 
-    public static void onVoteClosed(MinecraftClient client, VoteClosedPacket packet) {
-        voteInfosCache.removeIf(voteInfo -> voteInfo.equals(packet.voteInfo()));
+    public static void onVoteClosed(MinecraftClient client, VoteInfo voteInfo) {
+        voteInfosCache.removeIf(voteInfo1 -> voteInfo1.equals(voteInfo));
         if (client.currentScreen instanceof VoteScreen voteScreen) {
             voteScreen.updateVotesGUI();
         }
@@ -108,6 +99,11 @@ public class VoteScreen extends Screen {
         syncVoteInfos();
         lastRefreshTime = System.currentTimeMillis();
         this.updateButtonState();
+    }
+
+    @Override
+    public boolean shouldPause() {
+        return false;
     }
 
     @Override

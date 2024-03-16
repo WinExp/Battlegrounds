@@ -12,6 +12,7 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RawShapedRecipe;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
+import net.minecraft.registry.tag.ItemTags;
 
 import java.util.Map;
 
@@ -50,12 +51,13 @@ public class MinersPickaxeItem extends PickaxeItem implements ItemNbtCrafting, E
     @Override
     public ShapedRecipe getRecipe() {
         RawShapedRecipe rawShaped = RawShapedRecipe.create(Map.of(
-                        'a', Ingredient.ofItems(Items.DIAMOND),
-                        'b', Ingredient.ofItems(Items.IRON_PICKAXE)
+                        'a', Ingredient.ofItems(Items.RAW_IRON),
+                        'b', Ingredient.fromTag(ItemTags.COALS),
+                        'c', Ingredient.ofItems(Items.STICK)
                 ),
                 "aaa",
-                "aba",
-                "aaa");
+                "bcb",
+                " c ");
         return new ShapedRecipe(this.getIdentifier().toString(),
                 CraftingRecipeCategory.EQUIPMENT,
                 rawShaped,

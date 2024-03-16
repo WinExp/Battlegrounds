@@ -108,7 +108,7 @@ public class MolotovEntity extends ThrownItemEntity {
             AreaEffectCloudEntity areaEffectCloud = new AreaEffectCloudEntity(world, this.getX(), this.getY(), this.getZ());
             areaEffectCloud.addEffect(new StatusEffectInstance(StatusEffects.INSTANT_DAMAGE, 1, 0));
             areaEffectCloud.setDuration(12 * 20);
-            areaEffectCloud.setWaitTime(2 * 20);
+            areaEffectCloud.setWaitTime(20);
             areaEffectCloud.setRadius(5.0F);
             areaEffectCloud.setRadiusGrowth(-(7 - areaEffectCloud.getRadius()) / areaEffectCloud.getDuration());
             areaEffectCloud.setColor(Colors.RED);

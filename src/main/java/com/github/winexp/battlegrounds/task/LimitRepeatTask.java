@@ -17,16 +17,14 @@ public class LimitRepeatTask extends ScheduledTask {
 
             try {
                 if (this.count == 0) {
-                    this.preTriggerRunnable = () -> {
+                    super.preTriggerRunnable = () -> {
                         triggerEnd.run();
                         throw new TaskCancelledException(false);
                     };
                 }
-                super.run();
+                super.getRunnable().run();
             } catch (TaskCancelledException e) {
-                if (e.getEnforceCancel()) {
-                    throw e;
-                }
+                e.ensureNotAbsolute();
                 this.count--;
                 this.delay = this.getUnitTicks();
             }
@@ -41,20 +39,15 @@ public class LimitRepeatTask extends ScheduledTask {
     }
 
     @Override
-    public void run() {
-        fixedRunnable.run();
-    }
-
-    @Override
     public Runnable getRunnable() {
-        return fixedRunnable;
+        return this.fixedRunnable;
     }
 
     public int getCount() {
-        return count;
+        return this.count;
     }
 
     public long getUnitTicks() {
-        return unitTicks;
+        return this.unitTicks;
     }
 }

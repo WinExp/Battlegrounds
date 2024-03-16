@@ -3,7 +3,7 @@ package com.github.winexp.battlegrounds.item;
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.entity.projectile.FlashBangEntity;
 import com.github.winexp.battlegrounds.entity.projectile.MolotovEntity;
-import com.github.winexp.battlegrounds.item.combat.*;
+import com.github.winexp.battlegrounds.item.weapon.*;
 import com.github.winexp.battlegrounds.item.mining.MinersPickaxeItem;
 import com.github.winexp.battlegrounds.item.recipe.NbtCrafting;
 import com.github.winexp.battlegrounds.item.recipe.ShapedNbtCrafting;
@@ -25,6 +25,7 @@ import net.minecraft.recipe.RawShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.Util;
@@ -39,7 +40,7 @@ public class Items extends net.minecraft.item.Items {
     public static final PVPProSwordItem PVP_PRO_SWORD = registerItem("pvp_pro_sword", new PVPProSwordItem(ToolMaterials.PVP_PRO_SWORD, 3, -2.4F, new Item.Settings().rarity(Rarity.EPIC).fireproof()));
     public static final SevenElevenSwordItem SEVEN_ELEVEN_SWORD = registerItem("seven_eleven_sword", new SevenElevenSwordItem(ToolMaterials.SEVEN_ELEVEN_SWORD, 3, -2.4F, new Item.Settings().rarity(Rarity.EPIC).fireproof()));
     public static final StevesPainSwordItem STEVES_PAIN_SWORD = registerItem("steves_pain_sword", new StevesPainSwordItem(ToolMaterials.STEVES_PAIN_SWORD, 3, -2.4F, new Item.Settings().rarity(Rarity.EPIC).fireproof()));
-    public static final LeachingSwordItem LEACHING_SWORD = registerItem("leaching_sword", new LeachingSwordItem(ToolMaterials.LEACHING_SWORD, 3, -2.4F, new Item.Settings().rarity(Rarity.UNCOMMON)));
+    public static final LeachingSwordItem LEACHING_SWORD = registerItem("leaching_sword", new LeachingSwordItem(ToolMaterials.LEACHING_SWORD, 3, -2.2F, new Item.Settings().rarity(Rarity.UNCOMMON)));
     public static final MinersPickaxeItem MINERS_PICKAXE = registerItem("miners_pickaxe", new MinersPickaxeItem(ToolMaterials.MINERS_PICKAXE, 1, -2.8F, new Item.Settings().rarity(Rarity.UNCOMMON)));
     public static final ButchersAxeItem BUTCHERS_AXE = registerItem("butchers_axe", new ButchersAxeItem(ToolMaterials.BUTCHERS_AXE, 5, -3.0F, new Item.Settings().rarity(Rarity.EPIC).fireproof()));
     public static final ChannelingBowItem CHANNELING_BOW = registerItem("channeling_bow", new ChannelingBowItem(new Item.Settings().rarity(Rarity.RARE).fireproof().maxDamage(ChannelingBowItem.DURABILITY)));
@@ -77,33 +78,23 @@ public class Items extends net.minecraft.item.Items {
                                 Enchantments.SMELTING, 1
                         ))
                 ),
-                // 铁镐（自动冶炼）
+                // 下界合金胸甲特供版
                 new ShapedNbtCrafting(
-                        new Identifier("battlegrounds", "iron_pickaxe_smelting"),
+                        new Identifier("battlegrounds", "netherite_chestplate_special"),
                         RawShapedRecipe.create(Map.of(
-                                        'a', Ingredient.ofItems(DIAMOND),
-                                        'b', Ingredient.ofItems(LIGHTNING_ROD),
-                                        'c', Ingredient.ofItems(Items.BOOK)
-                                ), "aaa",
+                                        'a', Ingredient.ofItems(NETHERITE_INGOT),
+                                        'b', Ingredient.ofItems(ANCIENT_DEBRIS),
+                                        'c', Ingredient.ofItems(DIAMOND_CHESTPLATE)
+                                ), "a a",
                                 "bcb",
-                                " c "),
+                                "bbb"),
                         CraftingRecipeCategory.EQUIPMENT,
-                        Util.make(IRON_PICKAXE.getDefaultStack(), (stack) ->
-                                stack.addEnchantment(Enchantments.SMELTING, 1))
-                ),
-                // 钻石胸甲（生机勃勃 3）
-                new ShapedNbtCrafting(
-                        new Identifier("battlegrounds", "diamond_chestplate_vitality"),
-                        RawShapedRecipe.create(Map.of(
-                                        'a', Ingredient.ofItems(DIAMOND),
-                                        'b', Ingredient.ofItems(LIGHT),
-                                        'c', Ingredient.ofItems(BOOK)
-                                ), "aaa",
-                                "bcb",
-                                " c "),
-                        CraftingRecipeCategory.EQUIPMENT,
-                        Util.make(DIAMOND_CHESTPLATE.getDefaultStack(), (stack) ->
-                                stack.addEnchantment(Enchantments.VITALITY, 3))
+                        Util.make(NETHERITE_CHESTPLATE.getDefaultStack(), (stack) -> {
+                            stack.setCustomName(Text.translatable("item.battlegrounds.netherite_chestplate_special")
+                                    .styled(style -> style.withItalic(false)));
+                            stack.addEnchantment(Enchantments.PROTECTION, 2);
+                            stack.addEnchantment(Enchantments.VITALITY, 3);
+                        })
                 )
         );
         List<ShapelessNbtCrafting> shapelessRecipes = List.of(

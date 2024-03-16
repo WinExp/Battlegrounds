@@ -1,13 +1,10 @@
 package com.github.winexp.battlegrounds.game;
 
-import com.github.winexp.battlegrounds.configs.GameProgress;
+import com.github.winexp.battlegrounds.config.GameProgress;
 import com.github.winexp.battlegrounds.entity.EntityTypes;
 import com.github.winexp.battlegrounds.helper.TeamHelper;
 import com.github.winexp.battlegrounds.helper.WorldHelper;
-import com.github.winexp.battlegrounds.task.LimitRepeatTask;
-import com.github.winexp.battlegrounds.task.TaskCancelledException;
-import com.github.winexp.battlegrounds.task.TaskExecutor;
-import com.github.winexp.battlegrounds.task.RepeatTask;
+import com.github.winexp.battlegrounds.task.*;
 import com.github.winexp.battlegrounds.util.*;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -47,14 +44,17 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GameManager {
     public static final GameManager INSTANCE = new GameManager();
-    private final String healthModifierId = "game/health_modifier";
-    private static final Identifier BAR_ID = new Identifier("battlegrounds", "progress_bar");
-    private static final boolean KEEP_INVENTORY = false;
-    private TeamHelper teamHelper;
     public RepeatTask reduceTask = RepeatTask.NONE_TASK;
     public RepeatTask barUpdateTask = RepeatTask.NONE_TASK;
     public LimitRepeatTask stopTask = LimitRepeatTask.NONE_TASK;
     public LimitRepeatTask startTask = LimitRepeatTask.NONE_TASK;
+    private static final String HEALTH_MODIFIER_ID = "game/health_modifier";
+    private static final Identifier BAR_ID = new Identifier("battlegrounds", "progress_bar");
+    private static final boolean KEEP_INVENTORY = false;
+    private static final int FIREWORK_MAX_AMOUNT = 4;
+    private static final int FIREWORK_SPAWN_OFFSET = 4;
+    private static final int FIREWORK_SPAWN_DELAY_TICKS = 40;
+    private TeamHelper teamHelper;
     private WorldHelper worldHelper;
     private CommandBossBar bossBar;
     private MinecraftServer server;
@@ -111,34 +111,35 @@ public class GameManager {
         }
         if (Variables.progress.gameStage.isStarted()
                 && Variables.progress.isInGame(PlayerUtil.getUUID(player))) {
-            PlayerUtil.setGameModeMap(player, GameMode.SPECTATOR);
+            PlayerUtil.setGameModeToMap(player, GameMode.SPECTATOR);
             GameProgress.PlayerPermission permission = new GameProgress.PlayerPermission();
             Variables.progress.players.put(PlayerUtil.getUUID(player), permission);
-            if (this.getInGamePlayersNum() != 1) {
-                return true;
-            }
-            ServerPlayerEntity p = this.getLastInGamePlayer();
-            this.server.getPlayerManager().broadcast(Text.translatable("battlegrounds.game.end.broadcast", p.getDisplayName())
+            if (this.getInGamePlayersNum() != 1) return true;
+            ServerPlayerEntity winner = this.getLastInGamePlayer();
+            this.server.getPlayerManager().broadcast(Text.translatable("battlegrounds.game.end.broadcast", winner.getDisplayName())
                     .formatted(Formatting.GOLD), false);
-            Random random = p.getWorld().getRandom();
-            int amount = random.nextInt(4) + 1;
-            for (int i = 0; i < amount; i++) {
-                int fireworkOffset = 4;
-                FireworkRocketEntity firework = EntityTypes.FIREWORK_ROCKET.create(this.server.getOverworld());
-                assert firework != null;
-                Vec3d pos = p.getPos();
-                Vec3d offset = new Vec3d(
-                        random.nextDouble() * (fireworkOffset * 2) - fireworkOffset,
-                        1,
-                        random.nextDouble() * (fireworkOffset * 2) - fireworkOffset
-                );
-                firework.refreshPositionAfterTeleport(pos.add(offset));
-                p.getWorld().spawnEntity(firework);
-            }
-
+            Random random = winner.getRandom();
+            int amount = random.nextInt(FIREWORK_MAX_AMOUNT) + 1;
+            LimitRepeatTask task = new LimitRepeatTask(() ->
+                    this.spawnWinnerFirework(winner), AbstractTask.NONE_RUNNABLE, 0, FIREWORK_SPAWN_DELAY_TICKS, amount);
+            TaskExecutor.INSTANCE.execute(task);
             this.stopGame();
         }
         return true;
+    }
+
+    private void spawnWinnerFirework(ServerPlayerEntity player) {
+        Random random = player.getRandom();
+        FireworkRocketEntity firework = EntityTypes.FIREWORK_ROCKET.create(this.server.getOverworld());
+        assert firework != null;
+        Vec3d pos = player.getPos();
+        Vec3d offset = new Vec3d(
+                random.nextDouble() * (FIREWORK_SPAWN_OFFSET * 2) - FIREWORK_SPAWN_OFFSET,
+                1,
+                random.nextDouble() * (FIREWORK_SPAWN_OFFSET * 2) - FIREWORK_SPAWN_OFFSET
+        );
+        firework.refreshPositionAfterTeleport(pos.add(offset));
+        player.getWorld().spawnEntity(firework);
     }
 
     public void prepareStartGame() {
@@ -272,17 +273,17 @@ public class GameManager {
             if (player != null && Variables.progress.isInGame(uuid)) {
                 EntityAttributeInstance attribute = player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
                 assert attribute != null;
-                EffectUtil.addAttribute(attribute, healthModifierId, Variables.config.attributes.genericAdditionHealth, EntityAttributeModifier.Operation.ADDITION);
+                EffectUtil.addAttribute(attribute, HEALTH_MODIFIER_ID, 20, EntityAttributeModifier.Operation.ADDITION);
                 player.setHealth(player.getMaxHealth());
                 player.addStatusEffect(new StatusEffectInstance(StatusEffects.SATURATION, 15 * 20, 3));
                 player.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 15 * 20, 3));
-                player.addStatusEffect(new StatusEffectInstance(StatusEffects.ABSORPTION, -1, 4));
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.ABSORPTION, StatusEffectInstance.INFINITE, 4));
                 GameProgress.PlayerPermission permission = Variables.progress.players.get(uuid);
                 permission.hasEffects = true;
                 permission.naturalRegen = false;
 
                 player.getInventory().clear();
-                PlayerUtil.setGameMode(player, GameMode.SURVIVAL);
+                PlayerUtil.changeGameMode(player, GameMode.SURVIVAL);
             }
         }
         for (ServerPlayerEntity player : this.server.getPlayerManager().getPlayerList()) {
@@ -388,7 +389,7 @@ public class GameManager {
             }
             // 死亡竞赛-最终圈
             if (Variables.progress.currentLap
-                    >= Variables.config.border.totalNum) {
+                    >= Variables.config.border.totalAmount) {
                 this.removeBossBar();
                 throw new TaskCancelledException();
             }
@@ -405,7 +406,7 @@ public class GameManager {
 
     public void stopGame() {
         for (ServerPlayerEntity player : Variables.server.getPlayerManager().getPlayerList()) {
-            PlayerUtil.setGameMode(player, GameMode.ADVENTURE);
+            PlayerUtil.changeGameMode(player, GameMode.ADVENTURE);
             player.getInventory().clear();
         }
 
@@ -420,7 +421,7 @@ public class GameManager {
             if (player != null) {
                 EntityAttributeInstance attribute = player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
                 assert attribute != null;
-                EffectUtil.removeAttribute(attribute, this.healthModifierId);
+                EffectUtil.removeAttribute(attribute, HEALTH_MODIFIER_ID);
             }
         }
         ConfigUtil.saveConfig(Variables.server.getSavePath(WorldSavePath.ROOT), "bg_progress", new GameProgress());

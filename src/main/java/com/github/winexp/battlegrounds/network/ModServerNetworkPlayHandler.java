@@ -22,8 +22,7 @@ public class ModServerNetworkPlayHandler {
     private static void onVote(VoteC2SPacket packet, ServerPlayerEntity player, PacketSender responseSender) {
         Identifier identifier = packet.identifier();
         if (VoteManager.INSTANCE.isVoting(identifier)) {
-            VoteInstance instance = VoteManager.INSTANCE.getVoteInstance(identifier);
-            assert instance != null;
+            VoteInstance instance = VoteManager.INSTANCE.getVoteInstance(identifier).orElseThrow();
             if (packet.result()) {
                 instance.acceptVote(player);
             } else {

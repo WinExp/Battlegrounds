@@ -9,6 +9,7 @@ import net.minecraft.util.Identifier;
 public record VotePreset(Identifier identifier, Text name, Text description, VoteSettings voteSettings) {
     public static final VotePreset START_GAME = new VotePreset(
             new Identifier("battlegrounds", "start_game"),
+            // TODO: 将 Text.literal() 替换为 Text.translatable()
             Text.literal("开始游戏").formatted(Formatting.GREEN),
             Text.literal("开始游戏的投票，需全玩家通过"),
             new VoteSettings(
@@ -17,17 +18,7 @@ public record VotePreset(Identifier identifier, Text name, Text description, Vot
                             GameManager.INSTANCE.prepareResetWorlds(voteInstance.getParticipants());
                         }
                     },
-                    (voteInstance, player, result) -> {
-                        if (result) {
-                            Variables.server.getPlayerManager().broadcast(Text.translatable("battlegrounds.command.accept.broadcast",
-                                            player.getDisplayName(), voteInstance.getAcceptedNum(), voteInstance.getTotal())
-                                    .formatted(Formatting.GREEN), false);
-                        } else {
-                            Variables.server.getPlayerManager().broadcast(Text.translatable("battlegrounds.command.deny.broadcast",
-                                            player.getDisplayName())
-                                    .formatted(Formatting.GOLD), false);
-                        }
-                    },
+                    (voteInstance, player, result) -> {},
                     VoteSettings.VoteMode.ALL_ACCEPT,
                     Variables.config.cooldown.startGameVoteCooldownTicks
     ));

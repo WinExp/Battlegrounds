@@ -15,22 +15,25 @@ public class TaskExecutor {
     }
 
     private void tick(MinecraftServer server) {
-        for (AbstractTask task : tasks) {
-            if (task.isCancelled()) tasks.remove(task);
+        for (AbstractTask task : this.tasks) {
+            if (task.isCancelled()) this.tasks.remove(task);
             try {
                 task.run();
             } catch (TaskCancelledException e) {
-                tasks.remove(task);
+                this.tasks.remove(task);
             }
         }
     }
 
     public void execute(AbstractTask task) {
-        if (tasks.contains(task)) return;
-        tasks.add(task);
+        if (this.tasks.contains(task)) return;
+        this.tasks.add(task);
     }
 
-    public void stopAllTask() {
-        tasks.clear();
+    public void cancelAllTask() {
+        for (AbstractTask task : this.tasks) {
+            task.cancel();
+            this.tasks.remove(task);
+        }
     }
 }

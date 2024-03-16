@@ -10,13 +10,11 @@ public class RepeatTask extends ScheduledTask {
     public RepeatTask(Runnable runnable, long delay, LongSupplier repeatDelay) {
         super(runnable, delay);
 
-        fixedRunnable = () -> {
+        this.fixedRunnable = () -> {
             try {
-                super.run();
+                super.getRunnable().run();
             } catch (TaskCancelledException e) {
-                if (e.getEnforceCancel()) {
-                    throw e;
-                }
+                e.ensureNotAbsolute();
             }
 
             if (this.delay <= 0) {
@@ -32,16 +30,11 @@ public class RepeatTask extends ScheduledTask {
     }
 
     @Override
-    public void run() {
-        fixedRunnable.run();
-    }
-
-    @Override
     public Runnable getRunnable() {
-        return fixedRunnable;
+        return this.fixedRunnable;
     }
 
     public long getRepeatDelay() {
-        return repeatDelay.getAsLong();
+        return this.repeatDelay.getAsLong();
     }
 }

@@ -15,8 +15,12 @@ public class ScheduledTask extends AbstractTask {
             this.delay--;
 
             if (this.delay <= 0) {
-                preTriggerRunnable.run();
-                super.run();
+                try {
+                    this.preTriggerRunnable.run();
+                    super.getRunnable().run();
+                } catch (TaskCancelledException e) {
+                    e.ensureNotAbsolute();
+                }
                 throw new TaskCancelledException(false);
             }
         };
@@ -25,16 +29,11 @@ public class ScheduledTask extends AbstractTask {
     }
 
     public long getDelay() {
-        return delay;
-    }
-
-    @Override
-    public void run() {
-        fixedRunnable.run();
+        return this.delay;
     }
 
     @Override
     public Runnable getRunnable() {
-        return fixedRunnable;
+        return this.fixedRunnable;
     }
 }

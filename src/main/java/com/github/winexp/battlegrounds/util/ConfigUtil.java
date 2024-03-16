@@ -6,7 +6,6 @@ import com.google.gson.GsonBuilder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-// TODO: 需要重写
 public class ConfigUtil {
     public static boolean isConfigExists(Path path, String configName) {
         return Files.isRegularFile(path.resolve(configName + ".json"));
@@ -19,7 +18,7 @@ public class ConfigUtil {
         buildConfig(path, configName, config);
     }
 
-    public static <T> T createOrLoadConfig(Path path, String configName, Class<T> clazz) {
+    public static <T> T readOrCreateConfig(Path path, String configName, Class<T> clazz) {
         if (isConfigExists(path, configName)) {
             return readConfig(path, configName, clazz);
         } else {
@@ -43,7 +42,7 @@ public class ConfigUtil {
         return gson.fromJson(json, clazz);
     }
 
-    public static void buildConfig(Path path, String configName, Object config) {
+    public static <T> void buildConfig(Path path, String configName, T config) {
         Path fileName = path.resolve(configName + ".json");
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()

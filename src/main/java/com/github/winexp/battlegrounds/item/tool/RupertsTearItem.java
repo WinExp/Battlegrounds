@@ -1,5 +1,6 @@
 package com.github.winexp.battlegrounds.item.tool;
 
+import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.util.MathUtil;
 import com.github.winexp.battlegrounds.util.WorldUtil;
 import com.github.winexp.battlegrounds.util.raycast.BlockRaycastResult;
@@ -25,7 +26,7 @@ import net.minecraft.world.World;
 
 import java.util.function.Predicate;
 
-public class RupertsTearItem extends ToolItem {
+public class RupertsTearItem extends ToolItem implements EnchantRestrict {
     private static final int COOLDOWN = 60 * 20;
     private static final int FAILED_COOLDOWN = 20;
     private static final int MAX_DISTANCE = 50;

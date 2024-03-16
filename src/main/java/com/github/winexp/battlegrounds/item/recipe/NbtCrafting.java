@@ -5,7 +5,7 @@ import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.util.Identifier;
 
-public sealed interface NbtCrafting permits ItemNbtCrafting, CustomNbtCrafting {
+public interface NbtCrafting {
     Identifier getIdentifier();
 
     ItemStack getDefaultStack();

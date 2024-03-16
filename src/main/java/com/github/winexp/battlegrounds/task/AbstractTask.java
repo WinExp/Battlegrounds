@@ -1,6 +1,6 @@
 package com.github.winexp.battlegrounds.task;
 
-import com.github.winexp.battlegrounds.events.TaskEvents;
+import com.github.winexp.battlegrounds.event.TaskEvents;
 
 public abstract class AbstractTask {
     public static final Runnable NONE_RUNNABLE = () -> {
@@ -13,19 +13,19 @@ public abstract class AbstractTask {
     }
 
     public void cancel() {
-        cancelled = true;
+        this.cancelled = true;
     }
 
     public boolean isCancelled() {
-        return cancelled;
+        return this.cancelled;
     }
 
     public Runnable getRunnable() {
-        return runnable;
+        return this.runnable;
     }
 
     public void run() {
-        runnable.run();
+        this.getRunnable().run();
         TaskEvents.TRIGGERED.invoker().triggered(this);
     }
 }

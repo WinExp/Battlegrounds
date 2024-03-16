@@ -1,6 +1,6 @@
 package com.github.winexp.battlegrounds.util;
 
-import com.github.winexp.battlegrounds.configs.GameProgress;
+import com.github.winexp.battlegrounds.config.GameProgress;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.SubtitleS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket;
@@ -30,19 +30,20 @@ public class PlayerUtil {
         player.teleport((ServerWorld) world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0, 0);
     }
 
-    public static void setGameModeMap(ServerPlayerEntity player, GameMode gameMode) {
-        if (Variables.progress.players.get(getUUID(player)) == null) {
-            GameProgress.PlayerPermission permission = new GameProgress.PlayerPermission();
+    public static void setGameModeToMap(ServerPlayerEntity player, GameMode gameMode) {
+        GameProgress.PlayerPermission permission = Variables.progress.players.get(getUUID(player));
+        if (permission == null) {
+            permission = new GameProgress.PlayerPermission();
             permission.gameMode = gameMode;
             Variables.progress.players.put(getUUID(player), permission);
         } else {
-            Variables.progress.players.get(getUUID(player)).gameMode = gameMode;
+            permission.gameMode = gameMode;
         }
     }
 
-    public static void setGameMode(ServerPlayerEntity player, GameMode gameMode) {
+    public static void changeGameMode(ServerPlayerEntity player, GameMode gameMode) {
         player.changeGameMode(gameMode);
-        setGameModeMap(player, gameMode);
+        setGameModeToMap(player, gameMode);
     }
 
     public static GameMode getDefaultGameMode() {
@@ -55,12 +56,13 @@ public class PlayerUtil {
         return gameMode;
     }
 
-    public static void setGameModeWithMap(ServerPlayerEntity player) {
+    public static void changeGameModeWithMap(ServerPlayerEntity player) {
         GameMode defaultGameMode = getDefaultGameMode();
-        if (Variables.progress.players.get(getUUID(player)) == null) {
+        GameProgress.PlayerPermission permission = Variables.progress.players.get(getUUID(player));
+        if (permission == null) {
             player.changeGameMode(defaultGameMode);
         } else {
-            player.changeGameMode(Variables.progress.players.get(getUUID(player)).gameMode);
+            player.changeGameMode(permission.gameMode);
         }
     }
 

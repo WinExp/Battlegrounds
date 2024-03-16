@@ -11,20 +11,21 @@ import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 public class MathUtil {
     private static final double RAYCAST_ACCURATE = 10;
 
-    private static final Function<Block, Float> TRANSPARENT_STRENGTH_FUNCTION = (block) -> {
+    private static final BiFunction<World, BlockPos, Float> TRANSPARENT_STRENGTH_FUNCTION = (world, blockPos) -> {
+        Block block = world.getBlockState(blockPos).getBlock();
         if (block instanceof LeavesBlock) {
-            return 0.95F;
+            return 0.7F;
         } else if (block instanceof TintedGlassBlock) {
-            return 0.9F;
+            return 0.6F;
         } else if (block instanceof TransparentBlock) {
-            return 0.98F;
-        } else return 0.99F;
+            return 0.85F;
+        } else return Math.max(1.0F - WorldUtil.getOpacityFloat(world, blockPos), 0.1F);
     };
 
     public static Vec3d getRotationVector(float pitch, float yaw) {
@@ -88,8 +89,9 @@ public class MathUtil {
                     double y = (end.y - begin.y) / distance / RAYCAST_ACCURATE;
                     double z = (end.z - begin.z) / distance / RAYCAST_ACCURATE;
                     begin = blockHitResult.getPos().add(x, y, z);
-                    Block block = world.getBlockState(blockHitResult.getBlockPos()).getBlock();
-                    strength *= TRANSPARENT_STRENGTH_FUNCTION.apply(block);
+                    float transparent = TRANSPARENT_STRENGTH_FUNCTION.apply(world, blockHitResult.getBlockPos());
+                    transparent = (float) Math.pow(transparent, 1.0F / RAYCAST_ACCURATE);
+                    strength *= transparent;
                 }
             }
         } while (end.distanceTo(begin) > 1 / RAYCAST_ACCURATE || strength <= 0);
