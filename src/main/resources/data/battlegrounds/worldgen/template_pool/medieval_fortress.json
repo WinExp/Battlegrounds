@@ -8,7 +8,14 @@
         "projection": "rigid",
         "element_type": "minecraft:single_pool_element",
         "location": "battlegrounds:medieval_fortress",
-        "processors": "minecraft:empty"
+        "processors": {
+          "processors": [
+            {
+              "processor_type": "minecraft:block_age",
+              "mossiness": 0.2
+            }
+          ]
+        }
       }
     }
   ]
