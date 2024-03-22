@@ -4,8 +4,8 @@ import com.github.winexp.battlegrounds.client.gui.screen.vote.VoteScreen;
 import com.github.winexp.battlegrounds.client.network.ModClientNetworkPlayHandler;
 import com.github.winexp.battlegrounds.client.render.FlashRenderer;
 import com.github.winexp.battlegrounds.client.render.entity.ChannelingArrowEntityRenderer;
-import com.github.winexp.battlegrounds.client.toast.VoteClosedToast;
-import com.github.winexp.battlegrounds.client.toast.VoteOpenedToast;
+import com.github.winexp.battlegrounds.client.toast.vote.VoteClosedToast;
+import com.github.winexp.battlegrounds.client.toast.vote.VoteOpenedToast;
 import com.github.winexp.battlegrounds.entity.EntityTypes;
 import com.github.winexp.battlegrounds.event.ClientApplyFogCallback;
 import com.github.winexp.battlegrounds.event.ClientVoteEvents;
@@ -28,8 +28,9 @@ public class BattlegroundsClient implements ClientModInitializer {
         EntityRendererRegistry.register(EntityTypes.MOLOTOV, FlyingItemEntityRenderer::new);
 
         // 自定义渲染器
-        HudRenderCallback.EVENT.register(new FlashRenderer());
-        ClientApplyFogCallback.EVENT.register(new FlashRenderer());
+        FlashRenderer flashRenderer = new FlashRenderer();
+        HudRenderCallback.EVENT.register(flashRenderer);
+        ClientApplyFogCallback.EVENT.register(flashRenderer);
     }
 
     @Override

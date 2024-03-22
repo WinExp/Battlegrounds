@@ -2,18 +2,19 @@ package com.github.winexp.battlegrounds.discussion.vote;
 
 import com.github.winexp.battlegrounds.event.ServerVoteEvents;
 import com.github.winexp.battlegrounds.task.ScheduledTask;
-import com.github.winexp.battlegrounds.task.TaskExecutor;
+import com.github.winexp.battlegrounds.task.TaskScheduler;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
+import com.google.common.collect.ImmutableList;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class VoteInstance implements AutoCloseable {
+public class VoteInstance {
     private final Identifier identifier;
     private final UUID uuid = UUID.randomUUID();
     private final Text name;
@@ -21,7 +22,8 @@ public class VoteInstance implements AutoCloseable {
     private final VoteSettings settings;
     private boolean voting = false;
     private ScheduledTask timeoutTask = ScheduledTask.NONE_TASK;
-    private final HashMap<UUID, @Nullable Boolean> voteMap = new HashMap<>();
+    private ImmutableList<UUID> participants = ImmutableList.of();
+    private final ConcurrentHashMap<UUID, Boolean> voteResultMap = new ConcurrentHashMap<>();
 
     public VoteInstance(Identifier identifier, VoteSettings settings) {
         this.identifier = identifier;
@@ -53,7 +55,9 @@ public class VoteInstance implements AutoCloseable {
     }
 
     public long getTimeLeft() {
-        return this.timeoutTask.getDelay();
+        if (this.settings.timeout() == VoteSettings.INFINITE_TIME) {
+            return -1;
+        } else return this.timeoutTask.getDelay();
     }
 
     public boolean isVoting() {
@@ -73,57 +77,67 @@ public class VoteInstance implements AutoCloseable {
     }
 
     public int getTotal() {
-        return this.voteMap.size();
+        return this.voteResultMap.size();
     }
 
     public Collection<UUID> getParticipants() {
-        return this.voteMap.keySet();
+        return this.voteResultMap.keySet();
     }
 
-    public boolean isPlayerParticipants(UUID uuid) {
-        return this.voteMap.get(uuid) != null;
+    public boolean isParticipants(ServerPlayerEntity player) {
+        return this.participants.contains(PlayerUtil.getAuthUUID(player));
+    }
+
+    public boolean isParticipants(UUID uuid) {
+        return this.participants.contains(uuid);
     }
 
     public int getAcceptedNum() {
         int num = 0;
-        for (boolean accepted : this.voteMap.values()) {
+        for (boolean accepted : this.voteResultMap.values()) {
             if (accepted) num++;
         }
         return num;
     }
-
+    
     public boolean acceptVote(ServerPlayerEntity player) {
-        UUID uuid = PlayerUtil.getUUID(player);
+        UUID uuid = PlayerUtil.getAuthUUID(player);
         if (!this.voting) return false;
-        if (!this.settings.voteMode().allowChangeVote && this.isPlayerParticipants(uuid)) return false;
-        this.voteMap.put(uuid, true);
+        if (!this.settings.voteMode().allowChangeVote && this.voteResultMap.containsKey(uuid)) return false;
+        this.voteResultMap.put(uuid, true);
         this.settings.playerVotedAction().accept(this, player, true);
-        if (this.settings.voteMode().acceptPredicate.test(this.voteMap.size(), this.getAcceptedNum())) {
+        if (this.settings.voteMode().acceptPredicate.test(this.voteResultMap.size(), this.getAcceptedNum())) {
             this.closeVote(VoteSettings.CloseReason.ACCEPTED);
         }
         return true;
     }
 
     public boolean denyVote(ServerPlayerEntity player) {
-        UUID uuid = PlayerUtil.getUUID(player);
+        UUID uuid = PlayerUtil.getAuthUUID(player);
         if (!this.voting) return false;
+        if (!this.settings.voteMode().allowChangeVote && this.voteResultMap.containsKey(uuid)) return false;
         if (this.settings.voteMode().canDenyCancel) this.closeVote(VoteSettings.CloseReason.DENIED);
-        if (!this.settings.voteMode().allowChangeVote && this.isPlayerParticipants(uuid)) return false;
-        this.voteMap.put(uuid, false);
+        this.voteResultMap.put(uuid, false);
         this.settings.playerVotedAction().accept(this, player, false);
         return true;
     }
 
     public boolean openVote(Collection<ServerPlayerEntity> participants) {
         if (this.voting) return false;
-        this.voteMap.clear();
-        for (ServerPlayerEntity player : participants) {
-            this.voteMap.put(PlayerUtil.getUUID(player), null);
-        }
-        if (this.settings.timeout() == VoteSettings.INFINITE_TIME) {
-            this.timeoutTask = new ScheduledTask(() ->
-                    this.closeVote(VoteSettings.CloseReason.TIMEOUT), this.settings.timeout());
-            TaskExecutor.INSTANCE.execute(this.timeoutTask);
+        this.voteResultMap.clear();
+        ImmutableList.Builder<UUID> listBuilder = ImmutableList.builder();
+        participants.forEach(player -> {
+            listBuilder.add(PlayerUtil.getAuthUUID(player));
+        });
+        this.participants = listBuilder.build();
+        if (this.settings.timeout() != VoteSettings.INFINITE_TIME) {
+            this.timeoutTask = new ScheduledTask(this.settings.timeout()) {
+                @Override
+                public void run() throws CancellationException {
+                    VoteInstance.this.closeVote(VoteSettings.CloseReason.TIMEOUT);
+                }
+            };
+            TaskScheduler.INSTANCE.schedule(this.timeoutTask);
         }
         ServerVoteEvents.OPENED.invoker().onOpened(this.getVoteInfo());
         this.voting = true;
@@ -132,12 +146,10 @@ public class VoteInstance implements AutoCloseable {
 
     public boolean closeVote(VoteSettings.CloseReason closeReason) {
         if (!this.voting) return false;
-        try (this) {
-            this.timeoutTask.cancel();
-            this.voting = false;
-            this.settings.voteClosedAction().accept(this, closeReason);
-            ServerVoteEvents.CLOSED.invoker().onClosed(this.getVoteInfo(), closeReason);
-        }
+        this.timeoutTask.cancel();
+        this.voting = false;
+        this.settings.voteClosedAction().accept(this, closeReason);
+        ServerVoteEvents.CLOSED.invoker().onClosed(this.getVoteInfo(), closeReason);
         return true;
     }
 
@@ -151,11 +163,5 @@ public class VoteInstance implements AutoCloseable {
         if (!(obj instanceof VoteInstance voteInstance)) return false;
         else if (!this.identifier.equals(voteInstance.identifier)) return false;
         else return this.uuid.equals(voteInstance.uuid);
-    }
-
-    @Override
-    public void close() {
-        this.voteMap.clear();
-        this.timeoutTask.cancel();
     }
 }

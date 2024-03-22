@@ -14,34 +14,38 @@ public class WorldHelper {
     }
 
     public World getWorld() {
-        return world;
+        return this.world;
+    }
+
+    public void setDefaultBorder() {
+        this.border.load(WorldBorder.DEFAULT_BORDER);
     }
 
     public WorldBorder getBorder() {
-        return border;
+        return this.border;
     }
 
     public int getBorderSize() {
-        return (int) border.getSize();
+        return (int) this.border.getSize();
     }
 
     public void setBorderSize(int size) {
-        border.setSize(size);
+        this.border.setSize(size);
     }
 
     public int getBorderCenterX() {
-        return (int) border.getCenterX();
+        return (int) this.border.getCenterX();
     }
 
     public int getBorderCenterZ() {
-        return (int) border.getCenterZ();
+        return (int) this.border.getCenterZ();
     }
 
     public void setBorderSize(int size, long timeMillis) {
-        border.interpolateSize(border.getSize(), size, timeMillis);
+        this.border.interpolateSize(this.border.getSize(), size, timeMillis);
     }
 
     public void setBorderCenter(int x, int z) {
-        border.setCenter(x, z);
+        this.border.setCenter(x, z);
     }
 }

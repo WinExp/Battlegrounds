@@ -1,22 +1,33 @@
 package com.github.winexp.battlegrounds.util;
 
-import com.github.winexp.battlegrounds.config.GameProgress;
+import com.github.winexp.battlegrounds.game.GameStage;
+import com.github.winexp.battlegrounds.game.PlayerPermission;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.SubtitleS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 
 import java.util.UUID;
+import java.util.function.Predicate;
 
 public class PlayerUtil {
+    public static void kickAllPlayers(MinecraftServer server, Text message) {
+        for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+            player.networkHandler.disconnect(message);
+        }
+    }
+
     public static void sendTitle(ServerPlayerEntity player, Text title) {
-        sendTitle(player, title, Text.of(""));
+        sendTitle(player, title, Text.empty());
     }
 
     public static void sendTitle(ServerPlayerEntity player, Text title, Text subtitle) {
@@ -25,17 +36,44 @@ public class PlayerUtil {
         player.networkHandler.sendPacket(new TitleFadeS2CPacket(5, 10, 15));
     }
 
+    public static void broadcastSound(MinecraftServer server, SoundEvent sound, SoundCategory category, float volume, float pitch) {
+        for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+            player.playSound(sound, category, volume, pitch);
+        }
+    }
+
+    public static void broadcastTitle(MinecraftServer server, Text title) {
+        broadcastTitle(server, title, (player) -> true);
+    }
+
+    public static void broadcastTitle(MinecraftServer server, Text title, Predicate<ServerPlayerEntity> playerPredicate) {
+        broadcastTitle(server, title, Text.empty(), playerPredicate);
+    }
+
+    public static void broadcastTitle(MinecraftServer server, Text title, Text subtitle) {
+        broadcastTitle(server, title, subtitle, (player) -> true);
+    }
+
+    public static void broadcastTitle(MinecraftServer server, Text title, Text subtitle, Predicate<ServerPlayerEntity> playerPredicate) {
+        for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+            if (playerPredicate.test(player)) {
+                sendTitle(player, title, subtitle);
+            }
+        }
+    }
+
     public static void randomTeleport(World world, ServerPlayerEntity player) {
         BlockPos pos = RandomUtil.getSecureLocation(world);
         player.teleport((ServerWorld) world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0, 0);
     }
 
     public static void setGameModeToMap(ServerPlayerEntity player, GameMode gameMode) {
-        GameProgress.PlayerPermission permission = Variables.progress.players.get(getUUID(player));
+        UUID uuid = getAuthUUID(player);
+        PlayerPermission permission = Variables.gameManager.getPlayerPermission(uuid);
         if (permission == null) {
-            permission = new GameProgress.PlayerPermission();
+            permission = new PlayerPermission();
             permission.gameMode = gameMode;
-            Variables.progress.players.put(getUUID(player), permission);
+            Variables.gameManager.setPlayerPermission(getAuthUUID(player), permission);
         } else {
             permission.gameMode = gameMode;
         }
@@ -48,7 +86,7 @@ public class PlayerUtil {
 
     public static GameMode getDefaultGameMode() {
         GameMode gameMode;
-        if (Variables.progress.gameStage.isIdle()) {
+        if (Variables.gameManager.getGameStage() == GameStage.IDLE) {
             gameMode = GameMode.ADVENTURE;
         } else {
             gameMode = GameMode.SPECTATOR;
@@ -57,8 +95,9 @@ public class PlayerUtil {
     }
 
     public static void changeGameModeWithMap(ServerPlayerEntity player) {
+        UUID uuid = getAuthUUID(player);
         GameMode defaultGameMode = getDefaultGameMode();
-        GameProgress.PlayerPermission permission = Variables.progress.players.get(getUUID(player));
+        PlayerPermission permission = Variables.gameManager.getPlayerPermission(uuid);
         if (permission == null) {
             player.changeGameMode(defaultGameMode);
         } else {
@@ -66,7 +105,7 @@ public class PlayerUtil {
         }
     }
 
-    public static UUID getUUID(PlayerEntity player) {
+    public static UUID getAuthUUID(PlayerEntity player) {
         return player.getGameProfile().getId();
     }
 }

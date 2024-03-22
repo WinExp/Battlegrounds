@@ -3,14 +3,15 @@ package com.github.winexp.battlegrounds.task;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.MinecraftServer;
 
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class TaskExecutor {
-    public static final TaskExecutor INSTANCE = new TaskExecutor();
+public class TaskScheduler {
+    public static final TaskScheduler INSTANCE = new TaskScheduler();
 
     private final CopyOnWriteArrayList<AbstractTask> tasks = new CopyOnWriteArrayList<>();
 
-    public TaskExecutor() {
+    public TaskScheduler() {
         ServerTickEvents.END_SERVER_TICK.register(this::tick);
     }
 
@@ -18,14 +19,14 @@ public class TaskExecutor {
         for (AbstractTask task : this.tasks) {
             if (task.isCancelled()) this.tasks.remove(task);
             try {
-                task.run();
-            } catch (TaskCancelledException e) {
+                task.tick();
+            } catch (CancellationException e) {
                 this.tasks.remove(task);
             }
         }
     }
 
-    public void execute(AbstractTask task) {
+    public void schedule(AbstractTask task) {
         if (this.tasks.contains(task)) return;
         this.tasks.add(task);
     }

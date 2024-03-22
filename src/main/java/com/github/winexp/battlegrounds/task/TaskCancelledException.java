@@ -1,5 +1,6 @@
 package com.github.winexp.battlegrounds.task;
 
+@Deprecated(forRemoval = true)
 public class TaskCancelledException extends RuntimeException {
     private final boolean absolute;
 

@@ -27,14 +27,12 @@ public final class ModClientNetworkPlayHandler {
         MinecraftClient client = MinecraftClient.getInstance();
         Vec3d pos = packet.pos();
         float distance = packet.distance();
-        client.execute(() -> {
-            Entity entity = client.getCameraEntity();
-            if (entity != null) {
-                float tickDelta = client.getTickDelta();
-                ClientVariables.flashStrength = Math.max(ClientVariables.flashStrength,
-                        FlashBangEntity.getFlashStrength(entity, pos, distance, tickDelta));
-            }
-        });
+        Entity entity = client.getCameraEntity();
+        if (entity != null) {
+            float tickDelta = client.getTickDelta();
+            ClientVariables.flashStrength = Math.max(ClientVariables.flashStrength,
+                    FlashBangEntity.getFlashStrength(entity, pos, distance, tickDelta));
+        }
     }
 
     private static void onVoteOpened(VoteOpenedPacket packet, ClientPlayerEntity player, PacketSender responseSender) {

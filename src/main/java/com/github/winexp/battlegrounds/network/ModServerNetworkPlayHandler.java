@@ -11,12 +11,12 @@ import net.minecraft.util.Identifier;
 
 public class ModServerNetworkPlayHandler {
     public static void registerReceivers() {
-        ServerPlayNetworking.registerGlobalReceiver(SyncVoteInfosC2SPacket.TYPE, ModServerNetworkPlayHandler::onGetVoteInfos);
+        ServerPlayNetworking.registerGlobalReceiver(SyncVoteInfosC2SPacket.TYPE, ModServerNetworkPlayHandler::onSyncVoteInfos);
         ServerPlayNetworking.registerGlobalReceiver(VoteC2SPacket.TYPE, ModServerNetworkPlayHandler::onVote);
     }
 
-    private static void onGetVoteInfos(SyncVoteInfosC2SPacket packet, ServerPlayerEntity player, PacketSender responseSender) {
-        VoteManager.INSTANCE.syncVoteInfos(player);
+    private static void onSyncVoteInfos(SyncVoteInfosC2SPacket packet, ServerPlayerEntity player, PacketSender responseSender) {
+        player.server.execute(() -> VoteManager.INSTANCE.syncVoteInfos(player));
     }
 
     private static void onVote(VoteC2SPacket packet, ServerPlayerEntity player, PacketSender responseSender) {

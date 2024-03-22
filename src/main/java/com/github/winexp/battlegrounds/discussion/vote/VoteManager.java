@@ -8,18 +8,17 @@ import com.github.winexp.battlegrounds.util.Variables;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
 public class VoteManager {
     public static final VoteManager INSTANCE = new VoteManager();
 
-    private final HashMap<Identifier, @NotNull VoteInstance> voteMap = new HashMap<>();
+    private final ConcurrentHashMap<Identifier, VoteInstance> voteMap = new ConcurrentHashMap<>();
 
-    public VoteManager() {
+    protected VoteManager() {
         ServerVoteEvents.CLOSED.register(this::onVoteClosed);
     }
 
@@ -61,12 +60,11 @@ public class VoteManager {
     }
 
 
-    @Nullable
-    public VoteInstance openVoteWithPreset(VotePreset preset, Collection<ServerPlayerEntity> participants) {
+    public Optional<VoteInstance> openVoteWithPreset(VotePreset preset, Collection<ServerPlayerEntity> participants) {
         VoteInstance instance = new VoteInstance(preset.identifier(), preset.name(), preset.description(), preset.voteSettings());
         if (this.openVote(instance, participants)) {
-            return instance;
-        } else return null;
+            return Optional.of(instance);
+        } else return Optional.empty();
     }
 
     public boolean openVote(VoteInstance voteInstance, Collection<ServerPlayerEntity> participants) {
