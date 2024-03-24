@@ -103,10 +103,11 @@ public class VoteInstance {
     public boolean acceptVote(ServerPlayerEntity player) {
         UUID uuid = PlayerUtil.getAuthUUID(player);
         if (!this.voting) return false;
+        if (!this.isParticipants(player)) return false;
         if (!this.settings.voteMode().allowChangeVote && this.voteResultMap.containsKey(uuid)) return false;
         this.voteResultMap.put(uuid, true);
         this.settings.playerVotedAction().accept(this, player, true);
-        if (this.settings.voteMode().acceptPredicate.test(this.voteResultMap.size(), this.getAcceptedNum())) {
+        if (this.settings.voteMode().acceptPredicate.test(this.participants.size(), this.getAcceptedNum())) {
             this.closeVote(VoteSettings.CloseReason.ACCEPTED);
         }
         return true;
@@ -115,6 +116,7 @@ public class VoteInstance {
     public boolean denyVote(ServerPlayerEntity player) {
         UUID uuid = PlayerUtil.getAuthUUID(player);
         if (!this.voting) return false;
+        if (!this.isParticipants(player)) return false;
         if (!this.settings.voteMode().allowChangeVote && this.voteResultMap.containsKey(uuid)) return false;
         if (this.settings.voteMode().canDenyCancel) this.closeVote(VoteSettings.CloseReason.DENIED);
         this.voteResultMap.put(uuid, false);

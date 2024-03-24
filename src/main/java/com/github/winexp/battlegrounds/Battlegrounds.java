@@ -7,13 +7,19 @@ import com.github.winexp.battlegrounds.config.ConfigUtil;
 import com.github.winexp.battlegrounds.config.RootConfig;
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.entity.EntityTypes;
-import com.github.winexp.battlegrounds.game.*;
+import com.github.winexp.battlegrounds.game.GameManager;
+import com.github.winexp.battlegrounds.game.GameProperties;
+import com.github.winexp.battlegrounds.game.GameUtil;
 import com.github.winexp.battlegrounds.item.ItemGroups;
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.loot.LootTableModifier;
-import com.github.winexp.battlegrounds.network.ModServerNetworkPlayHandler;
+import com.github.winexp.battlegrounds.network.ModServerConfigurationNetworkHandler;
+import com.github.winexp.battlegrounds.network.ModServerPlayNetworkHandler;
 import com.github.winexp.battlegrounds.sound.SoundEvents;
-import com.github.winexp.battlegrounds.util.*;
+import com.github.winexp.battlegrounds.task.TaskScheduler;
+import com.github.winexp.battlegrounds.util.Constants;
+import com.github.winexp.battlegrounds.util.FileUtil;
+import com.github.winexp.battlegrounds.util.Variables;
 import com.google.gson.JsonElement;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.serialization.JsonOps;
@@ -21,14 +27,15 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.Identifier;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 
@@ -98,6 +105,10 @@ public class Battlegrounds implements ModInitializer {
         RandomTpCommand.register(dispatcher);
     }
 
+    private void onPlayInit(ServerPlayNetworkHandler handler, MinecraftServer server) {
+
+    }
+
     private void onServerStarting(MinecraftServer server) {
         Variables.server = server;
         this.loadConfigs();
@@ -107,12 +118,16 @@ public class Battlegrounds implements ModInitializer {
         Variables.gameManager = GameManager.getManager(server);
     }
 
+    private void onServerStopping(MinecraftServer server) {
+        TaskScheduler.INSTANCE.cancelAllTask();
+    }
+
     private void onSaving(MinecraftServer server, boolean flush, boolean force) {
         this.loadConfigs();
     }
 
     private void tryDeleteWorld() {
-        if (Files.isRegularFile(Constants.DELETE_WORLD_TMP_FILE_PATH)) {
+        if (Constants.DELETE_WORLD_TMP_FILE_PATH.toFile().isFile()) {
             GameUtil.deleteWorld();
             FileUtil.delete(Constants.DELETE_WORLD_TMP_FILE_PATH, true);
             Constants.LOGGER.info("已重置地图");
@@ -122,7 +137,7 @@ public class Battlegrounds implements ModInitializer {
     @Override
     public void onInitialize() {
         INSTANCE = this;
-        Constants.LOGGER.info("Loading {}", Constants.MOD_ID);
+        Constants.LOGGER.info("Loading {}", Constants.MOD_NAME);
         // 加载配置
         this.loadConfigs();
         this.loadGamePresets(); // 加载游戏预设
@@ -132,10 +147,13 @@ public class Battlegrounds implements ModInitializer {
         // Fabric API
         ServerLifecycleEvents.SERVER_STARTING.register(this::onServerStarting);
         ServerLifecycleEvents.SERVER_STARTED.register(this::onServerStarted);
+        ServerLifecycleEvents.SERVER_STOPPING.register(this::onServerStopping);
         ServerLifecycleEvents.AFTER_SAVE.register(this::onSaving);
         LootTableEvents.MODIFY.register(new LootTableModifier());
-        // 注册网络包接收器
-        ModServerNetworkPlayHandler.registerReceivers();
+        ServerPlayConnectionEvents.INIT.register(this::onPlayInit);
+        // 注册网络包相关
+        ModServerConfigurationNetworkHandler.registerReceivers();
+        ModServerPlayNetworkHandler.register();
         // 注册物品
         Items.registerItems();
         // 注册物品组

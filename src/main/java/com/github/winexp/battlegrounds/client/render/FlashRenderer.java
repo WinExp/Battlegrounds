@@ -4,6 +4,8 @@ import com.github.winexp.battlegrounds.client.util.ClientVariables;
 import com.github.winexp.battlegrounds.entity.projectile.FlashBangEntity;
 import com.github.winexp.battlegrounds.event.ClientApplyFogCallback;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BackgroundRenderer;
@@ -12,6 +14,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 
+@Environment(EnvType.CLIENT)
 public class FlashRenderer implements HudRenderCallback, ClientApplyFogCallback {
     @Override
     public void onHudRender(DrawContext context, float tickDelta) {

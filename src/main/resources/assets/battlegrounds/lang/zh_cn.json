@@ -25,14 +25,16 @@
 
   "battlegrounds.game.already.broadcast": "所有玩家都已加入游戏，即将开始游戏！",
   "battlegrounds.game.border.reduce.broadcast": "正在缩小竞技场！",
-  "battlegrounds.game.deathmatch.already.broadcast": "死亡竞赛将在 %d 分钟后开始！",
   "battlegrounds.game.deathmatch.start.broadcast": "您已进入死亡竞赛模式！",
-  "battlegrounds.game.end.broadcast": "游戏结束！%s 是最后的赢家！",
+  "battlegrounds.game.won.broadcast": "游戏结束！%s 是最后的赢家！",
   "battlegrounds.game.join.broadcast": "%s 加入了游戏！(%d/%d)",
   "battlegrounds.game.join.spectator.broadcast": "%s 加入了游戏！(观战)",
   "battlegrounds.game.pvp.enable.broadcast": "PVP 已启用！",
   "battlegrounds.game.server.stop": "服务器正在重启以重置地图",
   "battlegrounds.game.delete_world.broadcast": "游戏即将开始，将在 %d 秒内重启服务器。",
+
+  "battlegrounds.network.config.mod_info.failed": "你的 Battlegrounds 版本与服务器不兼容！\n你的版本：%s-%d\n服务器版本：%s-%d",
+  "battlegrounds.network.config.mod_info.not_found": "你的 Battlegrounds 版本过旧或你未安装 Battlegrounds\n服务器版本：%s-%d",
 
   "enchantment.battlegrounds.channeling_pro": "引雷 Pro Max",
   "enchantment.battlegrounds.leaching": "浸毒",

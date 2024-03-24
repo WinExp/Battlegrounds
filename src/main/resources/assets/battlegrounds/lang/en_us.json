@@ -25,14 +25,16 @@
 
   "battlegrounds.game.already.broadcast": "All players have joined the server and are about to start the game!",
   "battlegrounds.game.border.reduce.broadcast": "The arena is shrinking!",
-  "battlegrounds.game.deathmatch.already.broadcast": "The Deathmatch will begin in %d minutes!",
   "battlegrounds.game.deathmatch.start.broadcast": "You are in Deathmatch mode!",
-  "battlegrounds.game.end.broadcast": "Game over! %s is the final winner!",
+  "battlegrounds.game.won.broadcast": "Game over! %s is the final winner!",
   "battlegrounds.game.join.broadcast": "%s joined the game! (%d/%d)",
   "battlegrounds.game.join.spectator.broadcast": "%s joined to the game! (Spectator)",
   "battlegrounds.game.pvp.enable.broadcast": "PVP has been enabled!",
   "battlegrounds.game.server.stop": "The server is restarting to reset the map",
   "battlegrounds.game.delete_world.broadcast": "The game is about to start and will restart the server in %d seconds.",
+
+  "battlegrounds.network.config.mod_info.failed": "Your version of Battlegrounds is not compatible with the server!\nYour version: %s-%d\nServer version: %s-%d",
+  "battlegrounds.network.config.mod_info.not_found": "Your version of Battlegrounds is too old or you don't have Battlegrounds installed.\nServer version: %s-%d",
 
   "enchantment.battlegrounds.channeling_pro": "Channeling Pro Max",
   "enchantment.battlegrounds.leaching": "Leaching",

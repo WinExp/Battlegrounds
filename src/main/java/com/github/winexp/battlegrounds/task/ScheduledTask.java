@@ -13,16 +13,20 @@ public abstract class ScheduledTask extends AbstractTask {
     public ScheduledTask(int delay) {
         super();
         this.delay = delay;
+        if (delay < 0) {
+            this.cancel();
+        }
     }
 
     @Override
     public void tick() throws CancellationException {
-        if (delay < 0) {
+        if (this.delay < 0) {
             this.cancel();
             throw new CancellationException();
         }
         this.delay--;
         if (this.delay <= 0) {
+            this.delay = -1;
             this.run();
         }
     }

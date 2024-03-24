@@ -14,7 +14,7 @@ public class FileUtil {
     }
 
     public static void delete(Path path, boolean deleteRoot, String... excludes) {
-        if (!Files.exists(path)) return;
+        if (!path.toFile().exists()) return;
         if (Stream.of(excludes).anyMatch(path::endsWith)) return;
         if (Files.isDirectory(path)) {
             for (File f : Objects.requireNonNull(path.toFile().listFiles())) {
@@ -23,7 +23,10 @@ public class FileUtil {
         }
         try {
             if (deleteRoot) {
-                Files.delete(path);
+                File[] files = path.toFile().listFiles();
+                if (files == null || files.length == 0) {
+                    Files.delete(path);
+                }
             }
         } catch (IOException e) {
             Constants.LOGGER.error("无法删除文件", e);

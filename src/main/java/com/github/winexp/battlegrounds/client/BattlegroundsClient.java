@@ -1,7 +1,8 @@
 package com.github.winexp.battlegrounds.client;
 
 import com.github.winexp.battlegrounds.client.gui.screen.vote.VoteScreen;
-import com.github.winexp.battlegrounds.client.network.ModClientNetworkPlayHandler;
+import com.github.winexp.battlegrounds.client.network.ModClientConfigurationNetworkHandler;
+import com.github.winexp.battlegrounds.client.network.ModClientPlayNetworkHandler;
 import com.github.winexp.battlegrounds.client.render.FlashRenderer;
 import com.github.winexp.battlegrounds.client.render.entity.ChannelingArrowEntityRenderer;
 import com.github.winexp.battlegrounds.client.toast.vote.VoteClosedToast;
@@ -49,8 +50,9 @@ public class BattlegroundsClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(VoteScreen::globalTick);
         // 注册实体渲染器
         this.registerRenderer();
-        // 注册网络包接收器
-        ModClientNetworkPlayHandler.registerReceivers();
+        // 注册网络包相关
+        ModClientConfigurationNetworkHandler.register();
+        ModClientPlayNetworkHandler.registerReceivers();
         // 注册按键绑定
         KeyBindings.registerKeyBindings();
         // 注册物品模型谓词

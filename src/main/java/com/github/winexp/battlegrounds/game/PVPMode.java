@@ -18,8 +18,8 @@ public enum PVPMode implements StringIdentifiable {
     public static final Codec<PVPMode> CODEC = StringIdentifiable.createCodec(PVPMode::values);
     private final BiPredicate<DamageSource, LivingEntity> allowDamagePredicate;
 
-    PVPMode(boolean allow) {
-        this.allowDamagePredicate = ((source, target) -> allow);
+    PVPMode(boolean allowDamage) {
+        this.allowDamagePredicate = ((source, target) -> allowDamage);
     }
 
     PVPMode(BiPredicate<DamageSource, LivingEntity> allowDamagePredicate) {

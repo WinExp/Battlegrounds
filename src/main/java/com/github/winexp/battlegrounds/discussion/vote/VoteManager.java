@@ -1,11 +1,14 @@
 package com.github.winexp.battlegrounds.discussion.vote;
 
+import com.github.winexp.battlegrounds.event.ModServerPlayerEvents;
 import com.github.winexp.battlegrounds.event.ServerVoteEvents;
-import com.github.winexp.battlegrounds.network.packet.s2c.SyncVoteInfosS2CPacket;
-import com.github.winexp.battlegrounds.network.packet.s2c.VoteClosedPacket;
-import com.github.winexp.battlegrounds.network.packet.s2c.VoteOpenedPacket;
+import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.SyncVoteInfosS2CPacket;
+import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.VoteClosedPacket;
+import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.VoteOpenedPacket;
 import com.github.winexp.battlegrounds.util.Variables;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.network.ClientConnection;
+import net.minecraft.server.network.ConnectedClientData;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
@@ -20,6 +23,7 @@ public class VoteManager {
 
     protected VoteManager() {
         ServerVoteEvents.CLOSED.register(this::onVoteClosed);
+        ModServerPlayerEvents.PLAYER_JOINED.register(this::onPlayerJoined);
     }
 
     private void onVoteClosed(VoteInfo voteInfo, VoteSettings.CloseReason reason) {
@@ -29,6 +33,10 @@ public class VoteManager {
             VoteClosedPacket packet = new VoteClosedPacket(voteInfo, reason);
             ServerPlayNetworking.send(player, packet);
         }
+    }
+
+    private void onPlayerJoined(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData clientData) {
+        this.syncVoteInfos(player);
     }
 
     public void syncVoteInfos(ServerPlayerEntity player) {

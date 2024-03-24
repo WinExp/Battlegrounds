@@ -8,7 +8,8 @@
     "customRecipe_RecipeManagerMixin",
     "deny_EnchantmentMixin",
     "deny_GrindstoneScreenHandlerMixin",
-    "naturalRegen_PlayerEntityMixin"
+    "naturalRegen_PlayerEntityMixin",
+    "onPlayerJoin_PlayerManagerMixin"
   ],
   "client": [
     "client.flash_BackgroundRendererMixin"

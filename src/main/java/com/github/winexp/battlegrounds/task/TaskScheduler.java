@@ -21,7 +21,7 @@ public class TaskScheduler {
             try {
                 task.tick();
             } catch (CancellationException e) {
-                this.tasks.remove(task);
+                task.cancel();
             }
         }
     }
@@ -34,7 +34,6 @@ public class TaskScheduler {
     public void cancelAllTask() {
         for (AbstractTask task : this.tasks) {
             task.cancel();
-            this.tasks.remove(task);
         }
     }
 }

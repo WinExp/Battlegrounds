@@ -1,4 +1,4 @@
-package com.github.winexp.battlegrounds.network.packet.s2c;
+package com.github.winexp.battlegrounds.network.packet.s2c.play.vote;
 
 import com.github.winexp.battlegrounds.discussion.vote.VoteInfo;
 import net.fabricmc.fabric.api.networking.v1.FabricPacket;
@@ -9,7 +9,7 @@ import net.minecraft.util.Identifier;
 import java.util.Collection;
 
 public record SyncVoteInfosS2CPacket(Collection<VoteInfo> voteInfos) implements FabricPacket {
-    public static final Identifier ID = new Identifier("battlegrounds", "sync_vote_infos");
+    public static final Identifier ID = new Identifier("battlegrounds", "play/vote/sync_vote_infos");
     public static final PacketType<SyncVoteInfosS2CPacket> TYPE = PacketType.create(ID, SyncVoteInfosS2CPacket::new);
 
     public SyncVoteInfosS2CPacket(PacketByteBuf buf) {

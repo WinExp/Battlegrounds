@@ -16,10 +16,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 
+import java.util.HashMap;
 import java.util.UUID;
 import java.util.function.Predicate;
 
 public class PlayerUtil {
+    private static final HashMap<UUID, ModVersion> playerVersionMap = new HashMap<>();
+
     public static void kickAllPlayers(MinecraftServer server, Text message) {
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
             player.networkHandler.disconnect(message);
@@ -65,6 +68,15 @@ public class PlayerUtil {
     public static void randomTeleport(World world, ServerPlayerEntity player) {
         BlockPos pos = RandomUtil.getSecureLocation(world);
         player.teleport((ServerWorld) world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0, 0);
+    }
+
+    public static ModVersion getPlayerModVersion(UUID uuid) {
+        return playerVersionMap.get(uuid);
+    }
+
+    public static void setPlayerModVersion(UUID uuid, ModVersion modVersion) {
+        if (modVersion == null) playerVersionMap.remove(uuid);
+        else playerVersionMap.put(uuid, modVersion);
     }
 
     public static void setGameModeToMap(ServerPlayerEntity player, GameMode gameMode) {

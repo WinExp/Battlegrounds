@@ -1,4 +1,4 @@
-package com.github.winexp.battlegrounds.network.packet.s2c;
+package com.github.winexp.battlegrounds.network.packet.s2c.play.vote;
 
 import com.github.winexp.battlegrounds.discussion.vote.VoteInfo;
 import net.fabricmc.fabric.api.networking.v1.FabricPacket;
@@ -7,7 +7,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
 public record VoteOpenedPacket(VoteInfo voteInfo) implements FabricPacket {
-    public static final Identifier ID = new Identifier("battlegrounds", "vote_opened");
+    public static final Identifier ID = new Identifier("battlegrounds", "play/vote/vote_opened");
     public static final PacketType<VoteOpenedPacket> TYPE = PacketType.create(ID, VoteOpenedPacket::new);
 
     public VoteOpenedPacket(PacketByteBuf buf) {

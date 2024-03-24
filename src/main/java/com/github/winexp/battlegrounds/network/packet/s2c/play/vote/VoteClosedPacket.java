@@ -1,4 +1,4 @@
-package com.github.winexp.battlegrounds.network.packet.s2c;
+package com.github.winexp.battlegrounds.network.packet.s2c.play.vote;
 
 import com.github.winexp.battlegrounds.discussion.vote.VoteInfo;
 import com.github.winexp.battlegrounds.discussion.vote.VoteSettings;
@@ -8,7 +8,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
 public record VoteClosedPacket(VoteInfo voteInfo, VoteSettings.CloseReason closeReason) implements FabricPacket {
-    public static final Identifier ID = new Identifier("battlegrounds", "vote_closed");
+    public static final Identifier ID = new Identifier("battlegrounds", "play/vote/vote_closed");
     public static final PacketType<VoteClosedPacket> TYPE = PacketType.create(ID, VoteClosedPacket::new);
 
     public VoteClosedPacket(PacketByteBuf buf) {
