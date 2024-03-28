@@ -5,6 +5,7 @@ import com.github.winexp.battlegrounds.client.network.ModClientConfigurationNetw
 import com.github.winexp.battlegrounds.client.network.ModClientPlayNetworkHandler;
 import com.github.winexp.battlegrounds.client.render.FlashRenderer;
 import com.github.winexp.battlegrounds.client.render.entity.ChannelingArrowEntityRenderer;
+import com.github.winexp.battlegrounds.client.toast.vote.PlayerVotedToast;
 import com.github.winexp.battlegrounds.client.toast.vote.VoteClosedToast;
 import com.github.winexp.battlegrounds.client.toast.vote.VoteOpenedToast;
 import com.github.winexp.battlegrounds.entity.EntityTypes;
@@ -19,6 +20,8 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 
 @Environment(EnvType.CLIENT)
 public class BattlegroundsClient implements ClientModInitializer {
@@ -40,13 +43,26 @@ public class BattlegroundsClient implements ClientModInitializer {
         ClientVoteEvents.OPENED.register(voteInfo -> {
             MinecraftClient client = MinecraftClient.getInstance();
             client.getToastManager().add(new VoteOpenedToast(voteInfo));
+            if (client.player != null) {
+                client.player.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.NEUTRAL, 0.3F, 1.0F);
+            }
             VoteScreen.onVoteOpened(client, voteInfo);
         });
-        ClientVoteEvents.CLOSED.register(((voteInfo, reason) -> {
+        ClientVoteEvents.CLOSED.register((voteInfo, reason) -> {
             MinecraftClient client = MinecraftClient.getInstance();
             client.getToastManager().add(new VoteClosedToast(voteInfo, reason));
+            if (client.player != null) {
+                client.player.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.NEUTRAL, 0.3F, 1.0F);
+            }
             VoteScreen.onVoteClosed(client, voteInfo);
-        }));
+        });
+        ClientVoteEvents.PLAYER_VOTED.register((playerName, voteInfo, result) -> {
+            MinecraftClient client = MinecraftClient.getInstance();
+            client.getToastManager().add(new PlayerVotedToast(playerName, voteInfo, result));
+            if (client.player != null) {
+                client.player.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.NEUTRAL, 0.3F, 1.0F);
+            }
+        });
         ClientTickEvents.END_CLIENT_TICK.register(VoteScreen::globalTick);
         // 注册实体渲染器
         this.registerRenderer();

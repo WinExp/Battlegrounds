@@ -11,9 +11,11 @@ import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Identifier;
 
 public class VitalityEnchantment extends Enchantment {
-    private final static String HEALTH_MODIFIER_ID = "enchantment.vitality.health_modifier";
+    private final static Identifier HEALTH_MODIFIER_ID = new Identifier("battlegrounds", "enchantment/vitality");
+    private final static double HEALTH_MODIFIER_ADD_VALUE_PER_LEVEL = 4;
 
     public VitalityEnchantment() {
         this(Rarity.VERY_RARE, EnchantmentTarget.ARMOR_CHEST, EquipmentSlot.CHEST);
@@ -36,7 +38,7 @@ public class VitalityEnchantment extends Enchantment {
         assert attribute != null;
         if (level > 0) {
             EffectUtil.addAttribute(attribute, HEALTH_MODIFIER_ID,
-                    level * 4, EntityAttributeModifier.Operation.ADDITION);
+                    level * HEALTH_MODIFIER_ADD_VALUE_PER_LEVEL, EntityAttributeModifier.Operation.ADDITION);
         } else {
             EffectUtil.removeAttribute(attribute, HEALTH_MODIFIER_ID);
         }

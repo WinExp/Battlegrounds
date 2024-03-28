@@ -2,6 +2,8 @@ package com.github.winexp.battlegrounds.util;
 
 import com.github.winexp.battlegrounds.game.GameStage;
 import com.github.winexp.battlegrounds.game.PlayerPermission;
+import net.fabricmc.fabric.api.networking.v1.FabricPacket;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.SubtitleS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket;
@@ -15,10 +17,12 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.UUID;
-import java.util.function.Predicate;
+import java.util.function.BiConsumer;
 
 public class PlayerUtil {
     private static final HashMap<UUID, ModVersion> playerVersionMap = new HashMap<>();
@@ -26,6 +30,12 @@ public class PlayerUtil {
     public static void kickAllPlayers(MinecraftServer server, Text message) {
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
             player.networkHandler.disconnect(message);
+        }
+    }
+
+    public static void randomTpAllPlayers(MinecraftServer server, World world) {
+        for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+            randomTeleport(world, player);
         }
     }
 
@@ -46,22 +56,23 @@ public class PlayerUtil {
     }
 
     public static void broadcastTitle(MinecraftServer server, Text title) {
-        broadcastTitle(server, title, (player) -> true);
-    }
-
-    public static void broadcastTitle(MinecraftServer server, Text title, Predicate<ServerPlayerEntity> playerPredicate) {
-        broadcastTitle(server, title, Text.empty(), playerPredicate);
+        broadcastTitle(server, title, Text.empty());
     }
 
     public static void broadcastTitle(MinecraftServer server, Text title, Text subtitle) {
-        broadcastTitle(server, title, subtitle, (player) -> true);
+        for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+            sendTitle(player, title, subtitle);
+        }
     }
 
-    public static void broadcastTitle(MinecraftServer server, Text title, Text subtitle, Predicate<ServerPlayerEntity> playerPredicate) {
+    public static <T extends FabricPacket> void broadcastPacket(MinecraftServer server, T packet) {
+        broadcastPacket(server, packet, (p, player) -> {});
+    }
+
+    public static <T extends FabricPacket> void broadcastPacket(MinecraftServer server, T packet, BiConsumer<T, ServerPlayerEntity> preprocessor) {
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-            if (playerPredicate.test(player)) {
-                sendTitle(player, title, subtitle);
-            }
+            preprocessor.accept(packet, player);
+            ServerPlayNetworking.send(player, packet);
         }
     }
 
@@ -70,11 +81,11 @@ public class PlayerUtil {
         player.teleport((ServerWorld) world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0, 0);
     }
 
-    public static ModVersion getPlayerModVersion(UUID uuid) {
+    public static ModVersion getPlayerModVersion(@NotNull UUID uuid) {
         return playerVersionMap.get(uuid);
     }
 
-    public static void setPlayerModVersion(UUID uuid, ModVersion modVersion) {
+    public static void setPlayerModVersion(@NotNull UUID uuid, @Nullable ModVersion modVersion) {
         if (modVersion == null) playerVersionMap.remove(uuid);
         else playerVersionMap.put(uuid, modVersion);
     }

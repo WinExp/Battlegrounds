@@ -8,27 +8,30 @@ import java.util.UUID;
 
 public class VoteInfo {
     public static final PacketByteBuf.PacketReader<VoteInfo> PACKET_READER = (buf) ->
-            new VoteInfo(buf.readIdentifier(), buf.readUuid(), buf.readText(), buf.readText(), buf.readLong());
+            new VoteInfo(buf.readIdentifier(), buf.readUuid(), buf.readText(), buf.readText(), buf.readInt(), buf.readBoolean());
     public static final PacketByteBuf.PacketWriter<VoteInfo> PACKET_WRITER = (buf, voteInfo) -> {
         buf.writeIdentifier(voteInfo.identifier);
         buf.writeUuid(voteInfo.uuid);
         buf.writeText(voteInfo.name);
         buf.writeText(voteInfo.description);
-        buf.writeLong(voteInfo.timeLeft);
+        buf.writeInt(voteInfo.timeLeft);
+        buf.writeBoolean(voteInfo.available);
     };
 
     public final Identifier identifier;
     public final UUID uuid;
     public final Text name;
     public final Text description;
-    public long timeLeft;
+    public int timeLeft;
+    public boolean available;
 
-    public VoteInfo(Identifier identifier, UUID uuid, Text name, Text description, long timeLeft) {
+    public VoteInfo(Identifier identifier, UUID uuid, Text name, Text description, int timeLeft, boolean available) {
         this.identifier = identifier;
         this.uuid = uuid;
         this.name = name;
         this.description = description;
         this.timeLeft = timeLeft;
+        this.available = available;
     }
 
     @Override

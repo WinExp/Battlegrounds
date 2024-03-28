@@ -7,11 +7,11 @@ import net.fabricmc.fabric.api.networking.v1.PacketType;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
-public record VoteClosedPacket(VoteInfo voteInfo, VoteSettings.CloseReason closeReason) implements FabricPacket {
+public record VoteClosedS2CPacket(VoteInfo voteInfo, VoteSettings.CloseReason closeReason) implements FabricPacket {
     public static final Identifier ID = new Identifier("battlegrounds", "play/vote/vote_closed");
-    public static final PacketType<VoteClosedPacket> TYPE = PacketType.create(ID, VoteClosedPacket::new);
+    public static final PacketType<VoteClosedS2CPacket> TYPE = PacketType.create(ID, VoteClosedS2CPacket::new);
 
-    public VoteClosedPacket(PacketByteBuf buf) {
+    public VoteClosedS2CPacket(PacketByteBuf buf) {
         this(VoteInfo.PACKET_READER.apply(buf), buf.readEnumConstant(VoteSettings.CloseReason.class));
     }
 

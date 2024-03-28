@@ -40,7 +40,7 @@ public record RootConfig(RandomTpConfig randomTp, Map<Identifier, VoteConfig> vo
         public static final Codec<RandomTpConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 Duration.CODEC.fieldOf("default_cooldown").forGetter(RandomTpConfig::defaultCooldown),
                 Duration.CODEC.fieldOf("damaged_cooldown").forGetter(RandomTpConfig::damagedCooldown),
-                Codec.unboundedMap(Identifier.CODEC, Duration.CODEC).fieldOf("cooldownMap").forGetter(RandomTpConfig::cooldownMap)
+                Codec.unboundedMap(Identifier.CODEC, Duration.CODEC).fieldOf("cooldown_map").forGetter(RandomTpConfig::cooldownMap)
         ).apply(instance, RandomTpConfig::new));
     }
 

@@ -1,9 +1,12 @@
 package com.github.winexp.battlegrounds.network;
 
+import com.github.winexp.battlegrounds.discussion.vote.VoteInfo;
 import com.github.winexp.battlegrounds.discussion.vote.VoteInstance;
 import com.github.winexp.battlegrounds.discussion.vote.VoteManager;
+import com.github.winexp.battlegrounds.network.packet.c2s.play.vote.GetVoteInfoC2SPacket;
 import com.github.winexp.battlegrounds.network.packet.c2s.play.vote.VoteC2SPacket;
 import com.github.winexp.battlegrounds.network.packet.c2s.play.vote.SyncVoteInfosC2SPacket;
+import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.UpdateVoteInfoS2CPacket;
 import com.github.winexp.battlegrounds.util.Constants;
 import com.github.winexp.battlegrounds.util.ModVersion;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
@@ -17,6 +20,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public class ModServerPlayNetworkHandler {
@@ -24,6 +28,7 @@ public class ModServerPlayNetworkHandler {
         ServerPlayConnectionEvents.INIT.register(ModServerPlayNetworkHandler::onPlayInit);
         ServerPlayConnectionEvents.DISCONNECT.register(ModServerPlayNetworkHandler::onPlayDisconnect);
         ServerPlayNetworking.registerGlobalReceiver(SyncVoteInfosC2SPacket.TYPE, ModServerPlayNetworkHandler::onSyncVoteInfos);
+        ServerPlayNetworking.registerGlobalReceiver(GetVoteInfoC2SPacket.TYPE, ModServerPlayNetworkHandler::onGetVoteInfo);
         ServerPlayNetworking.registerGlobalReceiver(VoteC2SPacket.TYPE, ModServerPlayNetworkHandler::onVote);
     }
 
@@ -57,14 +62,32 @@ public class ModServerPlayNetworkHandler {
         player.server.execute(() -> VoteManager.INSTANCE.syncVoteInfos(player));
     }
 
+    private static void onGetVoteInfo(GetVoteInfoC2SPacket packet, ServerPlayerEntity player, PacketSender responseSender) {
+        VoteManager.INSTANCE.getVoteInstance(packet.voteId()).ifPresentOrElse(voteInstance -> {
+            VoteInfo voteInfo = voteInstance.getVoteInfo(player);
+            UpdateVoteInfoS2CPacket responsePacket = new UpdateVoteInfoS2CPacket(Optional.of(voteInfo));
+            responseSender.sendPacket(responsePacket);
+        }, () -> {
+            UpdateVoteInfoS2CPacket responsePacket = new UpdateVoteInfoS2CPacket(Optional.empty());
+            responseSender.sendPacket(responsePacket);
+        });
+    }
+
     private static void onVote(VoteC2SPacket packet, ServerPlayerEntity player, PacketSender responseSender) {
         Identifier identifier = packet.identifier();
         if (VoteManager.INSTANCE.isVoting(identifier)) {
-            VoteInstance instance = VoteManager.INSTANCE.getVoteInstance(identifier).orElseThrow();
+            Optional<VoteInstance> optionalVoteInstance = VoteManager.INSTANCE.getVoteInstance(identifier);
+            if (optionalVoteInstance.isEmpty()) return;
+            VoteInstance voteInstance = optionalVoteInstance.get();
             if (packet.result()) {
-                instance.acceptVote(player);
+                voteInstance.acceptVote(player);
             } else {
-                instance.denyVote(player);
+                voteInstance.denyVote(player);
+            }
+            if (voteInstance.isVoting()) {
+                VoteInfo voteInfo = voteInstance.getVoteInfo(player);
+                UpdateVoteInfoS2CPacket responsePacket = new UpdateVoteInfoS2CPacket(Optional.of(voteInfo));
+                responseSender.sendPacket(responsePacket);
             }
         }
     }

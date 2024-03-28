@@ -1,19 +1,21 @@
 package com.github.winexp.battlegrounds.task;
 
+import com.github.winexp.battlegrounds.util.time.Duration;
+
 import java.util.concurrent.CancellationException;
 
 public abstract class ScheduledTask extends AbstractTask {
-    public static final ScheduledTask NONE_TASK = new ScheduledTask(-1) {
+    public static final ScheduledTask NONE_TASK = new ScheduledTask(Duration.INFINITY) {
         @Override
         public void run() throws CancellationException {
         }
     };
     protected int delay;
 
-    public ScheduledTask(int delay) {
+    public ScheduledTask(Duration delay) {
         super();
-        this.delay = delay;
-        if (delay < 0) {
+        this.delay = delay.toTicks();
+        if (delay.toTicks() < 0) {
             this.cancel();
         }
     }
@@ -31,7 +33,7 @@ public abstract class ScheduledTask extends AbstractTask {
         }
     }
 
-    public int getDelay() {
+    public int getDelayTicks() {
         return this.delay;
     }
 }
