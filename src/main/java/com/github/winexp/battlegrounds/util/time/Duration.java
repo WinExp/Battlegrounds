@@ -11,6 +11,8 @@ public record Duration(int hours, int minutes, int seconds, int ticks, int milli
             Codec.INT.optionalFieldOf("ticks", 0).forGetter(Duration::ticks),
             Codec.INT.optionalFieldOf("millis", 0).forGetter(Duration::millis)
     ).apply(instance, Duration::new));
+    public static final Duration ZERO = new Duration(0, 0, 0, 0, 0);
+    public static final Duration INFINITY = new Duration(-1, -1, -1, -1, -1);
 
     public static Duration withHours(int hours) {
         return new Duration(hours, 0, 0, 0, 0);
@@ -54,5 +56,10 @@ public record Duration(int hours, int minutes, int seconds, int ticks, int milli
                 + this.seconds * 1000
                 + this.ticks * 50
                 + this.millis;
+    }
+
+    public Duration add(Duration another) {
+        return new Duration(this.hours + another.hours, this.minutes + another.minutes,
+                this.seconds + another.seconds, this.ticks + another.ticks, this.millis + another.millis);
     }
 }

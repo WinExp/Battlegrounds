@@ -6,6 +6,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.text.Text;
 
 @Environment(EnvType.CLIENT)
 public class ClientVoteEvents {
@@ -16,19 +17,33 @@ public class ClientVoteEvents {
                 }
             });
     public static Event<Closed> CLOSED = EventFactory.createArrayBacked(Closed.class,
-            (listeners) -> (voteInstance, reason) -> {
+            (listeners) -> (voteInfo, reason) -> {
                 for (Closed listener : listeners) {
-                    listener.onClosed(voteInstance, reason);
+                    listener.onClosed(voteInfo, reason);
+                }
+            });
+    public static Event<PlayerVoted> PLAYER_VOTED = EventFactory.createArrayBacked(PlayerVoted.class,
+            (listeners) -> (playerName, voteInfo, result) -> {
+                for (PlayerVoted listener : listeners) {
+                    listener.onPlayerVoted(playerName, voteInfo, result);
                 }
             });
 
+    @Environment(EnvType.CLIENT)
     @FunctionalInterface
     public interface Opened {
         void onOpened(VoteInfo voteInfo);
     }
 
+    @Environment(EnvType.CLIENT)
     @FunctionalInterface
     public interface Closed {
         void onClosed(VoteInfo voteInfo, VoteSettings.CloseReason reason);
+    }
+
+    @Environment(EnvType.CLIENT)
+    @FunctionalInterface
+    public interface PlayerVoted {
+        void onPlayerVoted(Text playerName, VoteInfo voteInfo, boolean result);
     }
 }

@@ -8,13 +8,14 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 @Environment(EnvType.CLIENT)
-public class VoteOpenedToast extends SimpleToast {
+public class PlayerVotedToast extends SimpleToast {
     private static final Identifier TEXTURE = new Identifier("battlegrounds", "toast/vote");
 
-    public VoteOpenedToast(VoteInfo voteInfo) {
+    public PlayerVotedToast(Text playerName, VoteInfo voteInfo, boolean result) {
         super(
-                Text.translatable("gui.battlegrounds.vote.opened.toast.title", voteInfo.name),
-                Text.translatable("gui.battlegrounds.vote.opened.toast.subtitle"),
+                Text.translatable("gui.battlegrounds.vote.player_voted.toast.title", playerName, voteInfo.name,
+                        result ? Text.translatable("gui.battlegrounds.vote.accept") : Text.translatable("gui.battlegrounds.vote.deny")),
+                Text.translatable("gui.battlegrounds.vote.player_voted.toast.subtitle"),
                 Duration.withSeconds(5)
         );
     }

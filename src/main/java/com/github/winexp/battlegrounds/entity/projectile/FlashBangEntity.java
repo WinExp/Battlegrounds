@@ -7,8 +7,10 @@ import com.github.winexp.battlegrounds.network.packet.s2c.play.FlashS2CPacket;
 import com.github.winexp.battlegrounds.util.MathUtil;
 import com.github.winexp.battlegrounds.util.WorldUtil;
 import com.github.winexp.battlegrounds.util.raycast.BlockRaycastResult;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -59,7 +61,9 @@ public class FlashBangEntity extends ThrownItemEntity {
     };
 
     static {
-        ClientTickEvents.END_CLIENT_TICK.register(FlashBangEntity::clientTick);
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+            ClientTickEvents.END_CLIENT_TICK.register(FlashBangEntity::clientTick);
+        }
     }
 
     public FlashBangEntity(net.minecraft.entity.EntityType<? extends ThrownItemEntity> entityType, World world) {

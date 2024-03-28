@@ -62,22 +62,17 @@ public class VoteListWidget extends AlwaysSelectedEntryListWidget<VoteListWidget
     @Environment(EnvType.CLIENT)
     public static final class VoteEntry extends Entry {
         private final MinecraftClient client;
-        private final VoteListWidget parent;
         public final VoteInfo voteInfo;
         private boolean selectable = true;
 
-        public VoteEntry(VoteListWidget parent, VoteInfo voteInfo) {
+        public VoteEntry(VoteInfo voteInfo) {
             this.client = MinecraftClient.getInstance();
-            this.parent = parent;
             this.voteInfo = voteInfo;
         }
 
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            if (this.selectable) {
-                this.parent.setSelected(this);
-            }
-            return true;
+            return this.isSelectable();
         }
 
         @Override
@@ -99,7 +94,7 @@ public class VoteListWidget extends AlwaysSelectedEntryListWidget<VoteListWidget
         }
 
         public boolean isSelectable() {
-            return selectable;
+            return this.selectable && this.voteInfo.available;
         }
 
         public void setSelectable(boolean selectable) {

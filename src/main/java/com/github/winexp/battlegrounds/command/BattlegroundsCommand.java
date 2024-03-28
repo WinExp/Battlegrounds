@@ -4,24 +4,29 @@ import com.github.winexp.battlegrounds.Battlegrounds;
 import com.github.winexp.battlegrounds.discussion.vote.VoteManager;
 import com.github.winexp.battlegrounds.discussion.vote.VotePreset;
 import com.github.winexp.battlegrounds.entity.projectile.FlashBangEntity;
+import com.github.winexp.battlegrounds.game.GameProperties;
 import com.github.winexp.battlegrounds.task.TaskScheduler;
 import com.github.winexp.battlegrounds.util.*;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.GameModeArgumentType;
+import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.command.argument.Vec3ArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 
 import java.util.Collection;
+import java.util.Map;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
@@ -29,7 +34,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class BattlegroundsCommand {
     public static void registerRoot(CommandDispatcher<ServerCommandSource> dispatcher) {
         var cRoot = literal("battlegrounds");
-        var cStart = literal("start").executes(BattlegroundsCommand::executeStart);
+        var cStart = registerStart();
         var cStop = literal("stop").requires(source ->
                 source.hasPermissionLevel(2)).executes(BattlegroundsCommand::executeStop);
         var cReload = literal("reload").requires(source ->
@@ -40,6 +45,14 @@ public class BattlegroundsCommand {
         // 命令缩写
         var cRoot_redir = literal("bg").redirect(cNode);
         dispatcher.register(cRoot_redir);
+    }
+
+    public static ArgumentBuilder<ServerCommandSource, ?> registerStart() {
+        var cStart = literal("start");
+        var aProp = argument("gameProperties", IdentifierArgumentType.identifier()).suggests(((context, builder) ->
+                CommandSource.suggestMatching(Battlegrounds.GAME_PRESETS.keySet().stream().map(Identifier::toString), builder)))
+                .executes(BattlegroundsCommand::executeStart);
+        return cStart.then(aProp);
     }
 
     public static ArgumentBuilder<ServerCommandSource, ?> registerSummonFlash() {
@@ -91,21 +104,27 @@ public class BattlegroundsCommand {
         return 1;
     }
 
-    private static int executeStart(CommandContext<ServerCommandSource> context) {
+    private static int executeStart(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerCommandSource source = context.getSource();
+        Identifier id = IdentifierArgumentType.getIdentifier(context, "gameProperties");
+        if (!Battlegrounds.GAME_PRESETS.containsKey(id)) {
+            throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument().create();
+        }
+        GameProperties gameProperties = Battlegrounds.GAME_PRESETS.get(id);
         if (VoteManager.INSTANCE.containsVote(VotePreset.START_GAME.identifier())) {
             source.sendFeedback(() -> Text.translatable("vote.battlegrounds.already_voting.feedback")
                     .formatted(Formatting.RED), false);
         } else {
-            VoteManager.INSTANCE.openVoteWithPreset(VotePreset.START_GAME, Variables.server.getPlayerManager().getPlayerList())
+            VoteManager.INSTANCE.openVoteWithPreset(VotePreset.START_GAME, Variables.server.getPlayerManager().getPlayerList(),
+                            Map.of("gameProperties", gameProperties))
                     .orElseThrow();
         }
         return 1;
     }
 
     private static int executeStop(CommandContext<ServerCommandSource> context) {
-        VoteManager.INSTANCE.closeVote(VotePreset.START_GAME.identifier());
-        TaskScheduler.INSTANCE.cancelAllTask();
+        VoteManager.INSTANCE.closeAllVotes();
+        TaskScheduler.INSTANCE.cancelAllTasks();
         Variables.gameManager.stopGame();
         context.getSource().sendFeedback(() -> Text.translatable("battlegrounds.command.stop.feedback")
                 .formatted(Formatting.GREEN), true);

@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 
 public class ServerGameEvents {
     public static Event<StageChanged> STAGE_CHANGED = EventFactory.createArrayBacked(StageChanged.class,
@@ -28,7 +29,7 @@ public class ServerGameEvents {
 
     @FunctionalInterface
     public interface StageChanged {
-        void onStageChanged(Identifier id);
+        void onStageChanged(@Nullable Identifier id);
     }
 
     @FunctionalInterface
