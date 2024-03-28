@@ -1,6 +1,5 @@
 package com.github.winexp.battlegrounds.discussion.vote;
 
-import com.github.winexp.battlegrounds.game.GameManager;
 import com.github.winexp.battlegrounds.util.Variables;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -15,11 +14,13 @@ public record VotePreset(Identifier identifier, Text name, Text description, Vot
             new VoteSettings(
                     (voteInstance, closeReason) -> {
                         if (closeReason == VoteSettings.CloseReason.ACCEPTED) {
-                            GameManager.INSTANCE.prepareResetWorlds(voteInstance.getParticipants());
+                            Variables.gameManager.prepareToDeleteWorld(voteInstance.getParticipants());
                         }
                     },
                     (voteInstance, player, result) -> {},
                     VoteSettings.VoteMode.ALL_ACCEPT,
-                    Variables.config.cooldown.startGameVoteCooldownTicks
+                    Variables.config.votes()
+                            .get(new Identifier("battlegrounds", "start_game"))
+                            .timeout().toTicks()
     ));
 }

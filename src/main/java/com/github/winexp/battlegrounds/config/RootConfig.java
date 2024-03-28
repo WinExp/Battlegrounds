@@ -1,44 +1,52 @@
 package com.github.winexp.battlegrounds.config;
 
-public class RootConfig {
-    public final CooldownConfig cooldown = new CooldownConfig();
-    public final DelayConfig delay = new DelayConfig();
-    public final BorderConfig border = new BorderConfig();
+import com.github.winexp.battlegrounds.util.time.Duration;
+import com.google.common.collect.ImmutableMap;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.util.Identifier;
 
-    public static class CooldownConfig {
-        public final long startGameVoteCooldownTicks = 30 * 20;
-        public final long randomTpCooldownTicks = 2 * 60 * 20;
-        public final long randomTpDamagedCooldownTicks = 20 * 20;
+import java.util.Map;
+
+public record RootConfig(RandomTpConfig randomTp, Map<Identifier, VoteConfig> votes) implements IConfig<RootConfig> {
+    public static final Codec<RootConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            RandomTpConfig.CODEC.fieldOf("random_tp").forGetter(RootConfig::randomTp),
+            Codec.unboundedMap(Identifier.CODEC, VoteConfig.CODEC).fieldOf("votes").forGetter(RootConfig::votes)
+    ).apply(instance, RootConfig::new));
+
+    public static final RootConfig DEFAULT_CONFIG = new RootConfig(
+            new RandomTpConfig(
+                    Duration.withSeconds(30),
+                    Duration.withSeconds(20),
+                    Map.of(
+                            new Identifier("battlegrounds", "develop"), Duration.withMinutes(2),
+                            new Identifier("battlegrounds", "deathmatch"), Duration.withMinutes(4)
+                    )
+            ),
+            ImmutableMap.of(
+                    new Identifier("battlegrounds", "start_game"),
+                    new VoteConfig(
+                            Duration.withSeconds(30)
+                    )
+            )
+    );
+
+    @Override
+    public Codec<RootConfig> getCodec() {
+        return CODEC;
     }
 
-    public static class DelayConfig {
-        public final int serverCloseDelaySeconds = 10;
-        public final int gameStartDelaySeconds = 10;
+    public record RandomTpConfig(Duration defaultCooldown, Duration damagedCooldown, Map<Identifier, Duration> cooldownMap) {
+        public static final Codec<RandomTpConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                Duration.CODEC.fieldOf("default_cooldown").forGetter(RandomTpConfig::defaultCooldown),
+                Duration.CODEC.fieldOf("damaged_cooldown").forGetter(RandomTpConfig::damagedCooldown),
+                Codec.unboundedMap(Identifier.CODEC, Duration.CODEC).fieldOf("cooldownMap").forGetter(RandomTpConfig::cooldownMap)
+        ).apply(instance, RandomTpConfig::new));
     }
 
-    public static class BorderConfig {
-        public final int initialSize = 5000;
-        public final int resizeBlocks = 500;
-        public final int totalAmount = 4;
-        public final TimeConfig time = new TimeConfig();
-        public final BorderOrdinalConfig borderOrdinal = new BorderOrdinalConfig();
-        public final DeathmatchConfig deathmatch = new DeathmatchConfig();
-
-        public static class TimeConfig {
-            public final long resizeSpendTicks = 4 * 60 * 20;
-            public final int resizeDelayTicks = 3 * 60 * 20;
-        }
-
-        public static class BorderOrdinalConfig {
-            public final int pvpEnabledBorderOrdinal = 2;
-            public final int finalBorderOrdinal = 3;
-            public final int deathmatchBeginBorderOrdinal = 3;
-        }
-
-        public static class DeathmatchConfig {
-            public final int initialSize = 300;
-            public final long resizeSpendTicks = 5 * 60 * 20;
-            public final int finalSize = 150;
-        }
+    public record VoteConfig(Duration timeout) {
+        public static final Codec<VoteConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                Duration.CODEC.fieldOf("timeout").forGetter(VoteConfig::timeout)
+        ).apply(instance, VoteConfig::new));
     }
 }

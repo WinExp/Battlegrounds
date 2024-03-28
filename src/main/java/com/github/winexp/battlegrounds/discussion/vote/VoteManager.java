@@ -1,26 +1,29 @@
 package com.github.winexp.battlegrounds.discussion.vote;
 
+import com.github.winexp.battlegrounds.event.ModServerPlayerEvents;
 import com.github.winexp.battlegrounds.event.ServerVoteEvents;
-import com.github.winexp.battlegrounds.network.packet.s2c.SyncVoteInfosS2CPacket;
-import com.github.winexp.battlegrounds.network.packet.s2c.VoteClosedPacket;
-import com.github.winexp.battlegrounds.network.packet.s2c.VoteOpenedPacket;
+import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.SyncVoteInfosS2CPacket;
+import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.VoteClosedPacket;
+import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.VoteOpenedPacket;
 import com.github.winexp.battlegrounds.util.Variables;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.network.ClientConnection;
+import net.minecraft.server.network.ConnectedClientData;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
 public class VoteManager {
     public static final VoteManager INSTANCE = new VoteManager();
 
-    private final HashMap<Identifier, @NotNull VoteInstance> voteMap = new HashMap<>();
+    private final ConcurrentHashMap<Identifier, VoteInstance> voteMap = new ConcurrentHashMap<>();
 
-    public VoteManager() {
+    protected VoteManager() {
         ServerVoteEvents.CLOSED.register(this::onVoteClosed);
+        ModServerPlayerEvents.PLAYER_JOINED.register(this::onPlayerJoined);
     }
 
     private void onVoteClosed(VoteInfo voteInfo, VoteSettings.CloseReason reason) {
@@ -30,6 +33,10 @@ public class VoteManager {
             VoteClosedPacket packet = new VoteClosedPacket(voteInfo, reason);
             ServerPlayNetworking.send(player, packet);
         }
+    }
+
+    private void onPlayerJoined(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData clientData) {
+        this.syncVoteInfos(player);
     }
 
     public void syncVoteInfos(ServerPlayerEntity player) {
@@ -61,12 +68,11 @@ public class VoteManager {
     }
 
 
-    @Nullable
-    public VoteInstance openVoteWithPreset(VotePreset preset, Collection<ServerPlayerEntity> participants) {
+    public Optional<VoteInstance> openVoteWithPreset(VotePreset preset, Collection<ServerPlayerEntity> participants) {
         VoteInstance instance = new VoteInstance(preset.identifier(), preset.name(), preset.description(), preset.voteSettings());
         if (this.openVote(instance, participants)) {
-            return instance;
-        } else return null;
+            return Optional.of(instance);
+        } else return Optional.empty();
     }
 
     public boolean openVote(VoteInstance voteInstance, Collection<ServerPlayerEntity> participants) {

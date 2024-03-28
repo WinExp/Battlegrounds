@@ -1,40 +1,38 @@
 package com.github.winexp.battlegrounds.task;
 
-import java.util.function.LongSupplier;
+import java.util.concurrent.CancellationException;
+import java.util.function.IntSupplier;
 
-public class RepeatTask extends ScheduledTask {
-    public static final RepeatTask NONE_TASK = new RepeatTask(AbstractTask.NONE_RUNNABLE, -1, -1);
-    private final Runnable fixedRunnable;
-    private final LongSupplier repeatDelay;
+public abstract class RepeatTask extends ScheduledTask {
+    public static final RepeatTask NONE_TASK = new RepeatTask(-1, -1) {
+        @Override
+        public void onTriggered() throws CancellationException {
+        }
+    };
+    private final IntSupplier repeatDelay;
 
-    public RepeatTask(Runnable runnable, long delay, LongSupplier repeatDelay) {
-        super(runnable, delay);
-
-        this.fixedRunnable = () -> {
-            try {
-                super.getRunnable().run();
-            } catch (TaskCancelledException e) {
-                e.ensureNotAbsolute();
-            }
-
-            if (this.delay <= 0) {
-                this.delay = repeatDelay.getAsLong();
-            }
-        };
-
+    public RepeatTask(int delay, IntSupplier repeatDelay) {
+        super(delay);
         this.repeatDelay = repeatDelay;
     }
 
-    public RepeatTask(Runnable runnable, long delay, long repeatDelay) {
-        this(runnable, delay, () -> repeatDelay);
-    }
-
-    @Override
-    public Runnable getRunnable() {
-        return this.fixedRunnable;
+    public RepeatTask(int delay, int repeatDelay) {
+        this(delay, () -> repeatDelay);
     }
 
     public long getRepeatDelay() {
-        return this.repeatDelay.getAsLong();
+        return this.repeatDelay.getAsInt();
+    }
+
+    public void resetDelay() {
+        this.delay = this.repeatDelay.getAsInt();
+    }
+
+    public abstract void onTriggered() throws CancellationException;
+
+    @Override
+    public void run() throws CancellationException {
+        this.onTriggered();
+        this.resetDelay();
     }
 }

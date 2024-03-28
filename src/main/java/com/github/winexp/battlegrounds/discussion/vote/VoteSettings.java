@@ -1,14 +1,14 @@
 package com.github.winexp.battlegrounds.discussion.vote;
 
-import com.github.winexp.battlegrounds.util.function.TripleConsumer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.apache.commons.lang3.function.TriConsumer;
 
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 
-public record VoteSettings(BiConsumer<VoteInstance, CloseReason> voteClosedAction, TripleConsumer<VoteInstance, ServerPlayerEntity, Boolean> playerVotedAction,
-                           VoteMode voteMode, long timeout) {
-    public static final long INFINITE_TIME = -1;
+public record VoteSettings(BiConsumer<VoteInstance, CloseReason> voteClosedAction, TriConsumer<VoteInstance, ServerPlayerEntity, Boolean> playerVotedAction,
+                           VoteMode voteMode, int timeout) {
+    public static final int INFINITE_TIME = -1;
 
     public enum CloseReason {
         ACCEPTED, DENIED, TIMEOUT, MANUAL

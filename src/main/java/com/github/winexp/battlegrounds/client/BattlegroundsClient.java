@@ -1,11 +1,12 @@
 package com.github.winexp.battlegrounds.client;
 
 import com.github.winexp.battlegrounds.client.gui.screen.vote.VoteScreen;
-import com.github.winexp.battlegrounds.client.network.ModClientNetworkPlayHandler;
+import com.github.winexp.battlegrounds.client.network.ModClientConfigurationNetworkHandler;
+import com.github.winexp.battlegrounds.client.network.ModClientPlayNetworkHandler;
 import com.github.winexp.battlegrounds.client.render.FlashRenderer;
 import com.github.winexp.battlegrounds.client.render.entity.ChannelingArrowEntityRenderer;
-import com.github.winexp.battlegrounds.client.toast.VoteClosedToast;
-import com.github.winexp.battlegrounds.client.toast.VoteOpenedToast;
+import com.github.winexp.battlegrounds.client.toast.vote.VoteClosedToast;
+import com.github.winexp.battlegrounds.client.toast.vote.VoteOpenedToast;
 import com.github.winexp.battlegrounds.entity.EntityTypes;
 import com.github.winexp.battlegrounds.event.ClientApplyFogCallback;
 import com.github.winexp.battlegrounds.event.ClientVoteEvents;
@@ -28,8 +29,9 @@ public class BattlegroundsClient implements ClientModInitializer {
         EntityRendererRegistry.register(EntityTypes.MOLOTOV, FlyingItemEntityRenderer::new);
 
         // 自定义渲染器
-        HudRenderCallback.EVENT.register(new FlashRenderer());
-        ClientApplyFogCallback.EVENT.register(new FlashRenderer());
+        FlashRenderer flashRenderer = new FlashRenderer();
+        HudRenderCallback.EVENT.register(flashRenderer);
+        ClientApplyFogCallback.EVENT.register(flashRenderer);
     }
 
     @Override
@@ -48,8 +50,9 @@ public class BattlegroundsClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(VoteScreen::globalTick);
         // 注册实体渲染器
         this.registerRenderer();
-        // 注册网络包接收器
-        ModClientNetworkPlayHandler.registerReceivers();
+        // 注册网络包相关
+        ModClientConfigurationNetworkHandler.register();
+        ModClientPlayNetworkHandler.registerReceivers();
         // 注册按键绑定
         KeyBindings.registerKeyBindings();
         // 注册物品模型谓词

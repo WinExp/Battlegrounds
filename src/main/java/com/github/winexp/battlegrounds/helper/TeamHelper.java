@@ -1,6 +1,5 @@
 package com.github.winexp.battlegrounds.helper;
 
-import com.github.winexp.battlegrounds.util.Variables;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.scoreboard.ScoreHolder;
 import net.minecraft.scoreboard.Scoreboard;
@@ -40,7 +39,7 @@ public class TeamHelper {
     }
 
     public void assignPlayers(Collection<ServerPlayerEntity> players) {
-        if (this.maxPlayers * this.teams.size() > Variables.progress.players.keySet().size()) throw new RuntimeException("玩家数量不足");
+        if (this.maxPlayers * this.teams.size() > players.size()) throw new RuntimeException("玩家数量不足");
         for (ServerPlayerEntity player : players) {
             if (player != null) {
                 while (true) {

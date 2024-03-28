@@ -3,73 +3,101 @@ package com.github.winexp.battlegrounds;
 import com.github.winexp.battlegrounds.block.BlockSmeltableRegistry;
 import com.github.winexp.battlegrounds.command.BattlegroundsCommand;
 import com.github.winexp.battlegrounds.command.RandomTpCommand;
-import com.github.winexp.battlegrounds.config.GameProgress;
+import com.github.winexp.battlegrounds.config.ConfigUtil;
 import com.github.winexp.battlegrounds.config.RootConfig;
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.entity.EntityTypes;
-import com.github.winexp.battlegrounds.event.ModServerPlayerEvents;
 import com.github.winexp.battlegrounds.game.GameManager;
+import com.github.winexp.battlegrounds.game.GameProperties;
+import com.github.winexp.battlegrounds.game.GameUtil;
 import com.github.winexp.battlegrounds.item.ItemGroups;
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.loot.LootTableModifier;
-import com.github.winexp.battlegrounds.network.ModServerNetworkPlayHandler;
+import com.github.winexp.battlegrounds.network.ModServerConfigurationNetworkHandler;
+import com.github.winexp.battlegrounds.network.ModServerPlayNetworkHandler;
 import com.github.winexp.battlegrounds.sound.SoundEvents;
-import com.github.winexp.battlegrounds.util.ConfigUtil;
+import com.github.winexp.battlegrounds.task.TaskScheduler;
 import com.github.winexp.battlegrounds.util.Constants;
-import com.github.winexp.battlegrounds.util.PlayerUtil;
+import com.github.winexp.battlegrounds.util.FileUtil;
 import com.github.winexp.battlegrounds.util.Variables;
+import com.google.gson.JsonElement;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.serialization.JsonOps;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.WhitelistEntry;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.WorldSavePath;
+import net.minecraft.util.Identifier;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
 
 public class Battlegrounds implements ModInitializer {
     public static Battlegrounds INSTANCE;
+    public static final HashMap<Identifier, GameProperties> GAME_PRESETS = new HashMap<>();
 
-    public void saveConfigs() {
-        ConfigUtil.saveConfig(Constants.CONFIG_PATH, "config", Variables.config);
-        if (Variables.server != null) {
-            if (GameManager.INSTANCE.reduceTask.getDelay() >= 0) {
-                Variables.progress.resizeLapTimer = GameManager.INSTANCE.reduceTask.getDelay();
+    public void loadGamePresets() {
+        this.saveGamePresets();
+        GAME_PRESETS.clear();
+        for (File directory : FileUtil.listFiles(Constants.CONFIG_PATH.resolve("presets"))) {
+            if (directory.isDirectory()) {
+                for (File file : FileUtil.listFiles(directory.toPath())) {
+                    if (file.isFile() && file.getName().endsWith(".json")) {
+                        try {
+                            JsonElement json = Constants.GSON.fromJson(FileUtil.readString(file), JsonElement.class);
+                            GameProperties preset = GameProperties.CODEC.parse(JsonOps.INSTANCE, json)
+                                    .getOrThrow(false, Constants.LOGGER::error);
+                            GAME_PRESETS.put(preset.id(), preset);
+                        } catch (Exception e) {
+                            Constants.LOGGER.error("无法将 %s 转换为 GamePreset：".formatted(file.toString()), e);
+                        }
+                    }
+                }
             }
-            ConfigUtil.saveConfig(Variables.server.getSavePath(WorldSavePath.ROOT), "bg_progress", Variables.progress);
+        }
+    }
+
+    public void saveGamePresets() {
+        List<GameProperties> presets = List.of(
+                GameProperties.NORMAL_PRESET
+        );
+        for (GameProperties preset : presets) {
+            Identifier id = preset.id();
+            File file = Constants.CONFIG_PATH.resolve("presets")
+                    .resolve(id.getNamespace())
+                    .resolve(id.getPath() + ".json").toFile();
+            if (!file.isFile()) {
+                JsonElement json = GameProperties.CODEC.encodeStart(JsonOps.INSTANCE, preset)
+                        .getOrThrow(false, Constants.LOGGER::error);
+                String jsonStr = Constants.GSON.toJson(json);
+                try {
+                    FileUtil.writeString(file, jsonStr);
+                } catch (Exception e) {
+                    Constants.LOGGER.error("无法将 GamePreset 写入文件 %s：".formatted(file.toString()), e);
+                }
+            }
         }
     }
 
     public void loadConfigs() {
-        Variables.config = ConfigUtil.readOrCreateConfig(Constants.CONFIG_PATH, "config", RootConfig.class);
-        if (Variables.server != null) {
-            Variables.progress = ConfigUtil.readOrCreateConfig(Variables.server.getSavePath(WorldSavePath.ROOT),
-                    "bg_progress",
-                    GameProgress.class);
-        }
+        Variables.config = ConfigUtil.readOrCreateConfig(
+                Constants.CONFIG_PATH, "config",
+                RootConfig.CODEC, RootConfig.DEFAULT_CONFIG
+        );
     }
 
     public void reload() {
         this.loadConfigs();
+        this.loadGamePresets();
+
         Items.addCustomRecipes();
-        GameManager.INSTANCE.reduceTask.cancel();
-        if (Variables.progress.gameStage.isStarted() && !Variables.progress.gameStage.isDeathmatch()) {
-            GameManager.INSTANCE.runTasks();
-        }
     }
 
     private void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
@@ -77,87 +105,55 @@ public class Battlegrounds implements ModInitializer {
         RandomTpCommand.register(dispatcher);
     }
 
+    private void onPlayInit(ServerPlayNetworkHandler handler, MinecraftServer server) {
+
+    }
+
     private void onServerStarting(MinecraftServer server) {
         Variables.server = server;
-        GameManager.INSTANCE.setServer(server);
         this.loadConfigs();
     }
 
     private void onServerStarted(MinecraftServer server) {
-        GameManager.INSTANCE.initialize();
+        Variables.gameManager = GameManager.getManager(server);
+    }
+
+    private void onServerStopping(MinecraftServer server) {
+        TaskScheduler.INSTANCE.cancelAllTask();
     }
 
     private void onSaving(MinecraftServer server, boolean flush, boolean force) {
-        this.saveConfigs();
+        this.loadConfigs();
     }
 
-    private void onPlayerRespawn(ServerPlayerEntity oldPlayer, ServerPlayerEntity newPlayer, boolean alive) {
-        PlayerUtil.changeGameModeWithMap(newPlayer);
-    }
-
-    private boolean allowLivingEntityDamage(LivingEntity entity, DamageSource source, float amount) {
-        if (entity instanceof ServerPlayerEntity) {
-            if (Variables.progress.pvpMode == GameProgress.PVPMode.PEACEFUL) {
-                return false;
-            } else if (Variables.progress.pvpMode == GameProgress.PVPMode.NO_PVP) {
-                return source.getSource() == null || !source.getSource().isPlayer();
-            }
+    private void tryDeleteWorld() {
+        if (Constants.DELETE_WORLD_TMP_FILE_PATH.toFile().isFile()) {
+            GameUtil.deleteWorld();
+            FileUtil.delete(Constants.DELETE_WORLD_TMP_FILE_PATH, true);
+            Constants.LOGGER.info("已重置地图");
         }
-        return true;
-    }
-
-    private void onPlayerJoin(ServerPlayNetworkHandler handler, PacketSender sender, MinecraftServer server) {
-        ServerPlayerEntity player = handler.player;
-        Text joinText = Text.empty();
-        if (Variables.progress.gameStage.isPreparing()) {
-            GameProgress.PlayerPermission permission = Variables.progress.players.get(PlayerUtil.getUUID(player));
-            if (permission != null && !permission.inGame) {
-                joinText = Text.translatable("battlegrounds.game.join.spectator.broadcast", player.getDisplayName())
-                        .formatted(Formatting.DARK_GRAY);
-            } else {
-                joinText = Text.translatable("battlegrounds.game.join.broadcast", player.getDisplayName(),
-                        Variables.server.getPlayerManager().getCurrentPlayerCount() + 1, Variables.progress.players.size())
-                        .formatted(Formatting.GREEN);
-                Variables.server.getPlayerManager().getWhitelist().add(new WhitelistEntry(player.getGameProfile()));
-                if (Variables.server.getPlayerManager().getPlayerList().size() + 1 == Variables.progress.players.size()) {
-                    GameManager.INSTANCE.prepareStartGame();
-                }
-            }
-        } else if (Variables.progress.gameStage.isDeathmatch()) {
-            player.sendMessage(Text.translatable("battlegrounds.game.deathmatch.start.broadcast")
-                    .formatted(Formatting.GOLD), false);
-        }
-        server.getPlayerManager().broadcast(joinText, false);
-        PlayerUtil.changeGameModeWithMap(player);
-    }
-
-    private boolean allowPlayerNaturalRegen(PlayerEntity player) {
-        if (player.getWorld().isClient) return true;
-        GameProgress.PlayerPermission permission = Variables.progress.players.get(PlayerUtil.getUUID(player));
-        return permission == null || permission.naturalRegen;
     }
 
     @Override
     public void onInitialize() {
         INSTANCE = this;
-        Constants.LOGGER.info("Loading {}", Constants.MOD_ID);
+        Constants.LOGGER.info("Loading {}", Constants.MOD_NAME);
         // 加载配置
         this.loadConfigs();
+        this.loadGamePresets(); // 加载游戏预设
         // 注册事件
         // 指令
         CommandRegistrationCallback.EVENT.register(this::registerCommands);
         // Fabric API
         ServerLifecycleEvents.SERVER_STARTING.register(this::onServerStarting);
         ServerLifecycleEvents.SERVER_STARTED.register(this::onServerStarted);
+        ServerLifecycleEvents.SERVER_STOPPING.register(this::onServerStopping);
         ServerLifecycleEvents.AFTER_SAVE.register(this::onSaving);
-        ServerPlayConnectionEvents.JOIN.register(this::onPlayerJoin);
-        ServerLivingEntityEvents.ALLOW_DAMAGE.register(this::allowLivingEntityDamage);
-        ServerPlayerEvents.AFTER_RESPAWN.register(this::onPlayerRespawn);
         LootTableEvents.MODIFY.register(new LootTableModifier());
-        // 自定义事件
-        ModServerPlayerEvents.ALLOW_NATURAL_REGEN.register(this::allowPlayerNaturalRegen);
-        // 注册网络包接收器
-        ModServerNetworkPlayHandler.registerReceivers();
+        ServerPlayConnectionEvents.INIT.register(this::onPlayInit);
+        // 注册网络包相关
+        ModServerConfigurationNetworkHandler.registerReceivers();
+        ModServerPlayNetworkHandler.register();
         // 注册物品
         Items.registerItems();
         // 注册物品组
@@ -171,6 +167,6 @@ public class Battlegrounds implements ModInitializer {
         // 注册声音事件
         SoundEvents.registerSoundEvents();
         // 尝试重置存档
-        GameManager.INSTANCE.tryResetWorlds();
+        this.tryDeleteWorld();
     }
 }

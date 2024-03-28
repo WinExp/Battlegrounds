@@ -4,8 +4,7 @@ import com.github.winexp.battlegrounds.Battlegrounds;
 import com.github.winexp.battlegrounds.discussion.vote.VoteManager;
 import com.github.winexp.battlegrounds.discussion.vote.VotePreset;
 import com.github.winexp.battlegrounds.entity.projectile.FlashBangEntity;
-import com.github.winexp.battlegrounds.game.GameManager;
-import com.github.winexp.battlegrounds.task.TaskExecutor;
+import com.github.winexp.battlegrounds.task.TaskScheduler;
 import com.github.winexp.battlegrounds.util.*;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.ArgumentBuilder;
@@ -98,15 +97,16 @@ public class BattlegroundsCommand {
             source.sendFeedback(() -> Text.translatable("vote.battlegrounds.already_voting.feedback")
                     .formatted(Formatting.RED), false);
         } else {
-            VoteManager.INSTANCE.openVoteWithPreset(VotePreset.START_GAME, Variables.server.getPlayerManager().getPlayerList());
+            VoteManager.INSTANCE.openVoteWithPreset(VotePreset.START_GAME, Variables.server.getPlayerManager().getPlayerList())
+                    .orElseThrow();
         }
         return 1;
     }
 
     private static int executeStop(CommandContext<ServerCommandSource> context) {
         VoteManager.INSTANCE.closeVote(VotePreset.START_GAME.identifier());
-        TaskExecutor.INSTANCE.cancelAllTask();
-        GameManager.INSTANCE.stopGame();
+        TaskScheduler.INSTANCE.cancelAllTask();
+        Variables.gameManager.stopGame();
         context.getSource().sendFeedback(() -> Text.translatable("battlegrounds.command.stop.feedback")
                 .formatted(Formatting.GREEN), true);
 

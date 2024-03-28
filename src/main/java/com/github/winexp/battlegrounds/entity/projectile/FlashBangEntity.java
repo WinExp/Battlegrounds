@@ -3,7 +3,7 @@ package com.github.winexp.battlegrounds.entity.projectile;
 import com.github.winexp.battlegrounds.client.util.ClientVariables;
 import com.github.winexp.battlegrounds.entity.EntityTypes;
 import com.github.winexp.battlegrounds.item.Items;
-import com.github.winexp.battlegrounds.network.packet.s2c.FlashS2CPacket;
+import com.github.winexp.battlegrounds.network.packet.s2c.play.FlashS2CPacket;
 import com.github.winexp.battlegrounds.util.MathUtil;
 import com.github.winexp.battlegrounds.util.WorldUtil;
 import com.github.winexp.battlegrounds.util.raycast.BlockRaycastResult;

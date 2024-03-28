@@ -10,11 +10,11 @@ import net.minecraft.client.render.BackgroundRenderer;
 @FunctionalInterface
 public interface ClientApplyFogCallback {
     Event<ClientApplyFogCallback> EVENT = EventFactory.createArrayBacked(ClientApplyFogCallback.class,
-            (listeners) -> ((viewDistance, fogData) -> {
+            (listeners) -> (viewDistance, fogData) -> {
                 for (ClientApplyFogCallback listener : listeners) {
                     listener.onApplyFog(viewDistance, fogData);
                 }
-            }));
+            });
 
     void onApplyFog(float viewDistance, BackgroundRenderer.FogData fogData);
 }

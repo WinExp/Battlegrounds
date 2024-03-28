@@ -1,39 +1,37 @@
 package com.github.winexp.battlegrounds.task;
 
-public class ScheduledTask extends AbstractTask {
-    public static final ScheduledTask NONE_TASK = new ScheduledTask(AbstractTask.NONE_RUNNABLE, -1);
-    private final Runnable fixedRunnable;
-    protected long delay;
-    protected Runnable preTriggerRunnable = () -> {
+import java.util.concurrent.CancellationException;
+
+public abstract class ScheduledTask extends AbstractTask {
+    public static final ScheduledTask NONE_TASK = new ScheduledTask(-1) {
+        @Override
+        public void run() throws CancellationException {
+        }
     };
+    protected int delay;
 
-    public ScheduledTask(Runnable runnable, long delay) {
-        super(runnable);
-        fixedRunnable = () -> {
-            if (this.delay < 0) throw new TaskCancelledException(true);
-
-            this.delay--;
-
-            if (this.delay <= 0) {
-                try {
-                    this.preTriggerRunnable.run();
-                    super.getRunnable().run();
-                } catch (TaskCancelledException e) {
-                    e.ensureNotAbsolute();
-                }
-                throw new TaskCancelledException(false);
-            }
-        };
-
+    public ScheduledTask(int delay) {
+        super();
         this.delay = delay;
-    }
-
-    public long getDelay() {
-        return this.delay;
+        if (delay < 0) {
+            this.cancel();
+        }
     }
 
     @Override
-    public Runnable getRunnable() {
-        return this.fixedRunnable;
+    public void tick() throws CancellationException {
+        if (this.delay < 0) {
+            this.cancel();
+            throw new CancellationException();
+        }
+        this.delay--;
+        if (this.delay <= 0) {
+            this.delay = -1;
+            this.run();
+        }
+    }
+
+    public int getDelay() {
+        return this.delay;
     }
 }

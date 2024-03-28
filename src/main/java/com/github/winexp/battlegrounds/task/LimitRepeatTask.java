@@ -1,53 +1,43 @@
 package com.github.winexp.battlegrounds.task;
 
-import org.jetbrains.annotations.Range;
+import java.util.concurrent.CancellationException;
 
-public class LimitRepeatTask extends ScheduledTask {
-    public static final LimitRepeatTask NONE_TASK = new LimitRepeatTask(AbstractTask.NONE_RUNNABLE, AbstractTask.NONE_RUNNABLE, -1, 1, -1);
-    private final Runnable fixedRunnable;
-    private final long unitTicks;
+public abstract class LimitRepeatTask extends RepeatTask {
+    public static final LimitRepeatTask NONE_TASK = new LimitRepeatTask(-1, -1, -1) {
+        @Override
+        public void onTriggered() throws CancellationException {
+        }
+
+        @Override
+        public void onCompleted() throws CancellationException {
+        }
+    };
     private int count;
 
-    public LimitRepeatTask(Runnable trigger, Runnable triggerEnd, long delay, @Range(from = 1, to = Long.MAX_VALUE) long unitTicks, int count) {
-        super(trigger, delay);
-        fixedRunnable = () -> {
-            if (this.count < 0) {
-                throw new TaskCancelledException(true);
-            }
-
-            try {
-                if (this.count == 0) {
-                    super.preTriggerRunnable = () -> {
-                        triggerEnd.run();
-                        throw new TaskCancelledException(false);
-                    };
-                }
-                super.getRunnable().run();
-            } catch (TaskCancelledException e) {
-                e.ensureNotAbsolute();
-                this.count--;
-                this.delay = this.getUnitTicks();
-            }
-
-            if (this.count < 0) {
-                throw new TaskCancelledException(false);
-            }
-        };
-
+    public LimitRepeatTask(int delay, int repeatDelay, int count) {
+        super(delay, repeatDelay);
         this.count = count;
-        this.unitTicks = unitTicks;
+        if (count <= 0) {
+            this.cancel();
+        }
     }
 
+    public abstract void onTriggered() throws CancellationException;
+
+    public abstract void onCompleted() throws CancellationException;
+
     @Override
-    public Runnable getRunnable() {
-        return this.fixedRunnable;
+    public void run() throws CancellationException {
+        if (this.count <= 0) {
+            this.onCompleted();
+            this.cancel();
+            throw new CancellationException();
+        }
+        super.run();
+        this.count--;
     }
 
     public int getCount() {
         return this.count;
-    }
-
-    public long getUnitTicks() {
-        return this.unitTicks;
     }
 }

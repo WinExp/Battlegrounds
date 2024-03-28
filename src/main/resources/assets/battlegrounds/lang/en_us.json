@@ -1,10 +1,22 @@
 {
+  "advancements.battlegrounds.all_structures.description": "Arrived all structures",
+  "advancements.battlegrounds.all_structures.title": "Exploration, It never ends",
+  "advancements.battlegrounds.library.description": "Entering the library",
+  "advancements.battlegrounds.library.title": "Intelligentsia",
+  "advancements.battlegrounds.medieval_fortress.description": "Entering the medieval fortress",
+  "advancements.battlegrounds.medieval_fortress.title": "The Medieval fortress",
+  "advancements.battlegrounds.pvp_pro.description": "Got the PVP Pro",
+  "advancements.battlegrounds.pvp_pro.title": "Or PVP pro?",
+  "advancements.battlegrounds.relic_of_fantasy.description": "Entering the relic of fantasy",
+  "advancements.battlegrounds.relic_of_fantasy.title": "Dream on",
   "advancements.battlegrounds.root.description": "The origin of legends",
   "advancements.battlegrounds.root.title": "Battlegrounds",
+  "advancements.battlegrounds.seven_eleven.description": "Got the 7-Eleven",
+  "advancements.battlegrounds.seven_eleven.title": "Walk 10,000 miles a day",
   "advancements.battlegrounds.wine_shop.description": "Entering the wine shop",
   "advancements.battlegrounds.wine_shop.title": "Even good wine fears the depth of the alley",
 
-  "battlegrounds.border.bar": "%d seconds to next lap",
+  "battlegrounds.resize_border.bar": "%d seconds to next lap",
 
   "battlegrounds.command.randomtp.delay.feedback": "Random Teleportation is on cooldown with %d seconds remaining.",
   "battlegrounds.command.randomtp.feedback": "Trying to randomly teleport...",
@@ -13,20 +25,24 @@
 
   "battlegrounds.game.already.broadcast": "All players have joined the server and are about to start the game!",
   "battlegrounds.game.border.reduce.broadcast": "The arena is shrinking!",
-  "battlegrounds.game.deathmatch.already.broadcast": "The Deathmatch will begin in %d minutes!",
   "battlegrounds.game.deathmatch.start.broadcast": "You are in Deathmatch mode!",
-  "battlegrounds.game.end.broadcast": "Game over! %s is the final winner!",
+  "battlegrounds.game.won.broadcast": "Game over! %s is the final winner!",
   "battlegrounds.game.join.broadcast": "%s joined the game! (%d/%d)",
   "battlegrounds.game.join.spectator.broadcast": "%s joined to the game! (Spectator)",
   "battlegrounds.game.pvp.enable.broadcast": "PVP has been enabled!",
   "battlegrounds.game.server.stop": "The server is restarting to reset the map",
-  "battlegrounds.game.start.broadcast": "The game is about to start and will restart the server in %d seconds.",
+  "battlegrounds.game.delete_world.broadcast": "The game is about to start and will restart the server in %d seconds.",
+
+  "battlegrounds.network.config.mod_info.failed": "Your version of Battlegrounds is not compatible with the server!\nYour version: %s-%d\nServer version: %s-%d",
+  "battlegrounds.network.config.mod_info.not_found": "Your version of Battlegrounds is too old or you don't have Battlegrounds installed.\nServer version: %s-%d",
 
   "enchantment.battlegrounds.channeling_pro": "Channeling Pro Max",
   "enchantment.battlegrounds.leaching": "Leaching",
   "enchantment.battlegrounds.smelting": "Smelting",
   "enchantment.battlegrounds.steves_pain": "Steve's Pain",
   "enchantment.battlegrounds.vitality": "Vitality",
+
+  "entity.battlegrounds.channeling_arrow": "Channeling Arrow",
 
   "gui.battlegrounds.vote.accept": "Accept",
   "gui.battlegrounds.vote.closed.toast.subtitle": "You can open the voting screen to view",

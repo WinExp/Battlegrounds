@@ -1,6 +1,7 @@
 package com.github.winexp.battlegrounds.command;
 
-import com.github.winexp.battlegrounds.task.TaskExecutor;
+import com.github.winexp.battlegrounds.event.ServerGameEvents;
+import com.github.winexp.battlegrounds.task.TaskScheduler;
 import com.github.winexp.battlegrounds.task.RepeatTask;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
 import com.github.winexp.battlegrounds.util.Variables;
@@ -14,14 +15,17 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CancellationException;
 
 public class RandomTpCommand {
-    private static final HashMap<UUID, Long> cooldownTimers = new HashMap<>();
+    private static final HashMap<UUID, Integer> cooldownTimers = new HashMap<>();
     private static RepeatTask coolDownUpdateTask = RepeatTask.NONE_TASK;
+    private static Identifier cooldownId;
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         var cRoot = CommandManager.literal("randomtp").requires(ServerCommandSource::isExecutedByPlayer)
@@ -34,22 +38,47 @@ public class RandomTpCommand {
 
         dispatcher.register(cRoot_redir);
 
-        ServerLivingEntityEvents.ALLOW_DAMAGE.register(RandomTpCommand::allowLivingEntityDamage);
+        ServerLivingEntityEvents.ALLOW_DAMAGE.register(RandomTpCommand::onLivingEntityDamaged);
+        ServerGameEvents.STAGE_CHANGED.register(RandomTpCommand::onGameStageChanged);
     }
 
-    public static boolean allowLivingEntityDamage(LivingEntity entity, DamageSource source, float amount) {
+    private static void onGameStageChanged(Identifier id) {
+        if (id == null) {
+            cooldownId = null;
+        } else if (Variables.config.randomTp().cooldownMap().get(id) != null) {
+            cooldownId = id;
+        }
+    }
+
+    private static boolean onLivingEntityDamaged(LivingEntity entity, DamageSource source, float amount) {
         if (entity instanceof ServerPlayerEntity player) {
-            if (Variables.progress.gameStage.isStarted() && source.getSource() != null
-                    && source.getSource().isPlayer() && Variables.progress.isInGame(PlayerUtil.getUUID(player))) {
-                RandomTpCommand.setCooldown(player, Variables.config.cooldown.randomTpDamagedCooldownTicks);
+            UUID uuid = PlayerUtil.getAuthUUID(player);
+            if (Variables.gameManager.getGameStage().isGaming() && source.getSource() != null
+                    && source.getSource().isPlayer()
+                    && Variables.gameManager.isParticipant(uuid)) {
+                RandomTpCommand.updateCooldown(uuid, getConfigCooldown());
             }
         }
         return true;
     }
 
-    public static void setCooldown(ServerPlayerEntity player, long cooldown) {
-        UUID uuid = PlayerUtil.getUUID(player);
-        Long currentCooldown;
+    public static int getConfigCooldown() {
+        int cooldown = Variables.config.randomTp().defaultCooldown().toTicks();
+        if (cooldownId != null
+                && Variables.config.randomTp().cooldownMap().get(cooldownId) != null) {
+            cooldown = Variables.config.randomTp().cooldownMap().get(cooldownId).toTicks();
+        }
+        return cooldown;
+    }
+
+    public static void updateCooldown(UUID uuid, int cooldown) {
+        if (cooldownTimers.get(uuid) == null || cooldown > cooldownTimers.get(uuid)) {
+            setCooldown(uuid, cooldown);
+        }
+    }
+
+    public static void setCooldown(UUID uuid, int cooldown) {
+        Integer currentCooldown;
         if ((currentCooldown = cooldownTimers.putIfAbsent(uuid, cooldown)) != null) {
             cooldownTimers.put(uuid, Math.max(currentCooldown, cooldown));
         }
@@ -57,18 +86,23 @@ public class RandomTpCommand {
 
     private static int randomtp(CommandContext<ServerCommandSource> context) {
         if (coolDownUpdateTask == RepeatTask.NONE_TASK) {
-            coolDownUpdateTask = new RepeatTask(() -> cooldownTimers.forEach((uuid, ticks) -> {
-                if (ticks <= 0) return;
-                cooldownTimers.put(uuid, ticks - 1);
-            }), 0, 1);
+            coolDownUpdateTask = new RepeatTask(0, 1) {
+                @Override
+                public void onTriggered() throws CancellationException {
+                    cooldownTimers.replaceAll((uuid, cooldown) -> {
+                        if (cooldown > 0) return cooldown - 1;
+                        else return 0;
+                    });
+                }
+            };
         }
-        TaskExecutor.INSTANCE.execute(coolDownUpdateTask);
+        TaskScheduler.INSTANCE.schedule(coolDownUpdateTask);
 
         ServerCommandSource source = context.getSource();
         assert source.getPlayer() != null;
-        UUID uuid = PlayerUtil.getUUID(source.getPlayer());
-        if (!cooldownTimers.containsKey(uuid)) cooldownTimers.put(uuid, 0L);
-        Long cooldown = cooldownTimers.get(uuid);
+        UUID uuid = PlayerUtil.getAuthUUID(source.getPlayer());
+        if (!cooldownTimers.containsKey(uuid)) cooldownTimers.put(uuid, 0);
+        Integer cooldown = cooldownTimers.get(uuid);
         if (cooldown > 0) {
             source.sendFeedback(() -> Text.translatable("battlegrounds.command.randomtp.delay.feedback", cooldown / 20)
                     .formatted(Formatting.RED), false);
@@ -76,7 +110,7 @@ public class RandomTpCommand {
             source.sendFeedback(() -> Text.translatable("battlegrounds.command.randomtp.feedback")
                     .formatted(Formatting.GOLD), false);
             PlayerUtil.randomTeleport(Variables.server.getOverworld(), Objects.requireNonNull(source.getPlayer()));
-            cooldownTimers.put(uuid, Variables.config.cooldown.randomTpCooldownTicks);
+            updateCooldown(uuid, getConfigCooldown());
         }
 
         return 1;
