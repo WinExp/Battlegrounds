@@ -4,6 +4,7 @@ import com.github.winexp.battlegrounds.client.KeyBindings;
 import com.github.winexp.battlegrounds.discussion.vote.VoteInfo;
 import com.github.winexp.battlegrounds.network.packet.c2s.play.vote.VoteC2SPacket;
 import com.github.winexp.battlegrounds.network.packet.c2s.play.vote.SyncVoteInfosC2SPacket;
+import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.UpdateVoteInfoS2CPacket;
 import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.SyncVoteInfosS2CPacket;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -47,8 +48,6 @@ public class VoteScreen extends Screen {
         this.refreshButton.active = lastRefreshTime + 2000 <= System.currentTimeMillis();
         VoteListWidget.Entry entry = this.voteList.getSelectedOrNull();
         if (entry != null) {
-            if (entry instanceof VoteListWidget.VoteEntry voteEntry
-                    && !voteEntry.isSelectable()) return;
             this.acceptButton.active = true;
             this.denyButton.active = true;
         }
@@ -72,7 +71,7 @@ public class VoteScreen extends Screen {
         }
     }
 
-    public static void syncVoteInfoCallback(MinecraftClient client, SyncVoteInfosS2CPacket packet) {
+    public static void onSyncVoteInfos(MinecraftClient client, SyncVoteInfosS2CPacket packet) {
         voteInfosCache.clear();
         voteInfosCache.addAll(packet.voteInfos());
         if (client.currentScreen instanceof VoteScreen voteScreen) {
@@ -80,9 +79,20 @@ public class VoteScreen extends Screen {
         }
     }
 
+    public static void onUpdateVoteInfo(MinecraftClient client, UpdateVoteInfoS2CPacket packet) {
+        if (packet.voteInfo().isEmpty()) return;
+        VoteInfo voteInfo = packet.voteInfo().get();
+        voteInfosCache.remove(voteInfo);
+        voteInfosCache.add(voteInfo);
+        if (client.currentScreen instanceof VoteScreen voteScreen) {
+            voteScreen.updateVotesGUI();
+        }
+    }
+
     public void updateVotesGUI() {
-        this.voteList.setEntries(voteInfosCache.stream().map((voteInfo ->
-                new VoteListWidget.VoteEntry(this.voteList, voteInfo))).collect(Collectors.toList()));
+        this.voteList.setEntries(voteInfosCache.stream().map(VoteListWidget.VoteEntry::new)
+                .collect(Collectors.toList()));
+        this.updateButtonState();
     }
 
     private void onVoteButtonClicked(boolean result) {
@@ -92,6 +102,7 @@ public class VoteScreen extends Screen {
             ClientPlayNetworking.send(new VoteC2SPacket(identifier, result));
             voteEntry.setSelectable(false);
         }
+        this.voteList.setSelected(null);
         this.updateButtonState();
     }
 

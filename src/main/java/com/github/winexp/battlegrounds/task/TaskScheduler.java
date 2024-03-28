@@ -31,7 +31,7 @@ public class TaskScheduler {
         this.tasks.add(task);
     }
 
-    public void cancelAllTask() {
+    public void cancelAllTasks() {
         for (AbstractTask task : this.tasks) {
             task.cancel();
         }

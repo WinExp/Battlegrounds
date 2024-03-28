@@ -1,9 +1,11 @@
 package com.github.winexp.battlegrounds.task;
 
+import com.github.winexp.battlegrounds.util.time.Duration;
+
 import java.util.concurrent.CancellationException;
 
 public abstract class LimitRepeatTask extends RepeatTask {
-    public static final LimitRepeatTask NONE_TASK = new LimitRepeatTask(-1, -1, -1) {
+    public static final LimitRepeatTask NONE_TASK = new LimitRepeatTask(Duration.INFINITY, Duration.INFINITY, -1) {
         @Override
         public void onTriggered() throws CancellationException {
         }
@@ -14,7 +16,7 @@ public abstract class LimitRepeatTask extends RepeatTask {
     };
     private int count;
 
-    public LimitRepeatTask(int delay, int repeatDelay, int count) {
+    public LimitRepeatTask(Duration delay, Duration repeatDelay, int count) {
         super(delay, repeatDelay);
         this.count = count;
         if (count <= 0) {

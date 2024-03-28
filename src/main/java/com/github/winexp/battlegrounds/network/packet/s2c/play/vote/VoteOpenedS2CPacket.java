@@ -6,11 +6,11 @@ import net.fabricmc.fabric.api.networking.v1.PacketType;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
-public record VoteOpenedPacket(VoteInfo voteInfo) implements FabricPacket {
+public record VoteOpenedS2CPacket(VoteInfo voteInfo) implements FabricPacket {
     public static final Identifier ID = new Identifier("battlegrounds", "play/vote/vote_opened");
-    public static final PacketType<VoteOpenedPacket> TYPE = PacketType.create(ID, VoteOpenedPacket::new);
+    public static final PacketType<VoteOpenedS2CPacket> TYPE = PacketType.create(ID, VoteOpenedS2CPacket::new);
 
-    public VoteOpenedPacket(PacketByteBuf buf) {
+    public VoteOpenedS2CPacket(PacketByteBuf buf) {
         this(VoteInfo.PACKET_READER.apply(buf));
     }
 

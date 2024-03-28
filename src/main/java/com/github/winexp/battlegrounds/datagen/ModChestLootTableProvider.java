@@ -41,6 +41,8 @@ public class ModChestLootTableProvider extends SimpleFabricLootTableProvider {
                                         .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(2.0F, 4.0F))))
                                 .with(ItemEntry.builder(Items.GOLD_INGOT).weight(1)
                                         .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(3.0F, 8.0F))))
+                                .with(ItemEntry.builder(Items.EMERALD).weight(1)
+                                        .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(4.0F, 10.0F))))
                         )
                         .pool(LootPool.builder().rolls(UniformLootNumberProvider.create(1.0F, 2.0F))
                                 .with(ItemEntry.builder(Items.FLASH_BANG).weight(7))
@@ -52,7 +54,7 @@ public class ModChestLootTableProvider extends SimpleFabricLootTableProvider {
                                                 ConstantLootNumberProvider.create(0.0F),
                                                 UniformLootNumberProvider.create(0.2F, 0.8F)
                                         ))))
-                                .with(EmptyEntry.builder().weight(30))
+                                .with(EmptyEntry.builder().weight(24))
                         )
         );
         // crops

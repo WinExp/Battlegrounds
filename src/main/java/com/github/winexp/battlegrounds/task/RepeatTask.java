@@ -1,31 +1,33 @@
 package com.github.winexp.battlegrounds.task;
 
+import com.github.winexp.battlegrounds.util.time.Duration;
+
 import java.util.concurrent.CancellationException;
-import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 
 public abstract class RepeatTask extends ScheduledTask {
-    public static final RepeatTask NONE_TASK = new RepeatTask(-1, -1) {
+    public static final RepeatTask NONE_TASK = new RepeatTask(Duration.INFINITY, Duration.INFINITY) {
         @Override
         public void onTriggered() throws CancellationException {
         }
     };
-    private final IntSupplier repeatDelay;
+    private final Supplier<Duration> repeatDelay;
 
-    public RepeatTask(int delay, IntSupplier repeatDelay) {
+    public RepeatTask(Duration delay, Supplier<Duration> repeatDelay) {
         super(delay);
         this.repeatDelay = repeatDelay;
     }
 
-    public RepeatTask(int delay, int repeatDelay) {
+    public RepeatTask(Duration delay, Duration repeatDelay) {
         this(delay, () -> repeatDelay);
     }
 
-    public long getRepeatDelay() {
-        return this.repeatDelay.getAsInt();
+    public Duration getRepeatDelay() {
+        return this.repeatDelay.get();
     }
 
     public void resetDelay() {
-        this.delay = this.repeatDelay.getAsInt();
+        this.delay = this.repeatDelay.get().toTicks();
     }
 
     public abstract void onTriggered() throws CancellationException;

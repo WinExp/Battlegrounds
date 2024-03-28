@@ -5,6 +5,7 @@ import com.github.winexp.battlegrounds.task.TaskScheduler;
 import com.github.winexp.battlegrounds.task.RepeatTask;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
 import com.github.winexp.battlegrounds.util.Variables;
+import com.github.winexp.battlegrounds.util.time.Duration;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
@@ -16,6 +17,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Objects;
@@ -42,7 +44,7 @@ public class RandomTpCommand {
         ServerGameEvents.STAGE_CHANGED.register(RandomTpCommand::onGameStageChanged);
     }
 
-    private static void onGameStageChanged(Identifier id) {
+    private static void onGameStageChanged(@Nullable Identifier id) {
         if (id == null) {
             cooldownId = null;
         } else if (Variables.config.randomTp().cooldownMap().get(id) != null) {
@@ -86,7 +88,7 @@ public class RandomTpCommand {
 
     private static int randomtp(CommandContext<ServerCommandSource> context) {
         if (coolDownUpdateTask == RepeatTask.NONE_TASK) {
-            coolDownUpdateTask = new RepeatTask(0, 1) {
+            coolDownUpdateTask = new RepeatTask(Duration.ZERO, Duration.withTicks(1)) {
                 @Override
                 public void onTriggered() throws CancellationException {
                     cooldownTimers.replaceAll((uuid, cooldown) -> {
