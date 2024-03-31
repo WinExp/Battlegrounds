@@ -5,6 +5,7 @@ import com.github.winexp.battlegrounds.util.FileUtil;
 import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
+import net.minecraft.util.Util;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,14 +37,12 @@ public class ConfigUtil {
     public static <T extends Record> T readConfig(Path path, String configName, Codec<T> configCodec) {
         Path fileName = path.resolve(configName + ".json");
         JsonElement json = Constants.GSON.fromJson(FileUtil.readString(fileName), JsonElement.class);
-        return configCodec.parse(JsonOps.INSTANCE, json)
-                .getOrThrow(false, Constants.LOGGER::error);
+        return Util.getResult(configCodec.parse(JsonOps.INSTANCE, json), IllegalStateException::new);
     }
 
     public static <T extends Record> void writeConfig(Path path, String configName, IConfig<T> config) {
         Path fileName = path.resolve(configName + ".json");
-        JsonElement json = config.getCodec().encodeStart(JsonOps.INSTANCE, (T) config)
-                .getOrThrow(false, Constants.LOGGER::error);
-        FileUtil.writeString(fileName, json.toString());
+        JsonElement json = Util.getResult(config.getCodec().encodeStart(JsonOps.INSTANCE, (T) config), IllegalStateException::new);
+        FileUtil.writeString(fileName, Constants.GSON.toJson(json));
     }
 }

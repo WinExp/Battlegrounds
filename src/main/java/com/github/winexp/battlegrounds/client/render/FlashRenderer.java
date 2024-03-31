@@ -1,12 +1,13 @@
 package com.github.winexp.battlegrounds.client.render;
 
-import com.github.winexp.battlegrounds.client.util.ClientVariables;
 import com.github.winexp.battlegrounds.entity.projectile.FlashBangEntity;
 import com.github.winexp.battlegrounds.event.ClientApplyFogCallback;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BackgroundRenderer;
 import net.minecraft.client.render.FogShape;
@@ -16,9 +17,31 @@ import net.minecraft.util.math.MathHelper;
 
 @Environment(EnvType.CLIENT)
 public class FlashRenderer implements HudRenderCallback, ClientApplyFogCallback {
+    private float flashStrength;
+
+    public FlashRenderer() {
+        ClientTickEvents.END_CLIENT_TICK.register(this::tick);
+    }
+
+    private void tick(MinecraftClient client) {
+        if (this.flashStrength > 0) {
+            this.flashStrength -= FlashBangEntity.STRENGTH_LEFT_SPEED;
+        } else if (this.flashStrength < 0){
+            this.flashStrength = 0;
+        }
+    }
+
+    public float getFlashStrength() {
+        return this.flashStrength;
+    }
+
+    public void setFlashStrength(float flashStrength) {
+        this.flashStrength = Math.max(flashStrength, this.flashStrength);
+    }
+
     @Override
     public void onHudRender(DrawContext context, float tickDelta) {
-        float strength = ClientVariables.flashStrength;
+        float strength = this.flashStrength;
         if (strength > 0) {
             RenderSystem.enableBlend();
             if (strength > 1.0F) strength = 1.0F;
@@ -32,7 +55,7 @@ public class FlashRenderer implements HudRenderCallback, ClientApplyFogCallback 
 
     @Override
     public void onApplyFog(float viewDistance, BackgroundRenderer.FogData fogData) {
-        float flashStrength = ClientVariables.flashStrength;
+        float flashStrength = this.flashStrength;
         float flashLeftSpeed = FlashBangEntity.STRENGTH_LEFT_SPEED;
         if (flashStrength > 0) {
             fogData.fogShape = FogShape.SPHERE;

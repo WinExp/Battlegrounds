@@ -12,6 +12,8 @@ import com.github.winexp.battlegrounds.item.thrown.FlashBangItem;
 import com.github.winexp.battlegrounds.item.thrown.MolotovItem;
 import com.github.winexp.battlegrounds.item.tool.*;
 import com.github.winexp.battlegrounds.util.RecipeUtil;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.dispenser.ProjectileDispenserBehavior;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
@@ -175,6 +177,7 @@ public class Items extends net.minecraft.item.Items {
         });
     }
 
+    @Environment(EnvType.CLIENT)
     public static void registerModelPredicates() {
         ModelPredicateProviderRegistry.register(CHANNELING_BOW, new Identifier("pull"), (stack, clientWorld, entity, seed) -> {
             if (entity == null) return 0.0F;

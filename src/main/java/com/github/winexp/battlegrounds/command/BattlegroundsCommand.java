@@ -50,7 +50,7 @@ public class BattlegroundsCommand {
     public static ArgumentBuilder<ServerCommandSource, ?> registerStart() {
         var cStart = literal("start");
         var aProp = argument("gameProperties", IdentifierArgumentType.identifier()).suggests(((context, builder) ->
-                CommandSource.suggestMatching(Battlegrounds.GAME_PRESETS.keySet().stream().map(Identifier::toString), builder)))
+                CommandSource.suggestMatching(Constants.GAME_PROPERTIES.keySet().stream().map(Identifier::toString), builder)))
                 .executes(BattlegroundsCommand::executeStart);
         return cStart.then(aProp);
     }
@@ -79,8 +79,11 @@ public class BattlegroundsCommand {
     }
 
     public static ArgumentBuilder<ServerCommandSource, ?> registerGameMode() {
-        var cRoot = literal("gamemode");
-        var aMode = argument("gamemode", GameModeArgumentType.gameMode()).executes((context) ->
+        var cRoot = literal("gamemode").requires(source ->
+                source.hasPermissionLevel(2));
+        var aMode = argument("gamemode", GameModeArgumentType.gameMode())
+                .requires(ServerCommandSource::isExecutedByPlayer)
+                .executes((context) ->
                 executeChangeGameMode(context, true));
         var aPlayer = argument("players", EntityArgumentType.players()).executes((context ->
                 executeChangeGameMode(context, false)));
@@ -90,11 +93,9 @@ public class BattlegroundsCommand {
 
     private static int executeChangeGameMode(CommandContext<ServerCommandSource> context, boolean isSelf) throws CommandSyntaxException {
         GameMode gameMode = GameModeArgumentType.getGameMode(context, "gamemode");
-        if (isSelf && context.getSource().isExecutedByPlayer()) {
+        if (isSelf) {
             ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
             PlayerUtil.changeGameMode(player, gameMode);
-        } else if (isSelf && !context.getSource().isExecutedByPlayer()) {
-            throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument().create();
         } else {
             Collection<ServerPlayerEntity> players = EntityArgumentType.getPlayers(context, "players");
             for (ServerPlayerEntity player : players) {
@@ -107,10 +108,10 @@ public class BattlegroundsCommand {
     private static int executeStart(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerCommandSource source = context.getSource();
         Identifier id = IdentifierArgumentType.getIdentifier(context, "gameProperties");
-        if (!Battlegrounds.GAME_PRESETS.containsKey(id)) {
+        if (!Constants.GAME_PROPERTIES.containsKey(id)) {
             throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument().create();
         }
-        GameProperties gameProperties = Battlegrounds.GAME_PRESETS.get(id);
+        GameProperties gameProperties = Constants.GAME_PROPERTIES.get(id);
         if (VoteManager.INSTANCE.containsVote(VotePreset.START_GAME.identifier())) {
             source.sendFeedback(() -> Text.translatable("vote.battlegrounds.already_voting.feedback")
                     .formatted(Formatting.RED), false);
@@ -126,7 +127,7 @@ public class BattlegroundsCommand {
         VoteManager.INSTANCE.closeAllVotes();
         TaskScheduler.INSTANCE.cancelAllTasks();
         Variables.gameManager.stopGame();
-        context.getSource().sendFeedback(() -> Text.translatable("battlegrounds.command.stop.feedback")
+        context.getSource().sendFeedback(() -> Text.translatable("commands.battlegrounds.stop.feedback")
                 .formatted(Formatting.GREEN), true);
 
         return 1;
@@ -134,7 +135,7 @@ public class BattlegroundsCommand {
 
     private static int executeReload(CommandContext<ServerCommandSource> context) {
         Battlegrounds.INSTANCE.reload();
-        context.getSource().sendFeedback(() -> Text.translatable("battlegrounds.command.reload.feedback")
+        context.getSource().sendFeedback(() -> Text.translatable("commands.battlegrounds.reload.feedback")
                 .formatted(Formatting.GREEN), true);
 
         return 1;

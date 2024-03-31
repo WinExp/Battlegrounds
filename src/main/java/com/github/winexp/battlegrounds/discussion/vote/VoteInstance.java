@@ -88,7 +88,7 @@ public class VoteInstance {
 
     public VoteInfo getVoteInfo(UUID uuid) {
         return new VoteInfo(this.identifier, this.uuid, this.name, this.description, this.getTimeLeft(), this.voting &&
-                (this.settings.voteMode().allowChangeVote || !this.isVoted(uuid)));
+                (this.settings.allowChangeVote() || !this.isVoted(uuid)));
     }
 
     public VoteInfo getVoteInfo() {
@@ -135,7 +135,7 @@ public class VoteInstance {
         UUID uuid = PlayerUtil.getAuthUUID(player);
         if (!this.voting) return false;
         if (!this.isParticipants(player)) return false;
-        if (!this.settings.voteMode().allowChangeVote && this.isVoted(uuid)) return false;
+        if (!this.settings.allowChangeVote() && this.isVoted(uuid)) return false;
         this.voteResultMap.put(uuid, true);
         this.settings.playerVotedAction().accept(this, player, true);
         ServerVoteEvents.PLAYER_VOTED.invoker().onPlayerVoted(player, this.getVoteInfo(player), true);
@@ -149,7 +149,7 @@ public class VoteInstance {
         UUID uuid = PlayerUtil.getAuthUUID(player);
         if (!this.voting) return false;
         if (!this.isParticipants(player)) return false;
-        if (!this.settings.voteMode().allowChangeVote && this.isVoted(uuid)) return false;
+        if (!this.settings.allowChangeVote() && this.isVoted(uuid)) return false;
         if (this.settings.voteMode().canDenyCancel) this.closeVote(VoteSettings.CloseReason.DENIED);
         this.voteResultMap.put(uuid, false);
         this.settings.playerVotedAction().accept(this, player, false);

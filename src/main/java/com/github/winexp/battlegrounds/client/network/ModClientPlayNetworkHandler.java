@@ -1,7 +1,7 @@
 package com.github.winexp.battlegrounds.client.network;
 
 import com.github.winexp.battlegrounds.client.gui.screen.vote.VoteScreen;
-import com.github.winexp.battlegrounds.client.util.ClientVariables;
+import com.github.winexp.battlegrounds.client.util.ClientConstants;
 import com.github.winexp.battlegrounds.entity.projectile.FlashBangEntity;
 import com.github.winexp.battlegrounds.event.ClientVoteEvents;
 import com.github.winexp.battlegrounds.network.packet.s2c.play.FlashS2CPacket;
@@ -17,7 +17,7 @@ import net.minecraft.util.math.Vec3d;
 
 @Environment(EnvType.CLIENT)
 public final class ModClientPlayNetworkHandler {
-    public static void registerReceivers() {
+    public static void register() {
         ClientPlayNetworking.registerGlobalReceiver(FlashS2CPacket.TYPE, ModClientPlayNetworkHandler::onFlash);
         ClientPlayNetworking.registerGlobalReceiver(SyncVoteInfosS2CPacket.TYPE, ModClientPlayNetworkHandler::onSyncVoteInfos);
         ClientPlayNetworking.registerGlobalReceiver(UpdateVoteInfoS2CPacket.TYPE, ModClientPlayNetworkHandler::onUpdateVoteInfo);
@@ -33,8 +33,7 @@ public final class ModClientPlayNetworkHandler {
         Entity entity = client.getCameraEntity();
         if (entity != null) {
             float tickDelta = client.getTickDelta();
-            ClientVariables.flashStrength = Math.max(ClientVariables.flashStrength,
-                    FlashBangEntity.getFlashStrength(entity, pos, distance, tickDelta));
+            ClientConstants.FLASH_RENDERER.setFlashStrength(FlashBangEntity.getFlashStrength(entity, pos, distance, tickDelta));
         }
     }
 
