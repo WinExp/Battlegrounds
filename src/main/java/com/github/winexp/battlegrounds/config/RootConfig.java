@@ -8,10 +8,11 @@ import net.minecraft.util.Identifier;
 
 import java.util.Map;
 
-public record RootConfig(RandomTpConfig randomTp, Map<Identifier, VoteConfig> votes) implements IConfig<RootConfig> {
+public record RootConfig(RandomTpConfig randomTp, Map<Identifier, VoteConfig> votes, boolean debug) implements IConfig<RootConfig> {
     public static final Codec<RootConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             RandomTpConfig.CODEC.fieldOf("random_tp").forGetter(RootConfig::randomTp),
-            Codec.unboundedMap(Identifier.CODEC, VoteConfig.CODEC).fieldOf("votes").forGetter(RootConfig::votes)
+            Codec.unboundedMap(Identifier.CODEC, VoteConfig.CODEC).fieldOf("votes").forGetter(RootConfig::votes),
+            Codec.BOOL.fieldOf("debug").forGetter(RootConfig::debug)
     ).apply(instance, RootConfig::new));
 
     public static final RootConfig DEFAULT_CONFIG = new RootConfig(
@@ -28,7 +29,8 @@ public record RootConfig(RandomTpConfig randomTp, Map<Identifier, VoteConfig> vo
                     new VoteConfig(
                             Duration.withSeconds(30)
                     )
-            )
+            ),
+            false
     );
 
     @Override

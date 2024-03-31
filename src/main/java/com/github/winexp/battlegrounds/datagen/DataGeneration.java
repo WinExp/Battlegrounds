@@ -10,5 +10,6 @@ public class DataGeneration implements DataGeneratorEntrypoint {
         pack.addProvider(ModAdvancementProvider::new);
         pack.addProvider(ModChestLootTableProvider::new);
         pack.addProvider(ModItemTagProvider::new);
+        pack.addProvider(ModGamePropertiesProvider::new);
     }
 }

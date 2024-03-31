@@ -1,6 +1,7 @@
 package com.github.winexp.battlegrounds.command;
 
 import com.github.winexp.battlegrounds.event.ServerGameEvents;
+import com.github.winexp.battlegrounds.game.GameManager;
 import com.github.winexp.battlegrounds.task.TaskScheduler;
 import com.github.winexp.battlegrounds.task.RepeatTask;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
@@ -41,10 +42,10 @@ public class RandomTpCommand {
         dispatcher.register(cRoot_redir);
 
         ServerLivingEntityEvents.ALLOW_DAMAGE.register(RandomTpCommand::onLivingEntityDamaged);
-        ServerGameEvents.STAGE_CHANGED.register(RandomTpCommand::onGameStageChanged);
+        ServerGameEvents.STAGE_TRIGGERED.register(RandomTpCommand::onStageTriggered);
     }
 
-    private static void onGameStageChanged(@Nullable Identifier id) {
+    private static void onStageTriggered(GameManager gameManager, @Nullable Identifier id) {
         if (id == null) {
             cooldownId = null;
         } else if (Variables.config.randomTp().cooldownMap().get(id) != null) {
@@ -106,10 +107,10 @@ public class RandomTpCommand {
         if (!cooldownTimers.containsKey(uuid)) cooldownTimers.put(uuid, 0);
         Integer cooldown = cooldownTimers.get(uuid);
         if (cooldown > 0) {
-            source.sendFeedback(() -> Text.translatable("battlegrounds.command.randomtp.delay.feedback", cooldown / 20)
+            source.sendFeedback(() -> Text.translatable("commands.battlegrounds.randomtp.delay.feedback", cooldown / 20)
                     .formatted(Formatting.RED), false);
         } else {
-            source.sendFeedback(() -> Text.translatable("battlegrounds.command.randomtp.feedback")
+            source.sendFeedback(() -> Text.translatable("commands.battlegrounds.randomtp.feedback")
                     .formatted(Formatting.GOLD), false);
             PlayerUtil.randomTeleport(Variables.server.getOverworld(), Objects.requireNonNull(source.getPlayer()));
             updateCooldown(uuid, getConfigCooldown());

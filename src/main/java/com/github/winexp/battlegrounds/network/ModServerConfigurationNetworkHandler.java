@@ -9,7 +9,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerConfigurationNetworkHandler;
 
 public class ModServerConfigurationNetworkHandler {
-    public static void registerReceivers() {
+    public static void register() {
         ServerConfigurationConnectionEvents.DISCONNECT.register(ModServerConfigurationNetworkHandler::onConfigureDisconnect);
         ServerConfigurationNetworking.registerGlobalReceiver(ModInfoC2SPacket.TYPE, ModServerConfigurationNetworkHandler::onModInfoReceived);
     }

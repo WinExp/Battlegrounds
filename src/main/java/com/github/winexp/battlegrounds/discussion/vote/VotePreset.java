@@ -9,9 +9,8 @@ import net.minecraft.util.Identifier;
 public record VotePreset(Identifier identifier, Text name, Text description, VoteSettings voteSettings) {
     public static final VotePreset START_GAME = new VotePreset(
             new Identifier("battlegrounds", "start_game"),
-            // TODO: 将 Text.literal() 替换为 Text.translatable()
-            Text.literal("开始游戏").formatted(Formatting.GREEN),
-            Text.literal("开始游戏的投票，需全玩家通过"),
+            Text.translatable("vote.battlegrounds.start_game.title").formatted(Formatting.GREEN),
+            Text.translatable("vote.battlegrounds.start_game.description"),
             new VoteSettings(
                     (voteInstance, closeReason) -> {
                         if (closeReason == VoteSettings.CloseReason.ACCEPTED) {
@@ -24,6 +23,7 @@ public record VotePreset(Identifier identifier, Text name, Text description, Vot
                     VoteSettings.VoteMode.ALL_ACCEPT,
                     Variables.config.votes()
                             .get(new Identifier("battlegrounds", "start_game"))
-                            .timeout()
+                            .timeout(),
+                    false
     ));
 }

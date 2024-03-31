@@ -1,9 +1,9 @@
 package com.github.winexp.battlegrounds.game;
 
-import com.github.winexp.battlegrounds.util.Constants;
 import com.mojang.serialization.Codec;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.util.Util;
 import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,27 +16,19 @@ public class PlayerPermission {
 
     public static PlayerPermission createFromNbt(NbtCompound nbt) {
         PlayerPermission permission = new PlayerPermission();
-        permission.gameMode = GameMode.CODEC.parse(NbtOps.INSTANCE, nbt.get("gamemode"))
-                .getOrThrow(false, Constants.LOGGER::error);
-        permission.inGame = Codec.BOOL.parse(NbtOps.INSTANCE, nbt.get("in_game"))
-                .getOrThrow(false, Constants.LOGGER::error);
-        permission.allowNaturalRegen = Codec.BOOL.parse(NbtOps.INSTANCE, nbt.get("allow_natural_regen"))
-                .getOrThrow(false, Constants.LOGGER::error);
-        permission.hasEnrichEffects = Codec.BOOL.parse(NbtOps.INSTANCE, nbt.get("has_enrich_effects"))
-                .getOrThrow(false, Constants.LOGGER::error);
+        permission.gameMode = Util.getResult(GameMode.CODEC.parse(NbtOps.INSTANCE, nbt.get("gamemode")), IllegalStateException::new);
+        permission.inGame = Util.getResult(Codec.BOOL.parse(NbtOps.INSTANCE, nbt.get("in_game")), IllegalStateException::new);
+        permission.allowNaturalRegen = Util.getResult(Codec.BOOL.parse(NbtOps.INSTANCE, nbt.get("allow_natural_regen")), IllegalStateException::new);
+        permission.hasEnrichEffects = Util.getResult(Codec.BOOL.parse(NbtOps.INSTANCE, nbt.get("has_enrich_effects")), IllegalStateException::new);
         return permission;
     }
 
     public NbtCompound toNbt() {
         NbtCompound nbt = new NbtCompound();
-        nbt.put("gamemode", GameMode.CODEC.encodeStart(NbtOps.INSTANCE, this.gameMode)
-                .getOrThrow(false, Constants.LOGGER::error));
-        nbt.put("in_game", Codec.BOOL.encodeStart(NbtOps.INSTANCE, this.inGame)
-                .getOrThrow(false, Constants.LOGGER::error));
-        nbt.put("allow_natural_regen", Codec.BOOL.encodeStart(NbtOps.INSTANCE, this.allowNaturalRegen)
-                .getOrThrow(false, Constants.LOGGER::error));
-        nbt.put("has_enrich_effects", Codec.BOOL.encodeStart(NbtOps.INSTANCE, this.hasEnrichEffects)
-                .getOrThrow(false, Constants.LOGGER::error));
+        nbt.put("gamemode", Util.getResult(GameMode.CODEC.encodeStart(NbtOps.INSTANCE, this.gameMode), IllegalStateException::new));
+        nbt.put("in_game", Util.getResult(Codec.BOOL.encodeStart(NbtOps.INSTANCE, this.inGame), IllegalStateException::new));
+        nbt.put("allow_natural_regen", Util.getResult(Codec.BOOL.encodeStart(NbtOps.INSTANCE, this.allowNaturalRegen), IllegalStateException::new));
+        nbt.put("has_enrich_effects", Util.getResult(Codec.BOOL.encodeStart(NbtOps.INSTANCE, this.hasEnrichEffects), IllegalStateException::new));
         return nbt;
     }
 }

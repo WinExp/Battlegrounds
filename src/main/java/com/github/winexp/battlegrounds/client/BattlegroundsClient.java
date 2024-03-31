@@ -3,11 +3,11 @@ package com.github.winexp.battlegrounds.client;
 import com.github.winexp.battlegrounds.client.gui.screen.vote.VoteScreen;
 import com.github.winexp.battlegrounds.client.network.ModClientConfigurationNetworkHandler;
 import com.github.winexp.battlegrounds.client.network.ModClientPlayNetworkHandler;
-import com.github.winexp.battlegrounds.client.render.FlashRenderer;
 import com.github.winexp.battlegrounds.client.render.entity.ChannelingArrowEntityRenderer;
 import com.github.winexp.battlegrounds.client.toast.vote.PlayerVotedToast;
 import com.github.winexp.battlegrounds.client.toast.vote.VoteClosedToast;
 import com.github.winexp.battlegrounds.client.toast.vote.VoteOpenedToast;
+import com.github.winexp.battlegrounds.client.util.ClientConstants;
 import com.github.winexp.battlegrounds.entity.EntityTypes;
 import com.github.winexp.battlegrounds.event.ClientApplyFogCallback;
 import com.github.winexp.battlegrounds.event.ClientVoteEvents;
@@ -20,7 +20,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
-import net.minecraft.sound.SoundCategory;
+import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.sound.SoundEvents;
 
 @Environment(EnvType.CLIENT)
@@ -32,9 +32,8 @@ public class BattlegroundsClient implements ClientModInitializer {
         EntityRendererRegistry.register(EntityTypes.MOLOTOV, FlyingItemEntityRenderer::new);
 
         // 自定义渲染器
-        FlashRenderer flashRenderer = new FlashRenderer();
-        HudRenderCallback.EVENT.register(flashRenderer);
-        ClientApplyFogCallback.EVENT.register(flashRenderer);
+        HudRenderCallback.EVENT.register(ClientConstants.FLASH_RENDERER);
+        ClientApplyFogCallback.EVENT.register(ClientConstants.FLASH_RENDERER);
     }
 
     @Override
@@ -43,32 +42,26 @@ public class BattlegroundsClient implements ClientModInitializer {
         ClientVoteEvents.OPENED.register(voteInfo -> {
             MinecraftClient client = MinecraftClient.getInstance();
             client.getToastManager().add(new VoteOpenedToast(voteInfo));
-            if (client.player != null) {
-                client.player.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.NEUTRAL, 0.3F, 1.0F);
-            }
+            client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0F));
             VoteScreen.onVoteOpened(client, voteInfo);
         });
         ClientVoteEvents.CLOSED.register((voteInfo, reason) -> {
             MinecraftClient client = MinecraftClient.getInstance();
             client.getToastManager().add(new VoteClosedToast(voteInfo, reason));
-            if (client.player != null) {
-                client.player.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.NEUTRAL, 0.3F, 1.0F);
-            }
+            client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0F));
             VoteScreen.onVoteClosed(client, voteInfo);
         });
         ClientVoteEvents.PLAYER_VOTED.register((playerName, voteInfo, result) -> {
             MinecraftClient client = MinecraftClient.getInstance();
             client.getToastManager().add(new PlayerVotedToast(playerName, voteInfo, result));
-            if (client.player != null) {
-                client.player.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.NEUTRAL, 0.3F, 1.0F);
-            }
+            client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0F));
         });
         ClientTickEvents.END_CLIENT_TICK.register(VoteScreen::globalTick);
         // 注册实体渲染器
         this.registerRenderer();
         // 注册网络包相关
         ModClientConfigurationNetworkHandler.register();
-        ModClientPlayNetworkHandler.registerReceivers();
+        ModClientPlayNetworkHandler.register();
         // 注册按键绑定
         KeyBindings.registerKeyBindings();
         // 注册物品模型谓词

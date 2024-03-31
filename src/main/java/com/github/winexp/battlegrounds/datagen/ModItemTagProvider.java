@@ -15,6 +15,7 @@ public class ModItemTagProvider extends FabricTagProvider.ItemTagProvider {
 
     @Override
     protected void configure(RegistryWrapper.WrapperLookup arg) {
+        // conventional
         this.getOrCreateTagBuilder(ConventionalItemTags.BOWS)
                 .add(Items.CHANNELING_BOW);
     }

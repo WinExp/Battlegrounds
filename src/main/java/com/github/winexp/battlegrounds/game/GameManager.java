@@ -8,7 +8,6 @@ import com.github.winexp.battlegrounds.task.LimitRepeatTask;
 import com.github.winexp.battlegrounds.task.RepeatTask;
 import com.github.winexp.battlegrounds.task.ScheduledTask;
 import com.github.winexp.battlegrounds.task.TaskScheduler;
-import com.github.winexp.battlegrounds.util.Constants;
 import com.github.winexp.battlegrounds.util.EffectUtil;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
 import com.github.winexp.battlegrounds.util.RandomUtil;
@@ -41,6 +40,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
@@ -64,10 +64,13 @@ public class GameManager extends PersistentState {
     private final HashMap<UUID, PlayerPermission> playerPermissions = new HashMap<>();
     private PVPMode pvpMode = PVPMode.PEACEFUL;
     private GameStage gameStage = GameStage.IDLE;
+    private GameBorderStage borderStage = GameBorderStage.WAITING;
+    private boolean borderResizingEnabled = false;
     private GameProperties gameProperties;
     private GameProperties.StageInfo currentStage;
     private int resizeCount = 0;
     private LimitRepeatTask startTask = LimitRepeatTask.NONE_TASK;
+    private ScheduledTask borderResizingTask = ScheduledTask.NONE_TASK;
     private RepeatTask resizeBorderTask = RepeatTask.NONE_TASK;
     private RepeatTask updateBossBarTask = RepeatTask.NONE_TASK;
     private CommandBossBar resizeBossBar;
@@ -92,42 +95,64 @@ public class GameManager extends PersistentState {
         ServerLivingEntityEvents.ALLOW_DAMAGE.register(this::allowLivingEntityDamage);
         ServerLivingEntityEvents.AFTER_DEATH.register(this::onLivingEntityDeath);
         ServerPlayerEvents.AFTER_RESPAWN.register(this::onPlayerRespawn);
-        ServerGameEvents.STAGE_CHANGED.register(this::onStageChanged);
+        ServerGameEvents.STAGE_TRIGGERED.register(this::onTriggered);
         ServerGameEvents.BORDER_RESIZING.register(this::onBorderResizing);
+        ServerGameEvents.BORDER_RESIZE_COMPLETED.register(this::onBorderResizeCompleted);
         ServerGameEvents.PLAYER_WON.register(this::onPlayerWon);
+        ServerGameEvents.GAME_TIE.register(this::onGameTie);
     }
 
     private void onServerStopping(MinecraftServer server) {
-        this.disableBossBar();
+        this.disableBorderResizeBossBar();
     }
 
-    private void onBorderResizing(GameProperties.StageInfo currentStage, int resizeCount) {
-        this.server.getPlayerManager().broadcast(
-                Text.translatable("battlegrounds.game.border.reduce.broadcast")
+    private void onBorderResizing(GameManager gameManager) {
+        gameManager.server.getPlayerManager().broadcast(
+                Text.translatable("game.battlegrounds.border.reduce.broadcast")
                         .formatted(Formatting.GOLD)
                         .styled(style -> style.withUnderline(true)),
                 false
         );
     }
 
-    private void onStageChanged(@Nullable Identifier id) {
-        if (id == null) return;
-        if (id.equals(new Identifier("battlegrounds", "enable_pvp"))) {
-            this.pvpMode = PVPMode.PVP_MODE;
-            for (ServerPlayerEntity player : this.server.getPlayerManager().getPlayerList()) {
+    private void onBorderResizeCompleted(GameManager gameManager) {
+        if (resizeCount >= currentStage.resizeCount()) {
+            int currentStageIdx = gameProperties.stages().indexOf(currentStage);
+            if (currentStageIdx == gameProperties.stages().size() - 1) {
+                gameManager.disableBorderResizing();
+                gameManager.disableBorderResizeBossBar();
+                ServerGameEvents.STAGE_TRIGGERED.invoker().onTriggered(this, new Identifier("battlegrounds", "final"));
+            } else {
+                gameManager.currentStage = gameProperties.stages().get(currentStageIdx + 1);
+                int oldSize = gameManager.worldHelper.getBorderSize();
+                gameManager.worldHelper.setBorderSize(gameManager.currentStage.initialSize());
+                if (oldSize - gameManager.currentStage.initialSize() > gameManager.worldHelper.getBorder().getSafeZone()) {
+                    PlayerUtil.randomTpAllPlayers(gameManager.server, gameManager.server.getOverworld());
+                }
+                ServerGameEvents.STAGE_TRIGGERED.invoker().onTriggered(this, gameManager.currentStage.trigger());
+            }
+            gameManager.resizeCount = 0;
+        }
+    }
+
+    private void onTriggered(GameManager gameManager, @Nullable Identifier trigger) {
+        if (trigger == null) return;
+        if (trigger.equals(new Identifier("battlegrounds", "enable_pvp"))) {
+            gameManager.pvpMode = PVPMode.PVP_MODE;
+            for (ServerPlayerEntity player : gameManager.server.getPlayerManager().getPlayerList()) {
                 UUID uuid = PlayerUtil.getAuthUUID(player);
-                PlayerPermission permission = this.getPlayerPermission(uuid, new PlayerPermission());
+                PlayerPermission permission = gameManager.getPlayerPermission(uuid, new PlayerPermission());
                 if (permission.inGame) {
                     permission.hasEnrichEffects = false;
                 }
             }
-            this.server.getPlayerManager().broadcast(
-                    Text.translatable("battlegrounds.game.pvp.enable.broadcast")
+            gameManager.server.getPlayerManager().broadcast(
+                    Text.translatable("game.battlegrounds.pvp.enable.broadcast")
                             .formatted(Formatting.GOLD)
                             .styled(style -> style.withUnderline(true)),
                     false
             );
-        } else if (id.equals(new Identifier("battlegrounds", "deathmatch"))) {
+        } else if (trigger.equals(new Identifier("battlegrounds", "deathmatch"))) {
             for (ServerPlayerEntity player : this.server.getPlayerManager().getPlayerList()) {
                 UUID uuid = PlayerUtil.getAuthUUID(player);
                 PlayerPermission permission = this.getPlayerPermission(uuid, new PlayerPermission());
@@ -136,11 +161,19 @@ public class GameManager extends PersistentState {
                 }
             }
             this.server.getPlayerManager().broadcast(
-                    Text.translatable("battlegrounds.game.deathmatch.start.broadcast")
+                    Text.translatable("game.battlegrounds.deathmatch.start.broadcast")
                             .formatted(Formatting.GOLD)
                             .styled(style -> style.withBold(true).withUnderline(true)),
                     false
             );
+        } else if (trigger.equals(new Identifier("battlegrounds", "final"))) {
+            ScheduledTask timeoutTask = new ScheduledTask(this.gameProperties.timeout()) {
+                @Override
+                public void run() throws CancellationException {
+                    ServerGameEvents.GAME_TIE.invoker().onGameTie(GameManager.this);
+                }
+            };
+            TaskScheduler.INSTANCE.schedule(timeoutTask);
         }
     }
 
@@ -153,12 +186,11 @@ public class GameManager extends PersistentState {
             if (this.isParticipant(uuid)) {
                 PlayerUtil.changeGameMode(player, GameMode.ADVENTURE);
                 server.getPlayerManager().broadcast(
-                        Text.translatable("battlegrounds.game.join.broadcast",
+                        Text.translatable("game.battlegrounds.join.broadcast",
                                 player.getDisplayName(),
                                 this.getJoinedInGamePlayerCount(),
                                 this.getTotalInGamePlayerCount()
-                        )
-                                .formatted(Formatting.GREEN),
+                        ).formatted(Formatting.GREEN),
                         false
                 );
                 if (this.checkAllPlayersJoined() && this.startTask.isCancelled()) {
@@ -188,7 +220,7 @@ public class GameManager extends PersistentState {
             } else {
                 PlayerUtil.changeGameMode(player, GameMode.SPECTATOR);
                 server.getPlayerManager().broadcast(
-                        Text.translatable("battlegrounds.game.join.spectator.broadcast",
+                        Text.translatable("game.battlegrounds.join.spectator.broadcast",
                                 player.getDisplayName()
                         )
                                 .formatted(Formatting.GRAY),
@@ -207,27 +239,37 @@ public class GameManager extends PersistentState {
         && this.currentStage != null) {
             if (!this.currentStage.allowRespawn()) {
                 UUID uuid = PlayerUtil.getAuthUUID(player);
-                this.setPlayerPermission(uuid, new PlayerPermission());
-                PlayerUtil.changeGameMode(player, GameMode.SPECTATOR);
+                PlayerPermission permission = this.getPlayerPermission(uuid, new PlayerPermission());
+                permission.inGame = false;
+                PlayerUtil.setGameModeToMap(player, GameMode.SPECTATOR);
             }
             if (this.getJoinedInGamePlayerCount() == 1) {
                 ServerPlayerEntity winner = this.getLastInGamePlayer();
-                ServerGameEvents.PLAYER_WON.invoker().onPlayerWon(winner);
+                ServerGameEvents.PLAYER_WON.invoker().onPlayerWon(this, winner);
             }
         }
     }
 
-    private void onPlayerWon(ServerPlayerEntity winner) {
+    private void onPlayerWon(GameManager gameManager, ServerPlayerEntity winner) {
         Random random = winner.getRandom();
-        this.server.getPlayerManager().broadcast(
-                Text.translatable("battlegrounds.game.won.broadcast", winner.getDisplayName())
+        gameManager.server.getPlayerManager().broadcast(
+                Text.translatable("game.battlegrounds.won.broadcast", winner.getDisplayName())
                         .formatted(Formatting.GOLD)
                         .styled(style -> style.withBold(true).withUnderline(true)),
                 false
         );
         int fireworkAmount = random.nextBetween(2, 4);
         GameUtil.spawnWinnerFireworks(winner, fireworkAmount, 4);
-        this.stopGame();
+        gameManager.stopGame();
+    }
+
+    private void onGameTie(GameManager gameManager) {
+        gameManager.server.getPlayerManager().broadcast(Text.translatable("game.battlegrounds.tie")
+                .formatted(Formatting.GOLD)
+                .styled(style -> style
+                        .withBold(true)
+                        .withUnderline(true)), false);
+        gameManager.stopGame();
     }
 
     private boolean allowLivingEntityDamage(LivingEntity entity, DamageSource source, float amount) {
@@ -254,7 +296,7 @@ public class GameManager extends PersistentState {
     }
 
     public void assertGamePropertiesNotNull() {
-        Objects.requireNonNull(this.gameProperties);
+        if (this.gameProperties == null) throw new IllegalStateException();
     }
     public void assertIsGaming() {
         if (!this.gameStage.isGaming()) throw new IllegalStateException();
@@ -285,11 +327,15 @@ public class GameManager extends PersistentState {
     }
 
     public PVPMode getPvpMode() {
-        return pvpMode;
+        return this.pvpMode;
     }
 
     public GameProperties getGameProperties() {
-        return gameProperties;
+        return this.gameProperties;
+    }
+
+    public GameBorderStage getBorderStage() {
+        return this.borderStage;
     }
 
     public void setGameProperties(@NotNull GameProperties gameProperties) {
@@ -335,7 +381,7 @@ public class GameManager extends PersistentState {
         return this.getJoinedInGamePlayerCount() == this.getTotalInGamePlayerCount();
     }
 
-    public void enableBossBar() {
+    public void enableBorderResizeBossBar() {
         this.assertIsGaming();
         this.assertBorderResizeEnabled();
         BossBarManager manager = this.server.getBossBarManager();
@@ -356,7 +402,7 @@ public class GameManager extends PersistentState {
         TaskScheduler.INSTANCE.schedule(this.updateBossBarTask);
     }
 
-    public void disableBossBar() {
+    public void disableBorderResizeBossBar() {
         BossBarManager manager = this.server.getBossBarManager();
         if (this.resizeBossBar != manager.get(RESIZE_BOSS_BAR_ID)) {
             if (this.resizeBossBar != null) {
@@ -373,26 +419,40 @@ public class GameManager extends PersistentState {
 
     private void updateBossBar() {
         if (!this.gameStage.isGaming()) return;
-        int totalTime = this.currentStage.resizeTimeInfo().spendTime().add(this.currentStage.resizeTimeInfo().delayTime()).toTicks();
-        this.resizeBossBar.setName(Text.translatable(
-                "battlegrounds.resize_border.bar",
-                this.resizeBorderTask.getDelayTicks() / 20
-        )
-                .formatted(Formatting.GREEN));
-        this.resizeBossBar.setMaxValue(totalTime);
-        this.resizeBossBar.setValue(this.resizeBorderTask.getDelayTicks());
+        if (this.borderStage == GameBorderStage.WAITING) {
+            int delayTimeTicks = this.currentStage.resizeTimeInfo().delayTime().toTicks();
+            this.resizeBossBar.setName(
+                    Text.translatable(
+                                    "game.battlegrounds.info_bossbar.waiting",
+                            this.resizeBorderTask.getDelayTicks() / 20
+                    )
+                    .formatted(Formatting.GREEN));
+            this.resizeBossBar.setMaxValue(delayTimeTicks);
+            this.resizeBossBar.setValue(this.resizeBorderTask.getDelayTicks());
+        } else if (this.borderStage == GameBorderStage.RESIZING) {
+            int spendTimeTicks = this.currentStage.resizeTimeInfo().spendTime().toTicks();
+            this.resizeBossBar.setName(
+                    Text.translatable(
+                                    "game.battlegrounds.info_bossbar.resizing",
+                                    this.borderResizingTask.getDelayTicks() / 20
+                            )
+                            .formatted(Formatting.GOLD));
+            this.resizeBossBar.setMaxValue(spendTimeTicks);
+            this.resizeBossBar.setValue(this.borderResizingTask.getDelayTicks());
+        }
     }
 
     public void setIdleState() {
         this.gameStage = GameStage.IDLE;
         this.pvpMode = PVPMode.PEACEFUL;
+        this.borderStage = GameBorderStage.WAITING;
         this.worldHelper.setDefaultBorder();
     }
 
     public void prepareToDeleteWorld(Collection<UUID> participants) {
         this.assertGamePropertiesNotNull();
         this.server.getPlayerManager().broadcast(
-                Text.translatable("battlegrounds.game.delete_world.broadcast", 10)
+                Text.translatable("game.battlegrounds.delete_world.broadcast", 10)
                         .formatted(Formatting.GREEN)
                         .styled(style -> style.withUnderline(true)),
                 false
@@ -425,7 +485,7 @@ public class GameManager extends PersistentState {
         }
         this.gameStage = GameStage.WAITING_PLAYER;
         GameUtil.createDeleteWorldTmpFile(this.server.getSavePath(WorldSavePath.ROOT));
-        PlayerUtil.kickAllPlayers(this.server, Text.translatable("battlegrounds.game.server.stop")
+        PlayerUtil.kickAllPlayers(this.server, Text.translatable("game.battlegrounds.server.stop")
                 .formatted(Formatting.GREEN));
 
         this.server.stop(false);
@@ -438,6 +498,7 @@ public class GameManager extends PersistentState {
         World world = this.server.getOverworld();
         BlockPos borderCenter = RandomUtil.getSecureLocation(world);
         for (ServerPlayerEntity player : this.server.getPlayerManager().getPlayerList()) {
+            player.getInventory().clear();
             UUID uuid = PlayerUtil.getAuthUUID(player);
             PlayerPermission permission = this.getPlayerPermission(uuid, new PlayerPermission());
             if (permission.inGame) {
@@ -455,16 +516,15 @@ public class GameManager extends PersistentState {
         this.worldHelper.setBorderSize(this.currentStage.initialSize());
         PlayerUtil.randomTpAllPlayers(this.server, this.server.getOverworld());
         this.enableBorderResizing(this.currentStage.resizeTimeInfo().delayTime().toTicks());
-        this.enableBossBar();
-        ServerGameEvents.STAGE_CHANGED.invoker().onStageChanged(this.currentStage.trigger());
+        this.enableBorderResizeBossBar();
+        ServerGameEvents.STAGE_TRIGGERED.invoker().onTriggered(this, this.currentStage.trigger());
     }
 
     public void stopGame() {
-        this.assertIsGaming();
-        this.currentStage = null;
-        this.disableBossBar();
+        this.disableBorderResizeBossBar();
         this.disableBorderResizing();
         this.setIdleState();
+        this.currentStage = null;
         this.playerPermissions.clear();
         for (ServerPlayerEntity player : this.server.getPlayerManager().getPlayerList()) {
             player.getInventory().clear();
@@ -473,14 +533,16 @@ public class GameManager extends PersistentState {
             assert attributeInstance != null;
             EffectUtil.removeAttribute(attributeInstance, HEALTH_MODIFIER_ID);
         }
-        ServerGameEvents.STAGE_CHANGED.invoker().onStageChanged(null);
+        ServerGameEvents.STAGE_TRIGGERED.invoker().onTriggered(this, null);
     }
 
     public void resumeGame(int resizeTimer) {
         this.assertIsGaming();
         this.assertGamePropertiesNotNull();
-        this.enableBorderResizing(resizeTimer);
-        this.enableBossBar();
+        if (this.borderResizingEnabled) {
+            this.enableBorderResizing(resizeTimer);
+            this.enableBorderResizeBossBar();
+        }
     }
 
     public void enableBorderResizing(int delayTicks) {
@@ -495,48 +557,35 @@ public class GameManager extends PersistentState {
             }
         };
         TaskScheduler.INSTANCE.schedule(this.resizeBorderTask);
+        this.borderResizingEnabled = true;
     }
 
     public void disableBorderResizing() {
         if (this.resizeBorderTask != null) {
             this.resizeBorderTask.cancel();
         }
+        this.borderResizingEnabled = false;
     }
 
     private void resizeBorder() {
         this.assertIsGaming();
         Duration spendTime = this.currentStage.resizeTimeInfo().spendTime();
-        if (this.resizeCount == 0) {
-            this.worldHelper.setBorderSize(this.currentStage.initialSize());
-        }
-        this.worldHelper.setBorderSize(
+        this.worldHelper.interpolateBorderSize(
+                this.currentStage.initialSize() - (this.currentStage.resizeBlocks() * this.resizeCount),
                 this.currentStage.initialSize() - (this.currentStage.resizeBlocks() * (this.resizeCount + 1)),
                 spendTime.toMillis()
         );
+        this.borderStage = GameBorderStage.RESIZING;
         this.resizeCount++;
-        ServerGameEvents.BORDER_RESIZING.invoker().onBorderResizing(this.currentStage, this.resizeCount);
-        if (this.resizeCount >= this.currentStage.resizeCount()) {
-            ScheduledTask triggerTask = new ScheduledTask(spendTime) {
-                @Override
-                public void run() throws CancellationException {
-                    int currentStageIdx = GameManager.this.gameProperties.stages().indexOf(GameManager.this.currentStage);
-                    if (currentStageIdx == GameManager.this.gameProperties.stages().size() - 1) {
-                        GameManager.this.disableBorderResizing();
-                        GameManager.this.disableBossBar();
-                    } else {
-                        GameManager.this.currentStage = GameManager.this.gameProperties.stages().get(currentStageIdx + 1);
-                        int oldSize = GameManager.this.worldHelper.getBorderSize();
-                        GameManager.this.worldHelper.setBorderSize(GameManager.this.currentStage.initialSize());
-                        if (oldSize - GameManager.this.currentStage.initialSize() > GameManager.this.worldHelper.getBorder().getSafeZone()) {
-                            PlayerUtil.randomTpAllPlayers(GameManager.this.server, GameManager.this.server.getOverworld());
-                        }
-                        ServerGameEvents.STAGE_CHANGED.invoker().onStageChanged(GameManager.this.currentStage.trigger());
-                    }
-                    GameManager.this.resizeCount = 0;
-                }
-            };
-            TaskScheduler.INSTANCE.schedule(triggerTask);
-        }
+        ServerGameEvents.BORDER_RESIZING.invoker().onBorderResizing(GameManager.this);
+        this.borderResizingTask = new ScheduledTask(spendTime) {
+            @Override
+            public void run() throws CancellationException {
+                ServerGameEvents.BORDER_RESIZE_COMPLETED.invoker().onBorderResizeCompleted(GameManager.this);
+                GameManager.this.borderStage = GameBorderStage.WAITING;
+            }
+        };
+        TaskScheduler.INSTANCE.schedule(this.borderResizingTask);
     }
 
     public static PersistentState.Type<GameManager> getPersistentStateType(MinecraftServer server) {
@@ -564,8 +613,11 @@ public class GameManager extends PersistentState {
                 .result().orElse(PVPMode.PEACEFUL);
         manager.gameStage = GameStage.CODEC.parse(NbtOps.INSTANCE, nbt.get("game_stage"))
                 .result().orElse(GameStage.IDLE);
+        manager.borderStage = GameBorderStage.CODEC.parse(NbtOps.INSTANCE, nbt.get("border_stage"))
+                .result().orElse(GameBorderStage.WAITING);
+        manager.borderResizingEnabled = nbt.getBoolean("border_resizing_enabled");
         NbtList playerPermissionsList = (NbtList) nbt.get("player_permissions");
-        Objects.requireNonNull(playerPermissionsList);
+        if (playerPermissionsList == null) throw new IllegalStateException();
         for (NbtElement element : playerPermissionsList) {
             NbtCompound permissionNbt = (NbtCompound) element;
             PlayerPermission permission = PlayerPermission.createFromNbt(permissionNbt);
@@ -589,10 +641,10 @@ public class GameManager extends PersistentState {
     @Override
     public NbtCompound writeNbt(NbtCompound nbt) {
         nbt.putInt("resize_count", this.resizeCount);
-        nbt.put("pvp_mode", PVPMode.CODEC.encodeStart(NbtOps.INSTANCE, this.pvpMode)
-                .getOrThrow(false, Constants.LOGGER::error));
-        nbt.put("game_stage", GameStage.CODEC.encodeStart(NbtOps.INSTANCE, this.gameStage)
-                .getOrThrow(false, Constants.LOGGER::error));
+        nbt.put("pvp_mode", Util.getResult(PVPMode.CODEC.encodeStart(NbtOps.INSTANCE, this.pvpMode), IllegalStateException::new));
+        nbt.put("game_stage", Util.getResult(GameStage.CODEC.encodeStart(NbtOps.INSTANCE, this.gameStage), IllegalStateException::new));
+        nbt.put("border_stage", Util.getResult(GameBorderStage.CODEC.encodeStart(NbtOps.INSTANCE, this.borderStage), IllegalStateException::new));
+        nbt.putBoolean("border_resizing_enabled", this.borderResizingEnabled);
         NbtList playerPermissionsList = new NbtList();
         this.playerPermissions.forEach((uuid, permission) -> {
             NbtCompound permissionNbt = permission.toNbt();
@@ -601,12 +653,10 @@ public class GameManager extends PersistentState {
         });
         nbt.put("player_permissions", playerPermissionsList);
         if (this.gameProperties != null) {
-            nbt.put("game_properties", GameProperties.CODEC.encodeStart(NbtOps.INSTANCE, this.gameProperties)
-                    .getOrThrow(false, Constants.LOGGER::error));
+            nbt.put("game_properties", Util.getResult(GameProperties.CODEC.encodeStart(NbtOps.INSTANCE, this.gameProperties), IllegalStateException::new));
         }
         if (this.currentStage != null) {
-            nbt.put("current_stage", GameProperties.StageInfo.CODEC.encodeStart(NbtOps.INSTANCE, this.currentStage)
-                    .getOrThrow(false, Constants.LOGGER::error));
+            nbt.put("current_stage", Util.getResult(GameProperties.StageInfo.CODEC.encodeStart(NbtOps.INSTANCE, this.currentStage), IllegalStateException::new));
         }
         if (this.gameStage.isGaming()) {
             nbt.putInt("resize_timer", this.resizeBorderTask.getDelayTicks());

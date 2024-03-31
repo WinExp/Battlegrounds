@@ -1,17 +1,12 @@
 package com.github.winexp.battlegrounds.entity.projectile;
 
-import com.github.winexp.battlegrounds.client.util.ClientVariables;
 import com.github.winexp.battlegrounds.entity.EntityTypes;
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.network.packet.s2c.play.FlashS2CPacket;
 import com.github.winexp.battlegrounds.util.MathUtil;
 import com.github.winexp.battlegrounds.util.WorldUtil;
 import com.github.winexp.battlegrounds.util.raycast.BlockRaycastResult;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
@@ -60,12 +55,6 @@ public class FlashBangEntity extends ThrownItemEntity {
                 || !WorldUtil.isOpaqueFullCube(world, blockPos));
     };
 
-    static {
-        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
-            ClientTickEvents.END_CLIENT_TICK.register(FlashBangEntity::clientTick);
-        }
-    }
-
     public FlashBangEntity(net.minecraft.entity.EntityType<? extends ThrownItemEntity> entityType, World world) {
         super(entityType, world);
     }
@@ -89,14 +78,6 @@ public class FlashBangEntity extends ThrownItemEntity {
     private ParticleEffect getParticleParameters() {
         ItemStack itemStack = this.getItem();
         return (itemStack.isEmpty() ? ParticleTypes.ITEM_SNOWBALL : new ItemStackParticleEffect(ParticleTypes.ITEM, itemStack));
-    }
-
-    private static void clientTick(MinecraftClient client) {
-        if (ClientVariables.flashStrength > 0) {
-            ClientVariables.flashStrength -= FlashBangEntity.STRENGTH_LEFT_SPEED;
-        } else if (ClientVariables.flashStrength < 0){
-            ClientVariables.flashStrength = 0;
-        }
     }
 
     public static float getFlashStrength(Entity entity, Vec3d flashPos, float distance, float tickDelta) {

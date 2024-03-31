@@ -37,13 +37,13 @@ public class ModServerPlayNetworkHandler {
         ModVersion playerModVersion = PlayerUtil.getPlayerModVersion(uuid);
         if (playerModVersion == null) {
             handler.disconnect(Text.translatable(
-                    "battlegrounds.network.config.mod_info.not_found",
+                    "disconnect.battlegrounds.config.mod_info.not_found",
                     Constants.MOD_VERSION.version().getFriendlyString(),
                     Constants.MOD_VERSION.protocolVersion()
             ).formatted(Formatting.RED).styled(style -> style.withBold(true)));
         } else if (playerModVersion.protocolVersion() != Constants.MOD_VERSION.protocolVersion()) {
             handler.disconnect(Text.translatable(
-                            "battlegrounds.network.config.mod_info.failed",
+                            "disconnect.battlegrounds.config.mod_info.failed",
                             playerModVersion.version().getFriendlyString(),
                             playerModVersion.protocolVersion(),
                             Constants.MOD_VERSION.version().getFriendlyString(),
