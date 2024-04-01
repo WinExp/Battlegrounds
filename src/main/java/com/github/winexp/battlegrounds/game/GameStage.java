@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import net.minecraft.util.StringIdentifiable;
 
 public enum GameStage implements StringIdentifiable {
-    IDLE, WAITING_PLAYER, GAMING;
+    IDLE, WAITING_PLAYER, GAMING, FINAL;
 
     public static final Codec<GameStage> CODEC = StringIdentifiable.createCodec(GameStage::values);
 

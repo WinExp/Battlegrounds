@@ -26,6 +26,10 @@ public class TaskScheduler {
         }
     }
 
+    public boolean isRunning(AbstractTask task) {
+        return this.tasks.contains(task) && task.isCancelled();
+    }
+
     public void schedule(AbstractTask task) {
         if (this.tasks.contains(task)) return;
         this.tasks.add(task);
