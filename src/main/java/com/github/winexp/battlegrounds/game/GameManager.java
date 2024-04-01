@@ -70,6 +70,7 @@ public class GameManager extends PersistentState {
     private GameProperties.StageInfo currentStage;
     private int resizeCount = 0;
     private LimitRepeatTask startTask = LimitRepeatTask.NONE_TASK;
+    private ScheduledTask timeoutTask = ScheduledTask.NONE_TASK;
     private ScheduledTask borderResizingTask = ScheduledTask.NONE_TASK;
     private RepeatTask resizeBorderTask = RepeatTask.NONE_TASK;
     private RepeatTask updateBossBarTask = RepeatTask.NONE_TASK;
@@ -95,7 +96,7 @@ public class GameManager extends PersistentState {
         ServerLivingEntityEvents.ALLOW_DAMAGE.register(this::allowLivingEntityDamage);
         ServerLivingEntityEvents.AFTER_DEATH.register(this::onLivingEntityDeath);
         ServerPlayerEvents.AFTER_RESPAWN.register(this::onPlayerRespawn);
-        ServerGameEvents.STAGE_TRIGGERED.register(this::onTriggered);
+        ServerGameEvents.STAGE_TRIGGERED.register(this::onStageTriggered);
         ServerGameEvents.BORDER_RESIZING.register(this::onBorderResizing);
         ServerGameEvents.BORDER_RESIZE_COMPLETED.register(this::onBorderResizeCompleted);
         ServerGameEvents.PLAYER_WON.register(this::onPlayerWon);
@@ -103,7 +104,7 @@ public class GameManager extends PersistentState {
     }
 
     private void onServerStopping(MinecraftServer server) {
-        this.disableBorderResizeBossBar();
+        this.disableInfoBossBar();
     }
 
     private void onBorderResizing(GameManager gameManager) {
@@ -120,7 +121,7 @@ public class GameManager extends PersistentState {
             int currentStageIdx = gameProperties.stages().indexOf(currentStage);
             if (currentStageIdx == gameProperties.stages().size() - 1) {
                 gameManager.disableBorderResizing();
-                gameManager.disableBorderResizeBossBar();
+                gameManager.disableInfoBossBar();
                 ServerGameEvents.STAGE_TRIGGERED.invoker().onTriggered(this, new Identifier("battlegrounds", "final"));
             } else {
                 gameManager.currentStage = gameProperties.stages().get(currentStageIdx + 1);
@@ -135,7 +136,7 @@ public class GameManager extends PersistentState {
         }
     }
 
-    private void onTriggered(GameManager gameManager, @Nullable Identifier trigger) {
+    private void onStageTriggered(GameManager gameManager, @Nullable Identifier trigger) {
         if (trigger == null) return;
         if (trigger.equals(new Identifier("battlegrounds", "enable_pvp"))) {
             gameManager.pvpMode = PVPMode.PVP_MODE;
@@ -167,13 +168,8 @@ public class GameManager extends PersistentState {
                     false
             );
         } else if (trigger.equals(new Identifier("battlegrounds", "final"))) {
-            ScheduledTask timeoutTask = new ScheduledTask(this.gameProperties.timeout()) {
-                @Override
-                public void run() throws CancellationException {
-                    ServerGameEvents.GAME_TIE.invoker().onGameTie(GameManager.this);
-                }
-            };
-            TaskScheduler.INSTANCE.schedule(timeoutTask);
+            this.gameStage = GameStage.FINAL;
+            this.enableTimeoutTimer(this.gameProperties.timeout().toTicks());
         }
     }
 
@@ -381,7 +377,7 @@ public class GameManager extends PersistentState {
         return this.getJoinedInGamePlayerCount() == this.getTotalInGamePlayerCount();
     }
 
-    public void enableBorderResizeBossBar() {
+    public void enableInfoBossBar() {
         this.assertIsGaming();
         this.assertBorderResizeEnabled();
         BossBarManager manager = this.server.getBossBarManager();
@@ -392,17 +388,17 @@ public class GameManager extends PersistentState {
         bossBar.clearPlayers();
         bossBar.addPlayers(this.server.getPlayerManager().getPlayerList());
         this.resizeBossBar = bossBar;
-        this.updateBossBar();
+        this.updateInfoBossBar();
         this.updateBossBarTask = new RepeatTask(Duration.withTicks(this.resizeBorderTask.getDelayTicks() % 20), Duration.withSeconds(1)) {
             @Override
             public void onTriggered() throws CancellationException {
-                GameManager.this.updateBossBar();
+                GameManager.this.updateInfoBossBar();
             }
         };
         TaskScheduler.INSTANCE.schedule(this.updateBossBarTask);
     }
 
-    public void disableBorderResizeBossBar() {
+    public void disableInfoBossBar() {
         BossBarManager manager = this.server.getBossBarManager();
         if (this.resizeBossBar != manager.get(RESIZE_BOSS_BAR_ID)) {
             if (this.resizeBossBar != null) {
@@ -417,9 +413,19 @@ public class GameManager extends PersistentState {
         manager.remove(this.resizeBossBar);
     }
 
-    private void updateBossBar() {
+    private void updateInfoBossBar() {
         if (!this.gameStage.isGaming()) return;
-        if (this.borderStage == GameBorderStage.WAITING) {
+        if (TaskScheduler.INSTANCE.isRunning(this.timeoutTask)) {
+            int timeoutTimeTicks = this.gameProperties.timeout().toTicks();
+            this.resizeBossBar.setName(
+                    Text.translatable(
+                                    "game.battlegrounds.info_bossbar.timeout",
+                                    this.timeoutTask.getDelayTicks() / 20
+                            )
+                            .formatted(Formatting.RED));
+            this.resizeBossBar.setMaxValue(timeoutTimeTicks);
+            this.resizeBossBar.setValue(this.timeoutTask.getDelayTicks());
+        } else if (this.borderStage == GameBorderStage.WAITING) {
             int delayTimeTicks = this.currentStage.resizeTimeInfo().delayTime().toTicks();
             this.resizeBossBar.setName(
                     Text.translatable(
@@ -516,12 +522,12 @@ public class GameManager extends PersistentState {
         this.worldHelper.setBorderSize(this.currentStage.initialSize());
         PlayerUtil.randomTpAllPlayers(this.server, this.server.getOverworld());
         this.enableBorderResizing(this.currentStage.resizeTimeInfo().delayTime().toTicks());
-        this.enableBorderResizeBossBar();
+        this.enableInfoBossBar();
         ServerGameEvents.STAGE_TRIGGERED.invoker().onTriggered(this, this.currentStage.trigger());
     }
 
     public void stopGame() {
-        this.disableBorderResizeBossBar();
+        this.disableInfoBossBar();
         this.disableBorderResizing();
         this.setIdleState();
         this.currentStage = null;
@@ -541,8 +547,18 @@ public class GameManager extends PersistentState {
         this.assertGamePropertiesNotNull();
         if (this.borderResizingEnabled) {
             this.enableBorderResizing(resizeTimer);
-            this.enableBorderResizeBossBar();
+            this.enableInfoBossBar();
         }
+    }
+
+    public void enableTimeoutTimer(int ticksLeft) {
+        this.timeoutTask = new ScheduledTask(Duration.withTicks(ticksLeft)) {
+            @Override
+            public void run() throws CancellationException {
+                ServerGameEvents.GAME_TIE.invoker().onGameTie(GameManager.this);
+            }
+        };
+        TaskScheduler.INSTANCE.schedule(this.timeoutTask);
     }
 
     public void enableBorderResizing(int delayTicks) {
@@ -635,6 +651,11 @@ public class GameManager extends PersistentState {
                     .result().orElse(0);
             manager.resumeGame(timer);
         }
+        if (nbt.contains("timeout_timer")) {
+            int timer = Codec.INT.parse(NbtOps.INSTANCE, nbt.get("timeout_timer"))
+                    .result().orElse(manager.gameProperties.timeout().toTicks());
+            manager.enableTimeoutTimer(timer);
+        }
         return manager;
     }
 
@@ -660,6 +681,9 @@ public class GameManager extends PersistentState {
         }
         if (this.gameStage.isGaming()) {
             nbt.putInt("resize_timer", this.resizeBorderTask.getDelayTicks());
+        }
+        if (TaskScheduler.INSTANCE.isRunning(this.timeoutTask)) {
+            nbt.putInt("timeout_timer", this.timeoutTask.getDelayTicks());
         }
         return nbt;
     }

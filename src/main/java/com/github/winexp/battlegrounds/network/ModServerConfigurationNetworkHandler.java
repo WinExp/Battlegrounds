@@ -10,15 +10,15 @@ import net.minecraft.server.network.ServerConfigurationNetworkHandler;
 
 public class ModServerConfigurationNetworkHandler {
     public static void register() {
-        ServerConfigurationConnectionEvents.DISCONNECT.register(ModServerConfigurationNetworkHandler::onConfigureDisconnect);
         ServerConfigurationNetworking.registerGlobalReceiver(ModInfoC2SPacket.TYPE, ModServerConfigurationNetworkHandler::onModInfoReceived);
-    }
-
-    private static void onConfigureDisconnect(ServerConfigurationNetworkHandler handler, MinecraftServer server) {
-        PlayerUtil.setPlayerModVersion(handler.getDebugProfile().getId(), null);
+        ServerConfigurationConnectionEvents.DISCONNECT.register(ModServerConfigurationNetworkHandler::onConfigureDisconnect);
     }
 
     private static void onModInfoReceived(ModInfoC2SPacket packet, ServerConfigurationNetworkHandler handler, PacketSender sender) {
         PlayerUtil.setPlayerModVersion(handler.getDebugProfile().getId(), packet.modVersion());
+    }
+
+    private static void onConfigureDisconnect(ServerConfigurationNetworkHandler handler, MinecraftServer server) {
+        PlayerUtil.setPlayerModVersion(handler.getDebugProfile().getId(), null);
     }
 }

@@ -37,6 +37,7 @@
   "game.battlegrounds.deathmatch.start.broadcast": "您已进入死亡竞赛模式！",
   "game.battlegrounds.delete_world.broadcast": "游戏即将开始，将在 %d 秒内重启服务器。",
   "game.battlegrounds.info_bossbar.resizing": "距离缩圈完成还有 %s 秒",
+  "game.battlegrounds.info_bossbar.timeout": "距离游戏超时还有 %s 秒",
   "game.battlegrounds.info_bossbar.waiting": "距离下一个圈还有 %d 秒",
   "game.battlegrounds.join.broadcast": "%s 加入了游戏！(%d/%d)",
   "game.battlegrounds.join.spectator.broadcast": "%s 加入了游戏！(观战)",

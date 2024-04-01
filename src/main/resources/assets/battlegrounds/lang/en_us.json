@@ -37,6 +37,7 @@
   "game.battlegrounds.deathmatch.start.broadcast": "You are in Deathmatch mode!",
   "game.battlegrounds.delete_world.broadcast": "The game is about to start and will restart the server in %d seconds.",
   "game.battlegrounds.info_bossbar.resizing": "%s seconds to completion of reduction.",
+  "game.battlegrounds.info_bossbar.timeout": "%s seconds to game timeout",
   "game.battlegrounds.info_bossbar.waiting": "%d seconds to next lap",
   "game.battlegrounds.join.broadcast": "%s joined the game! (%d/%d)",
   "game.battlegrounds.join.spectator.broadcast": "%s joined to the game! (Spectator)",
