@@ -21,9 +21,10 @@ import net.minecraft.util.Hand;
 import java.util.Map;
 
 public class KnockbackStickItem extends ToolItem implements ItemNbtCrafting, EnchantRestrict {
-    private static final int DURATION = 3 * 20;
+    private static final int DURATION = 5 * 20;
     public static final Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
-            Enchantments.KNOCKBACK, 5
+            Enchantments.KNOCKBACK, 7,
+            Enchantments.SHARPNESS, 1
     );
 
     public KnockbackStickItem(ToolMaterial material, Settings settings) {
@@ -31,7 +32,7 @@ public class KnockbackStickItem extends ToolItem implements ItemNbtCrafting, Enc
     }
 
     private void giveEffects(LivingEntity attacker, LivingEntity target) {
-        target.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, DURATION, 1), attacker);
+        target.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, DURATION, 2), attacker);
         target.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, DURATION, 0), attacker);
     }
 

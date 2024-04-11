@@ -8,6 +8,10 @@ public abstract class AbstractTask {
     protected AbstractTask() {
     }
 
+    public TaskExecuteStage getExecuteStage() {
+        return TaskExecuteStage.END;
+    }
+
     public boolean isCancelled() {
         return this.cancelled;
     }

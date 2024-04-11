@@ -8,17 +8,17 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.*;
 
 @Mixin(GrindstoneScreenHandler.class)
-public abstract class deny_GrindstoneScreenHandlerMixin {
+public abstract class restrict_GrindstoneScreenHandlerMixin {
     @Invoker("grind")
     public abstract ItemStack invokeGrind(ItemStack item, int damage, int amount);
 
     @Redirect(method = "updateResult", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/GrindstoneScreenHandler;grind(Lnet/minecraft/item/ItemStack;II)Lnet/minecraft/item/ItemStack;"))
-    private ItemStack getGrindResult(GrindstoneScreenHandler instance, ItemStack item, int damage, int amount) {
+    private ItemStack getGrindResult(GrindstoneScreenHandler instance, ItemStack stack, int damage, int amount) {
         boolean bl = true;
-        if (item.getItem() instanceof EnchantRestrict restrict) {
-            bl = restrict.isGrindable();
+        if (stack.getItem() instanceof EnchantRestrict restrict) {
+            bl = restrict.isGrindable(stack);
         }
-        if (bl) return this.invokeGrind(item, damage, amount);
+        if (bl) return this.invokeGrind(stack, damage, amount);
         else return ItemStack.EMPTY;
     }
 }

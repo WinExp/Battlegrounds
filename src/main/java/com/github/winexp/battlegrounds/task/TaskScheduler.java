@@ -12,22 +12,35 @@ public class TaskScheduler {
     private final CopyOnWriteArrayList<AbstractTask> tasks = new CopyOnWriteArrayList<>();
 
     public TaskScheduler() {
-        ServerTickEvents.END_SERVER_TICK.register(this::tick);
+        ServerTickEvents.START_SERVER_TICK.register(this::startTick);
+        ServerTickEvents.END_SERVER_TICK.register(this::endTick);
     }
 
-    private void tick(MinecraftServer server) {
+    private void startTick(MinecraftServer server) {
         for (AbstractTask task : this.tasks) {
-            if (task.isCancelled()) this.tasks.remove(task);
-            try {
-                task.tick();
-            } catch (CancellationException e) {
-                task.cancel();
-            }
+            if (task.getExecuteStage() != TaskExecuteStage.START) continue;
+            this.tryExecute(task);
+        }
+    }
+
+    private void endTick(MinecraftServer server) {
+        for (AbstractTask task : this.tasks) {
+            if (task.getExecuteStage() != TaskExecuteStage.END) continue;
+            this.tryExecute(task);
+        }
+    }
+
+    private void tryExecute(AbstractTask task) {
+        if (task.isCancelled()) this.tasks.remove(task);
+        try {
+            task.tick();
+        } catch (CancellationException e) {
+            task.cancel();
         }
     }
 
     public boolean isRunning(AbstractTask task) {
-        return this.tasks.contains(task) && task.isCancelled();
+        return this.tasks.contains(task) && !task.isCancelled();
     }
 
     public void schedule(AbstractTask task) {

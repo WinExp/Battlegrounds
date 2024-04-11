@@ -39,12 +39,13 @@ import java.util.List;
 import java.util.Map;
 
 public class Items extends net.minecraft.item.Items {
+    private static final ArrayList<NbtCrafting> nbtCraftingItems = new ArrayList<>();
     public static final PVPProSwordItem PVP_PRO_SWORD = registerItem("pvp_pro_sword", new PVPProSwordItem(ToolMaterials.PVP_PRO_SWORD, 3, -2.4F, new Item.Settings().rarity(Rarity.EPIC).fireproof()));
     public static final SevenElevenSwordItem SEVEN_ELEVEN_SWORD = registerItem("seven_eleven_sword", new SevenElevenSwordItem(ToolMaterials.SEVEN_ELEVEN_SWORD, 3, -2.4F, new Item.Settings().rarity(Rarity.EPIC).fireproof()));
     public static final StevesPainSwordItem STEVES_PAIN_SWORD = registerItem("steves_pain_sword", new StevesPainSwordItem(ToolMaterials.STEVES_PAIN_SWORD, 3, -2.4F, new Item.Settings().rarity(Rarity.EPIC).fireproof()));
-    public static final LeachingSwordItem LEACHING_SWORD = registerItem("leaching_sword", new LeachingSwordItem(ToolMaterials.LEACHING_SWORD, 3, -2.2F, new Item.Settings().rarity(Rarity.UNCOMMON)));
+    public static final LeachingSwordItem LEACHING_SWORD = registerItem("leaching_sword", new LeachingSwordItem(ToolMaterials.LEACHING_SWORD, 3, -2.0F, new Item.Settings().rarity(Rarity.UNCOMMON)));
     public static final MinersPickaxeItem MINERS_PICKAXE = registerItem("miners_pickaxe", new MinersPickaxeItem(ToolMaterials.MINERS_PICKAXE, 1, -2.8F, new Item.Settings().rarity(Rarity.UNCOMMON)));
-    public static final ButchersAxeItem BUTCHERS_AXE = registerItem("butchers_axe", new ButchersAxeItem(ToolMaterials.BUTCHERS_AXE, 5, -3.0F, new Item.Settings().rarity(Rarity.EPIC).fireproof()));
+    public static final ButchersAxeItem BUTCHERS_AXE = registerItem("butchers_axe", new ButchersAxeItem(ToolMaterials.BUTCHERS_AXE, 5, -3.3F, new Item.Settings().rarity(Rarity.EPIC).fireproof()));
     public static final ChannelingBowItem CHANNELING_BOW = registerItem("channeling_bow", new ChannelingBowItem(new Item.Settings().rarity(Rarity.RARE).fireproof().maxDamage(ChannelingBowItem.DURABILITY)));
     public static final FlashBangItem FLASH_BANG = registerItem("flash_bang", new FlashBangItem(new Item.Settings().maxCount(16).rarity(Rarity.UNCOMMON)));
     public static final MolotovItem MOLOTOV = registerItem("molotov", new MolotovItem(new Item.Settings().maxCount(16).rarity(Rarity.UNCOMMON)));
@@ -54,16 +55,19 @@ public class Items extends net.minecraft.item.Items {
     public static <T extends Item> T registerItem(String name, T item) {
         T result = Registry.register(Registries.ITEM, new Identifier("battlegrounds", name), item);
         if (item instanceof NbtCrafting nbtCrafting) {
-            addRecipe(nbtCrafting);
+            nbtCraftingItems.add(nbtCrafting);
         }
         return result;
     }
 
-    private static void addRecipe(NbtCrafting item) {
-        RecipeUtil.addRecipe(item);
+    public static void addRecipes() {
+        for (NbtCrafting nbtCrafting : nbtCraftingItems) {
+            RecipeUtil.addRecipe(nbtCrafting);
+        }
+        addCustomRecipes();
     }
 
-    public static void addCustomRecipes() {
+    private static void addCustomRecipes() {
         List<ShapedNbtCrafting> shapedRecipes = List.of(
                 // 自动冶炼
                 new ShapedNbtCrafting(
@@ -155,11 +159,6 @@ public class Items extends net.minecraft.item.Items {
                     entity.setFuse(FlashBangItem.FUSE);
                 });
             }
-
-            @Override
-            protected float getForce() {
-                return 1.3F;
-            }
         });
         DispenserBlock.registerBehavior(MOLOTOV, new ProjectileDispenserBehavior() {
             @Override
@@ -168,11 +167,6 @@ public class Items extends net.minecraft.item.Items {
                     entity.setItem(stack);
                     entity.setFuse(MolotovItem.FUSE);
                 });
-            }
-
-            @Override
-            protected float getForce() {
-                return 1.3F;
             }
         });
     }
@@ -191,6 +185,6 @@ public class Items extends net.minecraft.item.Items {
 
     public static void registerItems() {
         registerDispenserBehaviors();
-        addCustomRecipes();
+        addRecipes();
     }
 }

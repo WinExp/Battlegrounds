@@ -1,8 +1,8 @@
 package com.github.winexp.battlegrounds.client.network;
 
 import com.github.winexp.battlegrounds.client.gui.screen.vote.VoteScreen;
+import com.github.winexp.battlegrounds.client.render.FlashRenderer;
 import com.github.winexp.battlegrounds.client.util.ClientConstants;
-import com.github.winexp.battlegrounds.entity.projectile.FlashBangEntity;
 import com.github.winexp.battlegrounds.event.ClientVoteEvents;
 import com.github.winexp.battlegrounds.network.packet.s2c.play.FlashS2CPacket;
 import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.*;
@@ -33,7 +33,7 @@ public final class ModClientPlayNetworkHandler {
         Entity entity = client.getCameraEntity();
         if (entity != null) {
             float tickDelta = client.getTickDelta();
-            ClientConstants.FLASH_RENDERER.setFlashStrength(FlashBangEntity.getFlashStrength(entity, pos, distance, tickDelta));
+            ClientConstants.FLASH_RENDERER.setFlashStrength(FlashRenderer.getFlashStrength(entity, pos, distance, tickDelta));
         }
     }
 

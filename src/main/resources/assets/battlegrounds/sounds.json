@@ -1,8 +1,19 @@
 {
-  "tube_fall": {
-    "subtitle": "subtitles.battlegrounds.tube_fall",
+  "entity.flash_bang.rebound": {
+    "subtitle": "subtitles.battlegrounds.entity.flash_bang.rebound",
     "sounds": [
-      "battlegrounds:tube_fall"
+      {
+        "name": "battlegrounds:entity/flash_bang/rebound"
+      }
+    ]
+  },
+  "player.tube_fall": {
+    "subtitle": "subtitles.battlegrounds.player.tube_fall",
+    "sounds": [
+      {
+        "name": "battlegrounds:player/tube_fall",
+        "volume": 0.8
+      }
     ]
   }
 }

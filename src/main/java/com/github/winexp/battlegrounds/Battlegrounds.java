@@ -3,15 +3,19 @@ package com.github.winexp.battlegrounds;
 import com.github.winexp.battlegrounds.block.BlockSmeltableRegistry;
 import com.github.winexp.battlegrounds.command.BattlegroundsCommand;
 import com.github.winexp.battlegrounds.command.RandomTpCommand;
+import com.github.winexp.battlegrounds.command.argument.PVPModeArgumentType;
 import com.github.winexp.battlegrounds.config.ConfigUtil;
 import com.github.winexp.battlegrounds.config.RootConfig;
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.entity.EntityTypes;
+import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
 import com.github.winexp.battlegrounds.game.GameManager;
 import com.github.winexp.battlegrounds.game.GameUtil;
 import com.github.winexp.battlegrounds.item.ItemGroups;
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.loot.LootTableModifier;
+import com.github.winexp.battlegrounds.loot.function.LootFunctionTypes;
+import com.github.winexp.battlegrounds.mixin.ArgumentTypesInvoker;
 import com.github.winexp.battlegrounds.network.ModServerConfigurationNetworkHandler;
 import com.github.winexp.battlegrounds.network.ModServerPlayNetworkHandler;
 import com.github.winexp.battlegrounds.resource.listener.DataPackResourceReloadListener;
@@ -27,6 +31,8 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.command.argument.serialize.ConstantArgumentSerializer;
+import net.minecraft.registry.Registries;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
@@ -45,7 +51,7 @@ public class Battlegrounds implements ModInitializer {
     public void reload() {
         this.loadConfigs();
 
-        Items.addCustomRecipes();
+        Items.addRecipes();
     }
 
     private void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
@@ -78,6 +84,15 @@ public class Battlegrounds implements ModInitializer {
         }
     }
 
+    private void registerCommandArgumentTypes() {
+        ArgumentTypesInvoker.invokeRegister(
+                Registries.COMMAND_ARGUMENT_TYPE,
+                "battlegrounds:pvp_mode",
+                PVPModeArgumentType.class,
+                ConstantArgumentSerializer.of(PVPModeArgumentType::pvpMode)
+        );
+    }
+
     @Override
     public void onInitialize() {
         INSTANCE = this;
@@ -103,14 +118,20 @@ public class Battlegrounds implements ModInitializer {
         Items.registerItems();
         // 注册物品组
         ItemGroups.registerItemGroups();
+        // 注册战利品表物品修饰器
+        LootFunctionTypes.registerLootFunctions();
         // 注册实体
         EntityTypes.registerEntityTypes();
+        // 注册状态效果
+        StatusEffects.registerStatusEffects();
         // 注册附魔
         Enchantments.registerEnchantments();
         // 自动冶炼
         BlockSmeltableRegistry.registerDefaults();
         // 注册声音事件
         SoundEvents.registerSoundEvents();
+        // 注册指令参数类型
+        this.registerCommandArgumentTypes();
         // 尝试重置存档
         this.tryDeleteWorld();
     }

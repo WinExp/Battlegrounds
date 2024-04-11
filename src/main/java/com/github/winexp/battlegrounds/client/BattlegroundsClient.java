@@ -9,7 +9,6 @@ import com.github.winexp.battlegrounds.client.toast.vote.VoteClosedToast;
 import com.github.winexp.battlegrounds.client.toast.vote.VoteOpenedToast;
 import com.github.winexp.battlegrounds.client.util.ClientConstants;
 import com.github.winexp.battlegrounds.entity.EntityTypes;
-import com.github.winexp.battlegrounds.event.ClientApplyFogCallback;
 import com.github.winexp.battlegrounds.event.ClientVoteEvents;
 import com.github.winexp.battlegrounds.item.Items;
 import net.fabricmc.api.ClientModInitializer;
@@ -33,7 +32,6 @@ public class BattlegroundsClient implements ClientModInitializer {
 
         // 自定义渲染器
         HudRenderCallback.EVENT.register(ClientConstants.FLASH_RENDERER);
-        ClientApplyFogCallback.EVENT.register(ClientConstants.FLASH_RENDERER);
     }
 
     @Override

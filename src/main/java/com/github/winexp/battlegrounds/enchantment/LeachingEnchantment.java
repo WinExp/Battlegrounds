@@ -9,7 +9,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 
 public class LeachingEnchantment extends Enchantment {
-    public static final int DURATION = 3 * 20;
+    public static final int DURATION_PER_LEVEL = 5 * 20;
 
     public LeachingEnchantment() {
         this(Rarity.VERY_RARE, EnchantmentTarget.WEAPON, EquipmentSlot.MAINHAND);
@@ -19,11 +19,12 @@ public class LeachingEnchantment extends Enchantment {
         super(rarity, target, slots);
     }
 
-    private void addEffects(LivingEntity source, LivingEntity target) {
-        target.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, DURATION, 3), source);
-        target.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, DURATION, 0), source);
-        target.addStatusEffect(new StatusEffectInstance(StatusEffects.HUNGER, DURATION, 2), source);
-        target.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, DURATION, 0), source);
+    private void giveEffects(LivingEntity source, LivingEntity target, int level) {
+        int duration = Math.min(DURATION_PER_LEVEL * level, 30 * 20);
+        target.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, duration, 3), source);
+        target.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, duration, 0), source);
+        target.addStatusEffect(new StatusEffectInstance(StatusEffects.HUNGER, duration, 2), source);
+        target.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, duration, 0), source);
     }
 
     @Override
@@ -34,7 +35,7 @@ public class LeachingEnchantment extends Enchantment {
     @Override
     public void onTargetDamaged(LivingEntity user, Entity target, int level) {
         if (target instanceof LivingEntity livingEntity) {
-            addEffects(user, livingEntity);
+            giveEffects(user, livingEntity, level);
         }
     }
 

@@ -3,6 +3,7 @@ package com.github.winexp.battlegrounds.datagen;
 
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.loot.LootTables;
+import com.github.winexp.battlegrounds.loot.function.ReplaceItemLootFunction;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.SimpleFabricLootTableProvider;
 import net.minecraft.loot.LootPool;
@@ -32,28 +33,29 @@ public class ModChestLootTableProvider extends SimpleFabricLootTableProvider {
                 LootTable.builder()
                         .pool(LootPool.builder().rolls(UniformLootNumberProvider.create(2.0F, 3.0F))
                                 .with(ItemEntry.builder(Items.IRON_NUGGET).weight(1)
-                                        .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(5.0F, 32.0F))))
+                                        .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(6.0F, 35.0F))))
                                 .with(ItemEntry.builder(Items.GOLD_NUGGET).weight(1)
-                                        .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(5.0F, 32.0F))))
+                                        .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(8.0F, 40.0F))))
                         )
                         .pool(LootPool.builder().rolls(UniformLootNumberProvider.create(2.0F, 3.0F))
                                 .with(ItemEntry.builder(Items.IRON_INGOT).weight(1)
-                                        .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(2.0F, 4.0F))))
+                                        .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(4.0F, 8.0F))))
                                 .with(ItemEntry.builder(Items.GOLD_INGOT).weight(1)
-                                        .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(3.0F, 8.0F))))
+                                        .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(5.0F, 10.0F))))
                                 .with(ItemEntry.builder(Items.EMERALD).weight(1)
-                                        .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(4.0F, 10.0F))))
-                        )
-                        .pool(LootPool.builder().rolls(UniformLootNumberProvider.create(1.0F, 2.0F))
-                                .with(ItemEntry.builder(Items.FLASH_BANG).weight(7))
-                                .with(EmptyEntry.builder().weight(30))
+                                        .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(2.0F, 5.0F))))
                         )
                         .pool(LootPool.builder().rolls(ConstantLootNumberProvider.create(1.0F))
+                                .with(ItemEntry.builder(Items.FLASH_BANG).weight(7)
+                                        .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(1.0F, 2.0F))))
+                                .with(ItemEntry.builder(Items.RUPERTS_TEAR).weight(2))
                                 .with(ItemEntry.builder(Items.BUTCHERS_AXE).weight(1)
                                         .apply(SetDamageLootFunction.builder(new UniformLootNumberProvider(
-                                                ConstantLootNumberProvider.create(0.0F),
-                                                UniformLootNumberProvider.create(0.2F, 0.8F)
+                                                ConstantLootNumberProvider.create(0.1F),
+                                                UniformLootNumberProvider.create(0.25F, 0.85F)
                                         ))))
+                                .with(ItemEntry.builder(Items.MINERS_PICKAXE).weight(3)
+                                        .apply(ReplaceItemLootFunction.builder(Items.MINERS_PICKAXE)))
                                 .with(EmptyEntry.builder().weight(24))
                         )
         );
@@ -214,6 +216,11 @@ public class ModChestLootTableProvider extends SimpleFabricLootTableProvider {
                                         .apply(SetCountLootFunction.builder(ConstantLootNumberProvider.create(1.0F))))
                                 .with(ItemEntry.builder(Items.DIAMOND_SHOVEL).weight(1)
                                         .apply(SetCountLootFunction.builder(ConstantLootNumberProvider.create(1.0F))))
+                        )
+                        .pool(LootPool.builder().rolls(UniformLootNumberProvider.create(1.0F, 2.0F))
+                                .with(EmptyEntry.builder().weight(30))
+                                .with(ItemEntry.builder(Items.LEACHING_SWORD).weight(1)
+                                        .apply(ReplaceItemLootFunction.builder(Items.LEACHING_SWORD)))
                         )
                         .pool(LootPool.builder().rolls(UniformLootNumberProvider.create(2.0F, 3.0F))
                                 .with(EmptyEntry.builder().weight(3))

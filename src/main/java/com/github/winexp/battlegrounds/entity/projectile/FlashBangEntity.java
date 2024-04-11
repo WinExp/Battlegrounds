@@ -3,9 +3,10 @@ package com.github.winexp.battlegrounds.entity.projectile;
 import com.github.winexp.battlegrounds.entity.EntityTypes;
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.network.packet.s2c.play.FlashS2CPacket;
+import com.github.winexp.battlegrounds.sound.SoundEvents;
 import com.github.winexp.battlegrounds.util.MathUtil;
+import com.github.winexp.battlegrounds.util.RandomUtil;
 import com.github.winexp.battlegrounds.util.WorldUtil;
-import com.github.winexp.battlegrounds.util.raycast.BlockRaycastResult;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -24,36 +25,17 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
 import java.util.List;
-import java.util.function.BiPredicate;
-import java.util.function.Predicate;
 
 public class FlashBangEntity extends ThrownItemEntity {
-    public static final float MAX_FLASH_TICKS = 80;
-    public static final int MAX_DISTANCE = 32;
-    public static final float STRENGTH_LEFT_SPEED = 0.02F;
-    public static final float FOG_VISIBILITY = 3.0F;
-    public static final float DISTANCE_INCREMENT = 10;
+    public static final int MAX_DISTANCE = 48;
+    public static final float DISTANCE_INCREMENT = 15;
     private static final TrackedData<Integer> FUSE = DataTracker.registerData(FlashBangEntity.class, TrackedDataHandlerRegistry.INTEGER);
-    private static final Predicate<BlockRaycastResult> BLOCK_PREDICATE = (raycastResult) -> {
-        World world = raycastResult.world();
-        BlockHitResult hitResult = raycastResult.hitResult();
-        BlockPos blockPos = hitResult.getBlockPos();
-        return hitResult.getType() == HitResult.Type.MISS
-                || WorldUtil.isOpaqueFullCube(world, blockPos);
-    };
-    private static final BiPredicate<EntityHitResult, BlockRaycastResult> FLASH_PREDICATE = (entityHitResult, raycastResult) -> {
-        World world = raycastResult.world();
-        BlockPos blockPos = raycastResult.hitResult().getBlockPos();
-        return entityHitResult == null && (raycastResult.hitResult().getType() == HitResult.Type.MISS
-                || !WorldUtil.isOpaqueFullCube(world, blockPos));
-    };
 
     public FlashBangEntity(net.minecraft.entity.EntityType<? extends ThrownItemEntity> entityType, World world) {
         super(entityType, world);
@@ -80,24 +62,7 @@ public class FlashBangEntity extends ThrownItemEntity {
         return (itemStack.isEmpty() ? ParticleTypes.ITEM_SNOWBALL : new ItemStackParticleEffect(ParticleTypes.ITEM, itemStack));
     }
 
-    public static float getFlashStrength(Entity entity, Vec3d flashPos, float distance, float tickDelta) {
-        double maxDistance = MathUtil.distanceTo(entity.getPos(), flashPos);
-        Vec3d vec3d = entity.getCameraPosVec(tickDelta);
-        Vec3d vec3d2 = MathUtil.getRotationWithEntity(entity, flashPos);
-        Vec3d playerRotation = entity.getRotationVec(1.0F);
-        float rotationOffset = MathUtil.getOffset(vec3d2, playerRotation);
-        float rotationAttenuate = Math.max(0, Math.min(distance - 0.1F, rotationOffset - 0.85F));
-        EntityHitResult entityHitResult = MathUtil.raycastEntity(entity, flashPos, maxDistance, tickDelta);
-        BlockRaycastResult raycastResult1 = MathUtil.raycastBlock(entity, flashPos, vec3d, RaycastContext.FluidHandling.NONE, BLOCK_PREDICATE);
-        BlockRaycastResult raycastResult2 = MathUtil.raycastBlock(entity, vec3d, flashPos, RaycastContext.FluidHandling.NONE, BLOCK_PREDICATE);
-        if (FLASH_PREDICATE.test(entityHitResult, raycastResult1)
-        && FLASH_PREDICATE.test(entityHitResult, raycastResult2)) {
-            return (distance - rotationAttenuate) * (FlashBangEntity.MAX_FLASH_TICKS + 20)
-                    * FlashBangEntity.STRENGTH_LEFT_SPEED * Math.min(raycastResult1.strength(), raycastResult2.strength());
-        } else return 0;
-    }
-
-    public static void flash(World world, Vec3d pos) {
+    public static void summonFlash(World world, Vec3d pos) {
         List<? extends PlayerEntity> players = world.getPlayers();
         for (PlayerEntity player1 : players) {
             ServerPlayerEntity player = (ServerPlayerEntity) player1;
@@ -107,6 +72,15 @@ public class FlashBangEntity extends ThrownItemEntity {
                 FlashS2CPacket packet = new FlashS2CPacket(pos, distanceStrength);
                 ServerPlayNetworking.send(player, packet);
             }
+        }
+    }
+
+    public void flashAndDiscard() {
+        World world = this.getWorld();
+        if (!world.isClient) {
+            world.sendEntityStatus(this, (byte) 3);
+            summonFlash(world, this.getPos());
+            this.discard();
         }
     }
 
@@ -121,9 +95,13 @@ public class FlashBangEntity extends ThrownItemEntity {
         if (this.getFuse() >= 0) {
             this.setFuse(this.getFuse() - 1);
             if (this.getFuse() <= 0) {
-                BlockHitResult hitResult = BlockHitResult.createMissed(this.getPos(), Direction.UP, this.getBlockPos());
-                this.onCollision(hitResult);
+                this.flashAndDiscard();
             }
+        }
+        double speed = Math.sqrt(Math.pow(this.getVelocity().x, 2) + Math.pow(this.getVelocity().y, 2) + Math.pow(this.getVelocity().z, 2));
+        if (speed <= 0.1F && (WorldUtil.isFullCube(this.getWorld(), this.getBlockPos())
+                || WorldUtil.isFullCube(this.getWorld(), this.getBlockPos().down()))) {
+            this.flashAndDiscard();
         }
         super.tick();
     }
@@ -153,19 +131,39 @@ public class FlashBangEntity extends ThrownItemEntity {
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
         super.onEntityHit(entityHitResult);
+        this.reboundEntity();
         Entity entity = entityHitResult.getEntity();
-        entity.damage(this.getDamageSources().thrown(this, this.getOwner()), 1.0F);
+        entity.damage(this.getDamageSources().thrown(this, this.getOwner()), 2.0F);
+    }
+
+    private void reboundEntity() {
+        Vec3d velocity = this.getVelocity();
+        this.setVelocity(-velocity.x * 0.2,
+                -velocity.y * 0.2,
+                -velocity.z * 0.2);
+    }
+
+    private void reboundBlock(Direction side) {
+        Vec3d velocity = this.getVelocity();
+        int deltaX = side.getAxis() == Direction.Axis.X ? -1 : 1;
+        int deltaY = side.getAxis() == Direction.Axis.Y ? -1 : 1;
+        int deltaZ = side.getAxis() == Direction.Axis.Z ? -1 : 1;
+        this.setVelocity(velocity.x * deltaX * 0.4,
+                velocity.y * deltaY * 0.4,
+                velocity.z * deltaZ * 0.4);
+    }
+
+    @Override
+    protected void onBlockHit(BlockHitResult blockHitResult) {
+        super.onBlockHit(blockHitResult);
+        this.reboundBlock(blockHitResult.getSide());
     }
 
     @Override
     protected void onCollision(HitResult hitResult) {
         super.onCollision(hitResult);
-        World world = this.getWorld();
-        if (!world.isClient) {
-            world.sendEntityStatus(this, (byte) 3);
-            flash(world, this.getPos());
-            this.discard();
-        }
+        Random random = this.getWorld().getRandom();
+        this.playSound(SoundEvents.ENTITY_FLASH_BANG_REBOUND, 1.0F, RandomUtil.nextFloatBetween(random, 0.95F, 1.05F));
     }
 
     @Override

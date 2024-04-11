@@ -2,7 +2,7 @@ package com.github.winexp.battlegrounds.block;
 
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.item.Items;
-import com.github.winexp.battlegrounds.loot.function.ReplaceDropLootFunction;
+import com.github.winexp.battlegrounds.loot.function.ReplaceItemLootFunction;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.loot.condition.LootCondition;
@@ -34,7 +34,7 @@ public class BlockSmeltableRegistry {
         register(Blocks.IRON_ORE, Blocks.DEEPSLATE_IRON_ORE);
         register(Blocks.GOLD_ORE, Blocks.DEEPSLATE_GOLD_ORE);
         register(Blocks.COPPER_ORE, Blocks.DEEPSLATE_COPPER_ORE);
-        register(Blocks.NETHER_GOLD_ORE, ReplaceDropLootFunction.builder(Items.GOLD_INGOT));
+        register(Blocks.NETHER_GOLD_ORE, ReplaceItemLootFunction.builder(Items.GOLD_INGOT));
     }
 
     public static void register(Block... blocks) {

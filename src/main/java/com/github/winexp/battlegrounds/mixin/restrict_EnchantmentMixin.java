@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Enchantment.class)
-public abstract class deny_EnchantmentMixin {
+public abstract class restrict_EnchantmentMixin {
     @Shadow @Final public EnchantmentTarget target;
 
     @Inject(method = "isAcceptableItem", at = @At("RETURN"), cancellable = true)

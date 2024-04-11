@@ -20,6 +20,7 @@
     }
   },
   "result": {
-    "item": "battlegrounds:flash_bang"
+    "item": "battlegrounds:flash_bang",
+    "count": 4
   }
 }

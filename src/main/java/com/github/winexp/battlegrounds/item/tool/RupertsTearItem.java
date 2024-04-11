@@ -27,9 +27,10 @@ import net.minecraft.world.World;
 import java.util.function.Predicate;
 
 public class RupertsTearItem extends ToolItem implements EnchantRestrict {
-    private static final int COOLDOWN = 60 * 20;
+    private static final int MAX_COOLDOWN = 30 * 20;
+    private static final int MIN_COOLDOWN = 4 * 20;
     private static final int FAILED_COOLDOWN = 20;
-    private static final int MAX_DISTANCE = 50;
+    private static final int MAX_DISTANCE = 70;
 
     private static final Predicate<BlockRaycastResult> BLOCK_PREDICATE = (raycastResult) -> {
         World world = raycastResult.world();
@@ -60,7 +61,7 @@ public class RupertsTearItem extends ToolItem implements EnchantRestrict {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        ItemStack itemStack = user.getStackInHand(hand);
+        ItemStack stack = user.getStackInHand(hand);
         if (!world.isClient) {
             Vec3d begin = user.getEyePos();
             Vec3d rotation = user.getRotationVector();
@@ -72,7 +73,7 @@ public class RupertsTearItem extends ToolItem implements EnchantRestrict {
             || raycastResult.hitResult().getType() == HitResult.Type.MISS
             || !world.isDirectionSolid(pos, user, Direction.UP)) {
                 this.onUseFailed(user);
-                return TypedActionResult.fail(itemStack);
+                return TypedActionResult.fail(stack);
             }
             for (int y = pos.getY() + 1; y <= pos.getY() + 2; y++) {
                 BlockPos pos2 = new BlockPos(pos.getX(), y, pos.getZ());
@@ -83,17 +84,18 @@ public class RupertsTearItem extends ToolItem implements EnchantRestrict {
                         || fluid.matchesType(Fluids.LAVA)
                         || fluid.matchesType(Fluids.FLOWING_LAVA)) {
                     this.onUseFailed(user);
-                    return TypedActionResult.fail(itemStack);
+                    return TypedActionResult.fail(stack);
                 }
             }
             Vec3d tpPos = pos.up().toCenterPos();
-            user.getItemCooldownManager().set(this, COOLDOWN);
+            double distance = tpPos.distanceTo(user.getPos());
+            int cooldown = (int) (MAX_COOLDOWN * (Math.pow(distance, 1.5) / Math.pow(MAX_DISTANCE, 1.5)));
+            user.getItemCooldownManager().set(this, Math.max(MIN_COOLDOWN, cooldown));
             user.teleport(tpPos.x, tpPos.y, tpPos.z);
             user.onLanding();
             world.playSound(null, user.getX(), user.getY(), user.getZ(), SoundEvents.ENTITY_PLAYER_TELEPORT, SoundCategory.PLAYERS);
-            this.damageStack(itemStack, user);
-            return TypedActionResult.success(itemStack);
+            this.damageStack(stack, user);
         }
-        return TypedActionResult.pass(itemStack);
+        return TypedActionResult.success(stack, world.isClient);
     }
 }

@@ -1,6 +1,7 @@
 package com.github.winexp.battlegrounds.datagen;
 
 import com.github.winexp.battlegrounds.item.Items;
+import com.github.winexp.battlegrounds.registry.RegistryKeys;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricAdvancementProvider;
 import net.minecraft.advancement.Advancement;
@@ -13,7 +14,6 @@ import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
 import net.minecraft.predicate.entity.LocationPredicate;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.gen.structure.Structure;
@@ -151,6 +151,10 @@ public class ModAdvancementProvider extends FabricAdvancementProvider {
                         ),
                         RegistryKey.of(
                                 RegistryKeys.STRUCTURE,
+                                new Identifier("battlegrounds", "medieval_library")
+                        ),
+                        RegistryKey.of(
+                                RegistryKeys.STRUCTURE,
                                 new Identifier("battlegrounds", "medieval_fortress")
                         ),
                         RegistryKey.of(
@@ -160,6 +164,10 @@ public class ModAdvancementProvider extends FabricAdvancementProvider {
                         RegistryKey.of(
                                 RegistryKeys.STRUCTURE,
                                 new Identifier("battlegrounds", "wine_shop")
+                        ),
+                        RegistryKey.of(
+                                RegistryKeys.STRUCTURE,
+                                new Identifier("battlegrounds", "ancient_ruins")
                         )
                 )
                 .parent(rootAdvancement)
@@ -206,5 +214,50 @@ public class ModAdvancementProvider extends FabricAdvancementProvider {
                 ))
                 .rewards(AdvancementRewards.Builder.experience(100))
                 .build(exporter, "battlegrounds:story/seven_eleven");
+        AdvancementEntry stevesPainAdvancement = Advancement.Builder.create()
+                .parent(rootAdvancement)
+                .display(
+                        Items.STEVES_PAIN_SWORD.getDefaultStack(),
+                        Text.translatable("advancements.battlegrounds.steves_pain.title"),
+                        Text.translatable("advancements.battlegrounds.steves_pain.description"),
+                        null,
+                        AdvancementFrame.CHALLENGE,
+                        true, true, false
+                )
+                .criterion("seven_eleven_sword", InventoryChangedCriterion.Conditions.items(
+                        Items.STEVES_PAIN_SWORD
+                ))
+                .rewards(AdvancementRewards.Builder.experience(200))
+                .build(exporter, "battlegrounds:story/steves_pain");
+        AdvancementEntry channelingBowAdvancement = Advancement.Builder.create()
+                .parent(rootAdvancement)
+                .display(
+                        Items.CHANNELING_BOW.getDefaultStack(),
+                        Text.translatable("advancements.battlegrounds.channeling_bow.title"),
+                        Text.translatable("advancements.battlegrounds.channeling_bow.description"),
+                        null,
+                        AdvancementFrame.CHALLENGE,
+                        true, true, false
+                )
+                .criterion("channeling_bow", InventoryChangedCriterion.Conditions.items(
+                        Items.CHANNELING_BOW
+                ))
+                .rewards(AdvancementRewards.Builder.experience(200))
+                .build(exporter, "battlegrounds:story/channeling_bow");
+        AdvancementEntry butchersAxeAdvancement = Advancement.Builder.create()
+                .parent(rootAdvancement)
+                .display(
+                        Items.BUTCHERS_AXE.getDefaultStack(),
+                        Text.translatable("advancements.battlegrounds.butchers_axe.title"),
+                        Text.translatable("advancements.battlegrounds.butchers_axe.description"),
+                        null,
+                        AdvancementFrame.CHALLENGE,
+                        true, true, false
+                )
+                .criterion("butchers_axe", InventoryChangedCriterion.Conditions.items(
+                        Items.BUTCHERS_AXE
+                ))
+                .rewards(AdvancementRewards.Builder.experience(200))
+                .build(exporter, "battlegrounds:story/butchers_axe");
     }
 }

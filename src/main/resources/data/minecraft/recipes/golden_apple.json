@@ -1,18 +1,15 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
+    " a ",
     "aba",
-    "bcb",
-    "aba"
+    " a "
   ],
   "key": {
     "a": {
-      "item": "minecraft:iron_nugget"
-    },
-    "b": {
       "item": "minecraft:gold_ingot"
     },
-    "c": {
+    "b": {
       "item": "minecraft:apple"
     }
   },

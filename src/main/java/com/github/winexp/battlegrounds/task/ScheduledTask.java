@@ -34,6 +34,7 @@ public abstract class ScheduledTask extends AbstractTask {
     }
 
     public int getDelayTicks() {
-        return this.delay;
+        if (this.isCancelled()) return -1;
+        else return this.delay;
     }
 }

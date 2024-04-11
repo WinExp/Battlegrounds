@@ -15,6 +15,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
@@ -49,7 +50,7 @@ public class PlayerUtil {
         player.networkHandler.sendPacket(new TitleFadeS2CPacket(5, 10, 15));
     }
 
-    public static void broadcastSound(MinecraftServer server, SoundEvent sound, SoundCategory category, float volume, float pitch) {
+    public static void broadcastSound(MinecraftServer server, SoundCategory category, SoundEvent sound, float volume, float pitch) {
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
             player.playSound(sound, category, volume, pitch);
         }
@@ -78,7 +79,9 @@ public class PlayerUtil {
 
     public static void randomTeleport(World world, ServerPlayerEntity player) {
         BlockPos pos = RandomUtil.getSecureLocation(world);
-        player.teleport((ServerWorld) world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0, 0);
+        Vec3d centerPos = pos.toCenterPos();
+        player.teleport((ServerWorld) world, centerPos.getX(), centerPos.getY(), centerPos.getZ(), 0, 0);
+        player.onLanding();
     }
 
     public static ModVersion getPlayerModVersion(@NotNull UUID uuid) {

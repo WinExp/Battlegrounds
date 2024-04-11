@@ -1,7 +1,6 @@
 package com.github.winexp.battlegrounds.game;
 
 import com.github.winexp.battlegrounds.util.time.Duration;
-import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.util.Identifier;
@@ -15,42 +14,6 @@ public record GameProperties(Identifier id, List<StageInfo> stages, Duration tim
             StageInfo.CODEC.listOf().fieldOf("stages").forGetter(GameProperties::stages),
             Duration.CODEC.fieldOf("timeout").forGetter(GameProperties::timeout)
     ).apply(instance, GameProperties::new));
-
-    public static final List<GameProperties> DEFAULT_PROFILES = List.of(
-            new GameProperties(
-                    new Identifier("battlegrounds", "normal"),
-                    ImmutableList.of(
-                            new StageInfo(
-                                    new Identifier("battlegrounds", "develop"),
-                                    5000, 500, 2,
-                                    new StageInfo.ResizeTimeInfo(
-                                            Duration.withMinutes(4),
-                                            Duration.withMinutes(3)
-                                    ),
-                                    false
-                            ),
-                            new StageInfo(
-                                    new Identifier("battlegrounds", "enable_pvp"),
-                                    4000, 500, 2,
-                                    new StageInfo.ResizeTimeInfo(
-                                            Duration.withMinutes(3),
-                                            Duration.withMinutes(2)
-                                    ),
-                                    false
-                            ),
-                            new StageInfo(
-                                    new Identifier("battlegrounds", "deathmatch"),
-                                    1000, 200, 2,
-                                    new StageInfo.ResizeTimeInfo(
-                                            Duration.withMinutes(3),
-                                            Duration.withMinutes(2)
-                                    ),
-                                    false
-                            )
-                    ),
-                    Duration.withMinutes(15)
-            )
-    );
 
     public record StageInfo(Identifier trigger, int initialSize, int resizeBlocks,
                             @Range(from = 1, to = Integer.MAX_VALUE) int resizeCount, ResizeTimeInfo resizeTimeInfo,

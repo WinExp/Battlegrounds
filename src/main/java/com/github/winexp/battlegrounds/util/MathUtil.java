@@ -38,11 +38,10 @@ public class MathUtil {
         return new Vec3d(i * j, -k, h * j);
     }
 
-    public static Vec3d getRotationWithEntity(Entity self, Vec3d target) {
-        Vec3d vec3d = self.getEyePos();
-        double d = target.x - vec3d.x;
-        double e = target.y - vec3d.y;
-        double f = target.z - vec3d.z;
+    public static Vec3d getRotationToPos(Vec3d start, Vec3d target) {
+        double d = target.x - start.x;
+        double e = target.y - start.y;
+        double f = target.z - start.z;
         double g = Math.sqrt(d * d + f * f);
         float pitch = MathHelper.wrapDegrees((float)(-(MathHelper.atan2(e, g) * 57.2957763671875)));
         float yaw = MathHelper.wrapDegrees((float)(MathHelper.atan2(f, d) * 57.2957763671875) - 90.0F);
@@ -67,7 +66,7 @@ public class MathUtil {
     public static EntityHitResult raycastEntity(Entity entity, Vec3d end, double maxDistance, float tickDelta) {
         double e = maxDistance * maxDistance;
         Vec3d vec3d = entity.getCameraPosVec(tickDelta);
-        Vec3d vec3d2 = getRotationWithEntity(entity, end);
+        Vec3d vec3d2 = getRotationToPos(entity.getEyePos(), end);
         Box box = entity.getBoundingBox().stretch(vec3d2.multiply(maxDistance)).expand(1.0, 1.0, 1.0);
         return ProjectileUtil.raycast(entity, vec3d, end, box, (entity1) -> !entity1.isSpectator() && entity1.canHit(), e);
     }

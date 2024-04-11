@@ -1,6 +1,10 @@
 {
   "advancements.battlegrounds.all_structures.description": "Arrived all structures",
   "advancements.battlegrounds.all_structures.title": "Exploration, It never ends",
+  "advancements.battlegrounds.butchers_axe.description": "Got the Butcher's Axe",
+  "advancements.battlegrounds.butchers_axe.title": "Tube: Landing",
+  "advancements.battlegrounds.channeling_bow.description": "Got the Channeling Bow",
+  "advancements.battlegrounds.channeling_bow.title": "The fury of thunder",
   "advancements.battlegrounds.library.description": "Entering the library",
   "advancements.battlegrounds.library.title": "Intelligentsia",
   "advancements.battlegrounds.medieval_fortress.description": "Entering the medieval fortress",
@@ -13,6 +17,8 @@
   "advancements.battlegrounds.root.title": "Battlegrounds",
   "advancements.battlegrounds.seven_eleven.description": "Got the 7-Eleven",
   "advancements.battlegrounds.seven_eleven.title": "Walk 10,000 miles a day",
+  "advancements.battlegrounds.steves_pain.description": "Got the Steve's Pain",
+  "advancements.battlegrounds.steves_pain.title": "The Legend of the Potion",
   "advancements.battlegrounds.wine_shop.description": "Entering the wine shop",
   "advancements.battlegrounds.wine_shop.title": "Even good wine fears the depth of the alley",
 
@@ -24,6 +30,9 @@
   "disconnect.battlegrounds.config.mod_info.failed": "Your version of Battlegrounds is not compatible with the server!\nYour version: %s-%d\nServer version: %s-%d",
   "disconnect.battlegrounds.config.mod_info.not_found": "Your version of Battlegrounds is too old or you don't have Battlegrounds installed.\nServer version: %s-%d",
 
+  "effect.battlegrounds.adrenaline": "Adrenaline",
+  "effect.battlegrounds.approaching_extinction": "Approaching Extinction",
+
   "enchantment.battlegrounds.channeling_pro": "Channeling Pro Max",
   "enchantment.battlegrounds.leaching": "Leaching",
   "enchantment.battlegrounds.smelting": "Smelting",
@@ -31,6 +40,8 @@
   "enchantment.battlegrounds.vitality": "Vitality",
 
   "entity.battlegrounds.channeling_arrow": "Channeling Arrow",
+  "entity.battlegrounds.flash_bang": "Flash Bang",
+  "entity.battlegrounds.molotov": "Molotov",
 
   "game.battlegrounds.already.broadcast": "All players have joined the server and are about to start the game!",
   "game.battlegrounds.border.reduce.broadcast": "The arena is shrinking!",
@@ -62,6 +73,7 @@
   "item.battlegrounds.channeling_bow": "Channeling Bow",
   "item.battlegrounds.flash_bang": "Flash Bang",
   "item.battlegrounds.knockback_stick": "Knockback Stick",
+  "item.battlegrounds.legendary": "Legendary",
   "item.battlegrounds.leaching_sword": "Leaching Sword",
   "item.battlegrounds.miners_pickaxe": "Miner's Pickaxe",
   "item.battlegrounds.molotov": "Molotov",
@@ -82,7 +94,8 @@
   "key.battlegrounds.vote_screen": "Voting Screen",
   "key.categories.battlegrounds": "Battlegrounds",
 
-  "subtitles.battlegrounds.tube_fall": "Tube: Landing",
+  "subtitles.battlegrounds.entity.flash_bang.rebound": "Thrown objects: Rebounding",
+  "subtitles.battlegrounds.player.tube_fall": "Tube: Landing",
 
   "vote.battlegrounds.already_voting.feedback": "There is already a vote in progress!",
   "vote.battlegrounds.button.accept": "[Accept Vote]",

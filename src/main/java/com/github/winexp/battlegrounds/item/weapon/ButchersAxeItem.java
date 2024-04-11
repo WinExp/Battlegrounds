@@ -12,18 +12,17 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Hand;
 
 public class ButchersAxeItem extends AxeItem implements EnchantRestrict {
-    private static final int PENALTY_DURATION = 3 * 20;
+    private static final int PENALTY_DURATION = 7 * 20;
 
     public ButchersAxeItem(ToolMaterial material, float attackDamage, float attackSpeed, Settings settings) {
         super(material, attackDamage, attackSpeed, settings);
     }
 
     private void givePenaltyEffects(LivingEntity target) {
-        target.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, PENALTY_DURATION, 0), target);
-        target.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, PENALTY_DURATION, 3), target);
-        target.addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER, PENALTY_DURATION, 2), target);
+        target.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, PENALTY_DURATION, 1), target);
+        target.addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER, PENALTY_DURATION, 0), target);
         target.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, PENALTY_DURATION, 0), target);
-        target.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, PENALTY_DURATION, 1), target);
+        target.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, PENALTY_DURATION, 0), target);
     }
 
     @Override
@@ -41,7 +40,7 @@ public class ButchersAxeItem extends AxeItem implements EnchantRestrict {
         stack.damage(1, attacker, e -> e.sendToolBreakStatus(Hand.MAIN_HAND));
         if (!target.getWorld().isClient) {
             this.givePenaltyEffects(attacker);
-            target.getWorld().playSound(target, target.getBlockPos(), SoundEvents.TUBE_FALL, SoundCategory.NEUTRAL, 0.5F, 1.0F);
+            target.getWorld().playSound(target, target.getBlockPos(), SoundEvents.PLAYER_TUBE_FALL, SoundCategory.NEUTRAL, 1.0F, 1.0F);
         }
         return true;
     }

@@ -4,15 +4,16 @@
   "package": "com.github.winexp.battlegrounds.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "ArgumentTypesInvoker",
     "channeling_BowItemMixin",
     "customRecipe_RecipeManagerMixin",
-    "deny_EnchantmentMixin",
-    "deny_GrindstoneScreenHandlerMixin",
-    "naturalRegen_PlayerEntityMixin",
-    "onPlayerJoin_PlayerManagerMixin"
+    "events_PlayerEntityMixin",
+    "events_PlayerManagerMixin",
+    "restrict_EnchantmentMixin",
+    "restrict_GrindstoneScreenHandlerMixin",
+    "shield_PlayerEntityMixin"
   ],
   "client": [
-    "client.flash_BackgroundRendererMixin"
   ],
   "server": [
   ],

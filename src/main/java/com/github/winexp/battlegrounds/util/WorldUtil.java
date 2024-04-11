@@ -14,6 +14,11 @@ public class WorldUtil {
         return (float) getOpacity(world, pos) / 15;
     }
 
+    public static boolean isSolidBlock(World world, BlockPos pos) {
+        BlockState state = world.getBlockState(pos);
+        return state.isSolidBlock(world, pos);
+    }
+
     public static boolean isFullCube(World world, BlockPos pos) {
         BlockState state = world.getBlockState(pos);
         return state.isFullCube(world, pos);

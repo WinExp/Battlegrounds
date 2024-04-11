@@ -40,6 +40,7 @@ public abstract class LimitRepeatTask extends RepeatTask {
     }
 
     public int getCount() {
-        return this.count;
+        if (this.isCancelled()) return -1;
+        else return this.count;
     }
 }

@@ -15,11 +15,14 @@ import net.minecraft.recipe.book.CraftingRecipeCategory;
 import java.util.Map;
 
 public class ChannelingBowItem extends BowItem implements ItemNbtCrafting, EnchantRestrict {
-    public static final int DURABILITY = 400;
+    public static final int DURABILITY = 500;
     public static final Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
             Enchantments.CHANNELING_PRO, 1,
-            Enchantments.POWER, 3,
-            Enchantments.PUNCH, 2,
+            Enchantments.POWER, 5,
+            Enchantments.PUNCH, 3,
+            Enchantments.FLAME, 1,
+            Enchantments.FIRE_ASPECT, 2,
+            Enchantments.SHARPNESS, 7,
             Enchantments.INFINITY, 1
     );
 
