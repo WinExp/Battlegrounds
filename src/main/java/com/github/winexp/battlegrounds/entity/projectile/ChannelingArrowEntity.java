@@ -1,6 +1,7 @@
 package com.github.winexp.battlegrounds.entity.projectile;
 
 import com.github.winexp.battlegrounds.entity.EntityTypes;
+import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.util.RandomUtil;
 import com.google.common.collect.Sets;
@@ -12,7 +13,6 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -38,7 +38,8 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
     private static final Map<StatusEffect, Integer> STATUS_EFFECTS = Map.of(
             StatusEffects.SLOWNESS, 1,
             StatusEffects.WEAKNESS, 0,
-            StatusEffects.POISON, 1
+            StatusEffects.POISON, 1,
+            StatusEffects.APPROACHING_EXTINCTION, 0
     );
     private static final int STATUS_DURATION = 5 * 20;
     private static final ItemStack DEFAULT_STACK = new ItemStack(Items.ARROW);

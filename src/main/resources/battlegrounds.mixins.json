@@ -11,7 +11,7 @@
     "events_PlayerManagerMixin",
     "restrict_EnchantmentMixin",
     "restrict_GrindstoneScreenHandlerMixin",
-    "shield_PlayerEntityMixin"
+    "shield_LivingEntityMixin"
   ],
   "client": [
   ],

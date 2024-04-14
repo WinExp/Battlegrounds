@@ -1,6 +1,7 @@
 package com.github.winexp.battlegrounds.item.weapon;
 
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
+import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
 import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.item.recipe.ItemNbtCrafting;
@@ -12,7 +13,6 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ToolMaterial;
 import net.minecraft.potion.PotionUtil;

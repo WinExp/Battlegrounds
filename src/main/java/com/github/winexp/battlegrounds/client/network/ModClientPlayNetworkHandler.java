@@ -33,7 +33,8 @@ public final class ModClientPlayNetworkHandler {
         Entity entity = client.getCameraEntity();
         if (entity != null) {
             float tickDelta = client.getTickDelta();
-            ClientConstants.FLASH_RENDERER.setFlashStrength(FlashRenderer.getFlashStrength(entity, pos, distance, tickDelta));
+            float strength = FlashRenderer.getFlashStrength(entity, pos, distance, tickDelta);
+            ClientConstants.FLASH_RENDERER.setFlashStrength(strength);
         }
     }
 

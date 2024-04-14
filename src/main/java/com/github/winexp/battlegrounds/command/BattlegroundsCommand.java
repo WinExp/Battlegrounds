@@ -64,7 +64,7 @@ public class BattlegroundsCommand {
     }
 
     public static ArgumentBuilder<ServerCommandSource, ?> registerStart() {
-        var cStart = literal("start");
+        var cStart = literal("begin");
         var aProp = argument("gameProperties", IdentifierArgumentType.identifier())
                 .suggests(((context, builder) ->
                         CommandSource.suggestMatching(Constants.GAME_PROPERTIES.keySet().stream().map(Identifier::toString), builder)))

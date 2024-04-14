@@ -7,6 +7,15 @@
       }
     ]
   },
+  "entity.flash_bang.explode": {
+    "subtitle": "subtitles.battlegrounds.entity.flash_bang.explode",
+    "sounds": [
+      {
+        "name": "minecraft:entity.generic.explode",
+        "type": "event"
+      }
+    ]
+  },
   "player.tube_fall": {
     "subtitle": "subtitles.battlegrounds.player.tube_fall",
     "sounds": [

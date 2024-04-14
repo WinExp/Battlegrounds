@@ -1,5 +1,6 @@
 package com.github.winexp.battlegrounds.item.weapon;
 
+import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -10,7 +11,6 @@ import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SwordItem;
 import net.minecraft.item.ToolMaterial;
@@ -28,7 +28,8 @@ import java.util.Map;
 
 public abstract class LegendarySwordItem extends SwordItem {
     private final static Map<StatusEffect, Integer> legendaryEnrichStatusEffects = Map.of(
-            StatusEffects.RESISTANCE, 0
+            StatusEffects.RESISTANCE, 0,
+            StatusEffects.APPROACHING_EXTINCTION, 0
     );
 
     public LegendarySwordItem(ToolMaterial toolMaterial, int attackDamage, float attackSpeed, Settings settings) {

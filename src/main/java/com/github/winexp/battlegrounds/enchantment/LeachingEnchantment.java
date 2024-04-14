@@ -1,15 +1,24 @@
 package com.github.winexp.battlegrounds.enchantment;
 
+import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentTarget;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
+
+import java.util.Map;
 
 public class LeachingEnchantment extends Enchantment {
     public static final int DURATION_PER_LEVEL = 5 * 20;
+    private static final Map<StatusEffect, Integer> attackEffects = Map.of(
+            StatusEffects.POISON, 3,
+            StatusEffects.SLOWNESS, 0,
+            StatusEffects.HUNGER, 2,
+            StatusEffects.NAUSEA, 0
+    );
 
     public LeachingEnchantment() {
         this(Rarity.VERY_RARE, EnchantmentTarget.WEAPON, EquipmentSlot.MAINHAND);
@@ -21,10 +30,8 @@ public class LeachingEnchantment extends Enchantment {
 
     private void giveEffects(LivingEntity source, LivingEntity target, int level) {
         int duration = Math.min(DURATION_PER_LEVEL * level, 30 * 20);
-        target.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, duration, 3), source);
-        target.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, duration, 0), source);
-        target.addStatusEffect(new StatusEffectInstance(StatusEffects.HUNGER, duration, 2), source);
-        target.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, duration, 0), source);
+        attackEffects.forEach((effect, amplifier) ->
+                target.addStatusEffect(new StatusEffectInstance(effect, duration, amplifier), source));
     }
 
     @Override
@@ -35,7 +42,7 @@ public class LeachingEnchantment extends Enchantment {
     @Override
     public void onTargetDamaged(LivingEntity user, Entity target, int level) {
         if (target instanceof LivingEntity livingEntity) {
-            giveEffects(user, livingEntity, level);
+            this.giveEffects(user, livingEntity, level);
         }
     }
 

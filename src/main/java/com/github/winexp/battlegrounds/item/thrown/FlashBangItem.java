@@ -11,7 +11,7 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
 public class FlashBangItem extends Item {
-    public static final int FUSE = 2 * 20;
+    public static final int FUSE = 30;
     private static final int COOLDOWN = 20;
 
     public FlashBangItem(Settings settings) {
