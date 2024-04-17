@@ -15,12 +15,13 @@ import net.minecraft.predicate.item.ItemPredicate;
 import net.minecraft.util.Identifier;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class BlockSmeltableRegistry {
     private static final LootCondition.Builder DEFAULT_SMELTABLE_CONDITION = MatchToolLootCondition.builder(ItemPredicate.Builder.create()
             .enchantment(new EnchantmentPredicate(Enchantments.SMELTING, NumberRange.IntRange.atLeast(1))));
     public static final ConditionalLootFunction.Builder<?> DEFAULT_SMELTABLE_FUNCTION = FurnaceSmeltLootFunction.builder();
-    private static final HashMap<Identifier, ConditionalLootFunction.Builder<?>> smeltableBlocks = new HashMap<>();
+    private static final Map<Identifier, ConditionalLootFunction.Builder<?>> smeltableBlocks = new HashMap<>();
 
     public static boolean isSmeltable(Identifier lootTableId) {
         return smeltableBlocks.containsKey(lootTableId);

@@ -20,12 +20,13 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CancellationException;
 
 public class RandomTpCommand {
-    private static final HashMap<UUID, Integer> cooldownTimers = new HashMap<>();
+    private static final Map<UUID, Integer> cooldownTimers = new HashMap<>();
     private static RepeatTask coolDownUpdateTask = RepeatTask.NONE_TASK;
     private static Identifier cooldownId;
 

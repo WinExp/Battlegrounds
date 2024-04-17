@@ -28,7 +28,7 @@ public abstract class shield_LivingEntityMixin {
     }
 
     @Redirect(method = "damage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;takeShieldHit(Lnet/minecraft/entity/LivingEntity;)V"))
-    private void onTakeShieldHit(LivingEntity instance, LivingEntity attacker) {
+    private void takeShieldHit(LivingEntity instance, LivingEntity attacker) {
         if (!this.shieldDamaged) this.takeShieldHit(attacker);
     }
 

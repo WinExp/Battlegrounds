@@ -1,8 +1,10 @@
 package com.github.winexp.battlegrounds.item;
 
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
-import com.github.winexp.battlegrounds.entity.projectile.FlashBangEntity;
-import com.github.winexp.battlegrounds.entity.projectile.MolotovEntity;
+import com.github.winexp.battlegrounds.entity.effect.StatusEffectEntry;
+import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
+import com.github.winexp.battlegrounds.entity.projectile.thrown.FlashBangEntity;
+import com.github.winexp.battlegrounds.entity.projectile.thrown.MolotovEntity;
 import com.github.winexp.battlegrounds.item.weapon.*;
 import com.github.winexp.battlegrounds.item.mining.MinersPickaxeItem;
 import com.github.winexp.battlegrounds.item.recipe.NbtCrafting;
@@ -39,10 +41,20 @@ import java.util.List;
 import java.util.Map;
 
 public class Items extends net.minecraft.item.Items {
-    private static final ArrayList<NbtCrafting> nbtCraftingItems = new ArrayList<>();
-    public static final PVPProSwordItem PVP_PRO_SWORD = registerItem("pvp_pro_sword", new PVPProSwordItem(ToolMaterials.PVP_PRO_SWORD, 3, -2.4F, new Item.Settings().rarity(Rarity.EPIC).fireproof()));
-    public static final SevenElevenSwordItem SEVEN_ELEVEN_SWORD = registerItem("seven_eleven_sword", new SevenElevenSwordItem(ToolMaterials.SEVEN_ELEVEN_SWORD, 3, -2.4F, new Item.Settings().rarity(Rarity.EPIC).fireproof()));
-    public static final StevesPainSwordItem STEVES_PAIN_SWORD = registerItem("steves_pain_sword", new StevesPainSwordItem(ToolMaterials.STEVES_PAIN_SWORD, 3, -2.4F, new Item.Settings().rarity(Rarity.EPIC).fireproof()));
+    private static final List<NbtCrafting> nbtCraftingItems = new ArrayList<>();
+    public static final PVPProSwordItem PVP_PRO_SWORD = registerItem("pvp_pro_sword", new PVPProSwordItem(ToolMaterials.PVP_PRO_SWORD, 3, -2.4F, (LegendarySwordItem.Settings) new LegendarySwordItem.Settings()
+            .enrichEffect(new StatusEffectEntry(StatusEffects.FIRE_RESISTANCE, 0, 2 * 20))
+            .enrichEffect(new StatusEffectEntry(StatusEffects.STRENGTH, 0, 2 * 20))
+            .rarity(Rarity.EPIC).fireproof()));
+    public static final SevenElevenSwordItem SEVEN_ELEVEN_SWORD = registerItem("seven_eleven_sword", new SevenElevenSwordItem(ToolMaterials.SEVEN_ELEVEN_SWORD, 3, -2.4F, (LegendarySwordItem.Settings) new LegendarySwordItem.Settings()
+            .enrichEffect(new StatusEffectEntry(StatusEffects.JUMP_BOOST, 1, 2 * 20))
+            .enrichEffect(new StatusEffectEntry(StatusEffects.SPEED, 1, 2 * 20))
+            .attackEffect(new StatusEffectEntry(StatusEffects.SLOWNESS, 1, 5 * 20))
+            .attackEffect(new StatusEffectEntry(StatusEffects.WEAKNESS, 0, 5 * 20))
+            .attackEffectBound(35)
+            .rarity(Rarity.EPIC).fireproof()));
+    public static final StevesPainSwordItem STEVES_PAIN_SWORD = registerItem("steves_pain_sword", new StevesPainSwordItem(ToolMaterials.STEVES_PAIN_SWORD, 3, -2.4F, (LegendarySwordItem.Settings) new LegendarySwordItem.Settings()
+            .rarity(Rarity.EPIC).fireproof()));
     public static final LeachingSwordItem LEACHING_SWORD = registerItem("leaching_sword", new LeachingSwordItem(ToolMaterials.LEACHING_SWORD, 3, -2.0F, new Item.Settings().rarity(Rarity.UNCOMMON)));
     public static final MinersPickaxeItem MINERS_PICKAXE = registerItem("miners_pickaxe", new MinersPickaxeItem(ToolMaterials.MINERS_PICKAXE, 1, -2.8F, new Item.Settings().rarity(Rarity.UNCOMMON)));
     public static final ButchersAxeItem BUTCHERS_AXE = registerItem("butchers_axe", new ButchersAxeItem(ToolMaterials.BUTCHERS_AXE, 5, -3.3F, new Item.Settings().rarity(Rarity.EPIC).fireproof()));
@@ -142,7 +154,7 @@ public class Items extends net.minecraft.item.Items {
                 )
         );
 
-        ArrayList<NbtCrafting> items = new ArrayList<>();
+        List<NbtCrafting> items = new ArrayList<>();
         items.addAll(shapedRecipes);
         items.addAll(shapelessRecipes);
         for (NbtCrafting item : items) {

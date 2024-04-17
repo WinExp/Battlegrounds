@@ -1,6 +1,6 @@
 package com.github.winexp.battlegrounds.enchantment;
 
-import com.github.winexp.battlegrounds.util.EffectUtil;
+import com.github.winexp.battlegrounds.util.EntityUtil;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -37,10 +37,10 @@ public class VitalityEnchantment extends Enchantment {
         EntityAttributeInstance attribute = livingEntity.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
         assert attribute != null;
         if (level > 0) {
-            EffectUtil.addAttribute(attribute, HEALTH_MODIFIER_ID,
+            EntityUtil.addAttributeModifier(attribute, HEALTH_MODIFIER_ID,
                     level * HEALTH_MODIFIER_ADD_VALUE_PER_LEVEL, EntityAttributeModifier.Operation.ADDITION);
         } else {
-            EffectUtil.removeAttribute(attribute, HEALTH_MODIFIER_ID);
+            EntityUtil.removeAttributeModifier(attribute, HEALTH_MODIFIER_ID);
         }
     }
 

@@ -14,6 +14,7 @@ import net.minecraft.world.World;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 
 public class GameUtil {
     public static void createDeleteWorldTmpFile(Path savePath) {
@@ -40,13 +41,13 @@ public class GameUtil {
             nbt.putByte("Flight", (byte) flightTime);
             NbtList explosionsList = new NbtList();
             NbtCompound explosion = new NbtCompound();
-            ArrayList<Integer> colors = new ArrayList<>();
+            List<Integer> colors = new ArrayList<>();
             for (int j = 0; j < random.nextBetween(3, 4); j++) {
                 int idx = random.nextInt(DyeColor.values().length);
                 colors.add(DyeColor.values()[idx].getFireworkColor());
             }
             explosion.putIntArray("Colors", colors);
-            ArrayList<Integer> fadeColors = new ArrayList<>();
+            List<Integer> fadeColors = new ArrayList<>();
             for (int j = 0; j < random.nextBetween(2, 3); j++) {
                 int idx = random.nextInt(DyeColor.values().length);
                 fadeColors.add(DyeColor.values()[idx].getFireworkColor());

@@ -1,4 +1,4 @@
-package com.github.winexp.battlegrounds.entity.projectile;
+package com.github.winexp.battlegrounds.entity.projectile.thrown;
 
 import com.github.winexp.battlegrounds.entity.EntityTypes;
 import com.github.winexp.battlegrounds.item.Items;

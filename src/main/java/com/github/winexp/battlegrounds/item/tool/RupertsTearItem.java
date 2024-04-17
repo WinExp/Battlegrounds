@@ -3,7 +3,7 @@ package com.github.winexp.battlegrounds.item.tool;
 import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.registry.tag.ModFluidTags;
 import com.github.winexp.battlegrounds.util.MathUtil;
-import com.github.winexp.battlegrounds.util.WorldUtil;
+import com.github.winexp.battlegrounds.util.BlockUtil;
 import com.github.winexp.battlegrounds.util.raycast.BlockRaycastResult;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
@@ -29,7 +29,7 @@ public class RupertsTearItem extends ToolItem implements EnchantRestrict {
     private static final int MAX_COOLDOWN = 30 * 20;
     private static final int MIN_COOLDOWN = 4 * 20;
     private static final int FAILED_COOLDOWN = 20;
-    private static final int MAX_DISTANCE = 70;
+    private static final int MAX_DISTANCE = 100;
 
     public RupertsTearItem(ToolMaterial toolMaterial, Settings settings) {
         super(toolMaterial, settings);
@@ -70,14 +70,14 @@ public class RupertsTearItem extends ToolItem implements EnchantRestrict {
                 BlockState blockState = world.getBlockState(pos2);
                 FluidState fluidState = blockState.getFluidState();
 
-                if (!WorldUtil.canMobSpawnInside(world, pos2)
+                if (!BlockUtil.canMobSpawnInside(world, pos2)
                         || (!fluidState.isEmpty() && !fluidState.isIn(ModFluidTags.RUPERTS_TEAR_IGNORED))) {
                     this.onUseFailed(user);
                     return TypedActionResult.fail(stack);
                 }
             }
-            double y = WorldUtil.getBlockTopY(world, pos);
-            Box boundingBox = WorldUtil.getCollisionShape(world, pos).getBoundingBox();
+            double y = BlockUtil.getBlockMaxY(world, pos);
+            Box boundingBox = BlockUtil.getCollisionShape(world, pos).getBoundingBox();
             Vec3d tpPos = boundingBox.getCenter().add(Vec3d.of(pos)).withAxis(Direction.Axis.Y, y);
             double distance = tpPos.distanceTo(user.getPos());
             int cooldown = (int) (MAX_COOLDOWN * (Math.pow(distance, 1.5) / Math.pow(MAX_DISTANCE, 1.5)));

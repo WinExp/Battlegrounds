@@ -6,15 +6,16 @@ import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.entity.effect.StatusEffectInstance;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class Adrenaline extends StatusEffect {
-    protected Adrenaline(StatusEffectCategory category, int color) {
+public class AdrenalineStatusEffect extends StatusEffect {
+    protected AdrenalineStatusEffect(StatusEffectCategory category, int color) {
         super(category, color);
     }
 
     @Override
     public void applyUpdateEffect(LivingEntity entity, int amplifier) {
-        ArrayList<StatusEffectInstance> effects = new ArrayList<>(entity.getStatusEffects());
+        List<StatusEffectInstance> effects = new ArrayList<>(entity.getStatusEffects());
         for (StatusEffectInstance effectInstance : effects) {
             StatusEffect effect = effectInstance.getEffectType();
             if (effect.getCategory() == StatusEffectCategory.HARMFUL && !effect.isInstant()) {

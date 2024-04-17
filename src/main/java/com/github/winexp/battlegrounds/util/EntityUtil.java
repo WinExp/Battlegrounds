@@ -6,8 +6,8 @@ import net.minecraft.util.Identifier;
 
 import java.util.UUID;
 
-public class EffectUtil {
-    public static void addAttribute(EntityAttributeInstance attribute, Identifier id, double value, EntityAttributeModifier.Operation operation) {
+public class EntityUtil {
+    public static void addAttributeModifier(EntityAttributeInstance attribute, Identifier id, double value, EntityAttributeModifier.Operation operation) {
         UUID modifierUUID = UUID.nameUUIDFromBytes(id.toString().getBytes());
         if (attribute.getModifier(modifierUUID) == null) {
             EntityAttributeModifier healthModifier = new EntityAttributeModifier(modifierUUID, modifierUUID.toString(),
@@ -16,7 +16,7 @@ public class EffectUtil {
         }
     }
 
-    public static void removeAttribute(EntityAttributeInstance attribute, Identifier id) {
+    public static void removeAttributeModifier(EntityAttributeInstance attribute, Identifier id) {
         UUID modifierUUID = UUID.nameUUIDFromBytes(id.toString().getBytes());
         if (attribute.getModifier(modifierUUID) != null) {
             attribute.removeModifier(modifierUUID);

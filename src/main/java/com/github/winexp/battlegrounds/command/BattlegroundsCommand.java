@@ -4,7 +4,7 @@ import com.github.winexp.battlegrounds.Battlegrounds;
 import com.github.winexp.battlegrounds.command.argument.PVPModeArgumentType;
 import com.github.winexp.battlegrounds.discussion.vote.VoteManager;
 import com.github.winexp.battlegrounds.discussion.vote.VotePreset;
-import com.github.winexp.battlegrounds.entity.projectile.FlashBangEntity;
+import com.github.winexp.battlegrounds.entity.projectile.thrown.FlashBangEntity;
 import com.github.winexp.battlegrounds.game.GameProperties;
 import com.github.winexp.battlegrounds.game.PVPMode;
 import com.github.winexp.battlegrounds.task.TaskScheduler;

@@ -13,7 +13,7 @@ public abstract class restrict_GrindstoneScreenHandlerMixin {
     public abstract ItemStack invokeGrind(ItemStack item, int damage, int amount);
 
     @Redirect(method = "updateResult", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/GrindstoneScreenHandler;grind(Lnet/minecraft/item/ItemStack;II)Lnet/minecraft/item/ItemStack;"))
-    private ItemStack getGrindResult(GrindstoneScreenHandler instance, ItemStack stack, int damage, int amount) {
+    private ItemStack onGrind(GrindstoneScreenHandler instance, ItemStack stack, int damage, int amount) {
         boolean bl = true;
         if (stack.getItem() instanceof EnchantRestrict restrict) {
             bl = restrict.isGrindable(stack);

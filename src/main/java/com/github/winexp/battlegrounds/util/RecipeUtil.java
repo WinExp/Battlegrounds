@@ -7,9 +7,10 @@ import net.minecraft.util.Identifier;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 public class RecipeUtil {
-    private static final HashMap<Identifier, RecipeEntry<? extends Recipe<?>>> recipeMap = new HashMap<>();
+    private static final Map<Identifier, RecipeEntry<? extends Recipe<?>>> recipeMap = new HashMap<>();
 
     public static Collection<RecipeEntry<?>> getRecipes() {
         return recipeMap.values();

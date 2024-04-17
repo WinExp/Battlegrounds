@@ -15,12 +15,13 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 @Environment(EnvType.CLIENT)
 public class VoteScreen extends Screen {
-    private static final CopyOnWriteArrayList<VoteInfo> voteInfosCache = new CopyOnWriteArrayList<>();
+    private static final List<VoteInfo> voteInfosCache = new CopyOnWriteArrayList<>();
     private static long lastRefreshTime = 0;
     private VoteListWidget voteList;
     private ButtonWidget acceptButton;

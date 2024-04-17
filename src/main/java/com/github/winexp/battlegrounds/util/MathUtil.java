@@ -15,7 +15,7 @@ public class MathUtil {
     public static final BiFunction<World, BlockPos, Float> NONE_STRENGTH_FUNCTION =
             (world, pos) -> 1.0F;
     public static final Predicate<BlockRaycastResult> NONE_ABORT_PREDICATE = (raycastResult) -> true;
-    private static final double RAYCAST_ACCURATE = 10;
+    private static final double RAYCAST_ACCURATE = 5;
 
     public static Vec3d getRotationVector(float pitch, float yaw) {
         float f = pitch * 0.017453292F;

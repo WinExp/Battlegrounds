@@ -6,7 +6,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
 
-public class WorldUtil {
+public class BlockUtil {
     public static int getOpacity(World world, BlockPos pos) {
         BlockState state = world.getBlockState(pos);
         return state.getOpacity(world, pos);
@@ -21,7 +21,7 @@ public class WorldUtil {
         return state.getCollisionShape(world, pos);
     }
 
-    public static double getBlockTopY(World world, BlockPos pos) {
+    public static double getBlockMaxY(World world, BlockPos pos) {
         VoxelShape shape = getCollisionShape(world, pos);
         return shape.getMax(Direction.Axis.Y) + pos.getY();
     }

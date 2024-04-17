@@ -95,7 +95,8 @@
   "key.categories.battlegrounds": "Battlegrounds",
 
   "subtitles.battlegrounds.entity.flash_bang.explode": "闪光弹：爆炸",
-  "subtitles.battlegrounds.entity.flash_bang.rebound": "投掷物：反弹",
+  "subtitles.battlegrounds.entity.prop.generic.trigger": "投掷物：触发",
+  "subtitles.battlegrounds.entity.prop.generic.rebound": "投掷物：反弹",
   "subtitles.battlegrounds.player.tube_fall": "钢管：落地",
 
   "vote.battlegrounds.already_voting.feedback": "已有投票正在进行！",

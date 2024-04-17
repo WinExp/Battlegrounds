@@ -47,7 +47,7 @@ public class ButchersAxeItem extends AxeItem implements EnchantRestrict {
         stack.damage(1, attacker, e -> e.sendToolBreakStatus(Hand.MAIN_HAND));
         if (!target.getWorld().isClient) {
             this.givePenaltyEffects(attacker);
-            target.playSound(SoundEvents.PLAYER_TUBE_FALL, 1.0F, 1.0F);
+            target.playSound(SoundEvents.PLAYER_TUBE_FALL, 2.0F, 1.0F);
         }
         return true;
     }

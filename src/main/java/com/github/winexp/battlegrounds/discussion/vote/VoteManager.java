@@ -20,7 +20,7 @@ import java.util.function.BiConsumer;
 public class VoteManager {
     public static final VoteManager INSTANCE = new VoteManager();
 
-    private final ConcurrentHashMap<Identifier, VoteInstance> voteMap = new ConcurrentHashMap<>();
+    private final Map<Identifier, VoteInstance> voteMap = new ConcurrentHashMap<>();
 
     protected VoteManager() {
         ServerVoteEvents.OPENED.register(this::onVoteOpened);
@@ -67,7 +67,7 @@ public class VoteManager {
 
     public void syncVoteInfos(ServerPlayerEntity player) {
         Collection<VoteInstance> votes = this.getVoteList();
-        ArrayList<VoteInfo> voteInfos = new ArrayList<>();
+        List<VoteInfo> voteInfos = new ArrayList<>();
         for (VoteInstance vote : votes) {
             if (vote.isParticipant(player)) {
                 VoteInfo voteInfo = vote.getVoteInfo(player);

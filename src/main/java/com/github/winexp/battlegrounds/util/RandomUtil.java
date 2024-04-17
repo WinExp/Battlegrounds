@@ -25,7 +25,7 @@ public class RandomUtil {
         if (!box.contains(pos.getX(), pos.getY(), pos.getZ())) return false;
         for (int i = pos.getY() + 1; i <= box.getMaxY(); i++) {
             BlockPos pos1 = pos.withY(i);
-            if (!WorldUtil.canMobSpawnInside(world, pos1)) return false;
+            if (!BlockUtil.canMobSpawnInside(world, pos1)) return false;
         }
         return true;
     }

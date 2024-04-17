@@ -1,9 +1,18 @@
 {
-  "entity.flash_bang.rebound": {
-    "subtitle": "subtitles.battlegrounds.entity.flash_bang.rebound",
+  "entity.prop.generic.trigger": {
+    "subtitle": "subtitles.battlegrounds.entity.prop.generic.trigger",
     "sounds": [
       {
-        "name": "battlegrounds:entity/flash_bang/rebound"
+        "name": "minecraft:entity.generic.explode",
+        "type": "event"
+      }
+    ]
+  },
+  "entity.prop.generic.rebound": {
+    "subtitle": "subtitles.battlegrounds.entity.prop.generic.rebound",
+    "sounds": [
+      {
+        "name": "battlegrounds:entity/prop/generic/rebound"
       }
     ]
   },
@@ -12,6 +21,15 @@
     "sounds": [
       {
         "name": "minecraft:entity.generic.explode",
+        "type": "event"
+      }
+    ]
+  },
+  "entity.flash_bang.rebound": {
+    "subtitle": "subtitles.battlegrounds.entity.prop.generic.rebound",
+    "sounds": [
+      {
+        "name": "battlegrounds:entity.prop.generic.rebound",
         "type": "event"
       }
     ]

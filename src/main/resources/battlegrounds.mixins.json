@@ -11,9 +11,12 @@
     "events_PlayerManagerMixin",
     "restrict_EnchantmentMixin",
     "restrict_GrindstoneScreenHandlerMixin",
+    "shapeType_RaycastContextMixin",
     "shield_LivingEntityMixin"
   ],
   "client": [
+    "client.flash_AbstractSoundInstanceMixin",
+    "client.flashSprinting_ClientPlayerEntityMixin"
   ],
   "server": [
   ],

@@ -7,7 +7,7 @@ import com.github.winexp.battlegrounds.task.LimitRepeatTask;
 import com.github.winexp.battlegrounds.task.RepeatTask;
 import com.github.winexp.battlegrounds.task.ScheduledTask;
 import com.github.winexp.battlegrounds.task.TaskScheduler;
-import com.github.winexp.battlegrounds.util.EffectUtil;
+import com.github.winexp.battlegrounds.util.EntityUtil;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
 import com.github.winexp.battlegrounds.util.RandomUtil;
 import com.github.winexp.battlegrounds.util.time.Duration;
@@ -58,8 +58,8 @@ import java.util.concurrent.CancellationException;
 public class GameManager extends PersistentState implements GameListener {
     public final MinecraftServer server;
     private final WorldHelper worldHelper;
-    private final HashMap<UUID, PlayerPermission> playerPermissions = new HashMap<>();
-    private final ArrayList<GameListener> listeners = new ArrayList<>(List.of(this));
+    private final Map<UUID, PlayerPermission> playerPermissions = new HashMap<>();
+    private final List<GameListener> listeners = new ArrayList<>(List.of(this));
     private PVPMode pvpMode = PVPMode.PEACEFUL;
     private GameStage gameStage = GameStage.IDLE;
     private GameBorderStage borderStage = GameBorderStage.WAITING;
@@ -86,7 +86,7 @@ public class GameManager extends PersistentState implements GameListener {
     private final static Identifier RESIZE_BOSS_BAR_ID = new Identifier("battlegrounds", "resize_boss_bar");
     private final static Identifier HEALTH_MODIFIER_ID = new Identifier("battlegrounds", "game/main");
     private final static double HEALTH_MODIFIER_ADD_VALUE = 20;
-    private final static ArrayList<GameListener> globalListeners = new ArrayList<>();
+    private final static List<GameListener> globalListeners = new ArrayList<>();
 
     public GameManager(MinecraftServer server) {
         this.server = server;
@@ -555,7 +555,7 @@ public class GameManager extends PersistentState implements GameListener {
                 PlayerUtil.changeGameMode(player, GameMode.SURVIVAL);
                 EntityAttributeInstance attributeInstance = player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
                 assert attributeInstance != null;
-                EffectUtil.addAttribute(attributeInstance, HEALTH_MODIFIER_ID, HEALTH_MODIFIER_ADD_VALUE, EntityAttributeModifier.Operation.ADDITION);
+                EntityUtil.addAttributeModifier(attributeInstance, HEALTH_MODIFIER_ID, HEALTH_MODIFIER_ADD_VALUE, EntityAttributeModifier.Operation.ADDITION);
                 player.heal((float) HEALTH_MODIFIER_ADD_VALUE);
                 player.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 30 * 20, 3), player);
                 player.addStatusEffect(new StatusEffectInstance(StatusEffects.SATURATION, 30 * 20, 1), player);
@@ -586,7 +586,7 @@ public class GameManager extends PersistentState implements GameListener {
             PlayerUtil.changeGameMode(player, GameMode.ADVENTURE);
             EntityAttributeInstance attributeInstance = player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
             assert attributeInstance != null;
-            EffectUtil.removeAttribute(attributeInstance, HEALTH_MODIFIER_ID);
+            EntityUtil.removeAttributeModifier(attributeInstance, HEALTH_MODIFIER_ID);
         }
         this.listeners.forEach(listener ->
                 listener.onStageTriggered(this, null));

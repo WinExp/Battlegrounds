@@ -22,11 +22,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
 public class PlayerUtil {
-    private static final HashMap<UUID, ModVersion> playerVersionMap = new HashMap<>();
+    private static final Map<UUID, ModVersion> playerVersionMap = new HashMap<>();
 
     public static void kickAllPlayers(MinecraftServer server, Text message) {
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {

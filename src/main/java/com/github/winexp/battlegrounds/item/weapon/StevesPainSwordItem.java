@@ -4,14 +4,9 @@ import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.item.recipe.ItemNbtCrafting;
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.attribute.EntityAttribute;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
-import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
@@ -22,7 +17,6 @@ import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -42,26 +36,11 @@ public class StevesPainSwordItem extends LegendarySwordItem implements ItemNbtCr
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
             if (player.getEquippedStack(EquipmentSlot.MAINHAND).isOf(this)
                     || player.getEquippedStack(EquipmentSlot.OFFHAND).isOf(this)) {
-                if (server.getTicks() % 30 == 0) {
-                    player.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 30, 1), player);
+                if (server.getTicks() % 50 == 0) {
+                    player.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 50, 0), player);
                 }
             }
         }
-    }
-
-    @Override
-    public @NotNull Map<StatusEffect, Integer> getEnrichEffects() {
-        return Map.of();
-    }
-
-    @Override
-    public @NotNull Map<StatusEffect, Integer> getAttackEffects() {
-        return Map.of();
-    }
-
-    @Override
-    public @NotNull Multimap<EntityAttribute, EntityAttributeModifier> getCustomModifiers(EquipmentSlot slot) {
-        return ImmutableMultimap.of();
     }
 
     @Override

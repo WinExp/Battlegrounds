@@ -13,6 +13,7 @@ import net.minecraft.util.Util;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -32,7 +33,7 @@ public abstract class GamePropertiesProvider implements DataProvider {
         HashSet<Identifier> identifiers = new HashSet<>();
         HashSet<GameProperties> properties = new HashSet<>();
         this.generateGameProperties(properties::add);
-        ArrayList<CompletableFuture<?>> futures = new ArrayList<>();
+        List<CompletableFuture<?>> futures = new ArrayList<>();
         for (GameProperties property : properties) {
             if (!identifiers.add(property.id())) {
                 throw new IllegalStateException("Duplicate game properties " + property.id());

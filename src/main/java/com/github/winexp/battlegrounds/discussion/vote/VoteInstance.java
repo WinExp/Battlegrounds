@@ -25,7 +25,7 @@ public class VoteInstance {
     private ScheduledTask timeoutTask = ScheduledTask.NONE_TASK;
     private ImmutableList<UUID> participants = ImmutableList.of();
     private final Object lock = new Object();
-    private final ConcurrentHashMap<UUID, Boolean> voteResultMap = new ConcurrentHashMap<>();
+    private final Map<UUID, Boolean> voteResultMap = new ConcurrentHashMap<>();
 
     public VoteInstance(Identifier identifier, VoteSettings settings, Map<String, Object> parameters) {
         this.identifier = identifier;

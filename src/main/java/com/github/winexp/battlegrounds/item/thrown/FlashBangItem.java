@@ -1,6 +1,6 @@
 package com.github.winexp.battlegrounds.item.thrown;
 
-import com.github.winexp.battlegrounds.entity.projectile.FlashBangEntity;
+import com.github.winexp.battlegrounds.entity.projectile.thrown.FlashBangEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

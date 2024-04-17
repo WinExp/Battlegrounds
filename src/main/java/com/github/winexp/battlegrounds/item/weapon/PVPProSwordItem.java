@@ -1,18 +1,11 @@
 package com.github.winexp.battlegrounds.item.weapon;
 
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
-import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
 import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.item.recipe.ItemNbtCrafting;
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.attribute.EntityAttribute;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
-import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ToolMaterial;
 import net.minecraft.recipe.Ingredient;
@@ -22,7 +15,6 @@ import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -34,10 +26,6 @@ public class PVPProSwordItem extends LegendarySwordItem implements ItemNbtCrafti
             Enchantments.KNOCKBACK, 3,
             Enchantments.SWEEPING, 2,
             Enchantments.LOOTING, 3
-    );
-    private static final Map<StatusEffect, Integer> enrichEffects = Map.of(
-            StatusEffects.FIRE_RESISTANCE, 0,
-            StatusEffects.STRENGTH, 0
     );
 
     public PVPProSwordItem(ToolMaterial toolMaterial, int attackDamage, float attackSpeed, Settings settings) {
@@ -61,21 +49,6 @@ public class PVPProSwordItem extends LegendarySwordItem implements ItemNbtCrafti
     @Override
     public boolean isEnchantable(ItemStack stack) {
         return false;
-    }
-
-    @Override
-    public @NotNull Map<StatusEffect, Integer> getEnrichEffects() {
-        return enrichEffects;
-    }
-
-    @Override
-    public @NotNull Map<StatusEffect, Integer> getAttackEffects() {
-        return Map.of();
-    }
-
-    @Override
-    public @NotNull Multimap<EntityAttribute, EntityAttributeModifier> getCustomModifiers(EquipmentSlot slot) {
-        return ImmutableMultimap.of();
     }
 
     @Override

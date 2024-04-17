@@ -1,16 +1,13 @@
 package com.github.winexp.battlegrounds.item.weapon;
 
+import com.github.winexp.battlegrounds.entity.effect.StatusEffectEntry;
 import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttribute;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
-import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SwordItem;
 import net.minecraft.item.ToolMaterial;
@@ -20,20 +17,21 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public abstract class LegendarySwordItem extends SwordItem {
-    private final static Map<StatusEffect, Integer> legendaryEnrichStatusEffects = Map.of(
-            StatusEffects.RESISTANCE, 0,
-            StatusEffects.APPROACHING_EXTINCTION, 0
-    );
+    private final List<StatusEffectEntry> enrichEffects;
+    private final List<StatusEffectEntry> attackEffects;
+    private final int attackEffectBound;
 
     public LegendarySwordItem(ToolMaterial toolMaterial, int attackDamage, float attackSpeed, Settings settings) {
         super(toolMaterial, attackDamage, attackSpeed, settings);
+        this.enrichEffects = settings.enrichEffects;
+        this.attackEffects = settings.attackEffects;
+        this.attackEffectBound = settings.attackEffectBound;
         ServerTickEvents.END_SERVER_TICK.register(this::tick);
     }
 
@@ -41,13 +39,16 @@ public abstract class LegendarySwordItem extends SwordItem {
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
             if (player.getEquippedStack(EquipmentSlot.MAINHAND).isOf(this)
             || player.getEquippedStack(EquipmentSlot.OFFHAND).isOf(this)) {
-                int duration = this.getEnrichEffectsDuration();
-                legendaryEnrichStatusEffects.forEach((effect, amplifier) ->
-                        player.addStatusEffect(new StatusEffectInstance(effect, duration, amplifier), player));
-                this.getEnrichEffects().forEach((effect, amplifier) ->
-                        player.addStatusEffect(new StatusEffectInstance(effect, duration, amplifier), player));
+                for (StatusEffectEntry effectEntry : this.enrichEffects) {
+                    player.addStatusEffect(new StatusEffectInstance(effectEntry.statusEffect(), effectEntry.duration(), effectEntry.amplifier()), player);
+                }
             }
         }
+    }
+
+    @Override
+    public boolean hasGlint(ItemStack stack) {
+        return true;
     }
 
     @Override
@@ -58,48 +59,56 @@ public abstract class LegendarySwordItem extends SwordItem {
     }
 
     @Override
-    public boolean hasGlint(ItemStack stack) {
-        return true;
-    }
-
-    @Override
     public boolean postHit(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         super.postHit(stack, target, attacker);
         Random random = attacker.getRandom();
-        if (random.nextBetween(1, 100) <= this.getAttackEffectsBound()) {
-            int duration = this.getAttackEffectsDuration();
-            this.getAttackEffects().forEach((effect, amplifier) ->
-                    target.addStatusEffect(new StatusEffectInstance(effect, duration, amplifier), attacker));
+        if (random.nextBetween(1, 100) <= this.attackEffectBound) {
+            for (StatusEffectEntry effectEntry : attackEffects) {
+                target.addStatusEffect(new StatusEffectInstance(effectEntry.statusEffect(), effectEntry.duration(), effectEntry.amplifier()), attacker);
+            }
         }
         return true;
     }
 
-    public int getEnrichEffectsDuration() {
-        return 2 * 20;
-    }
+    public static class Settings extends Item.Settings {
+        private final List<StatusEffectEntry> enrichEffects;
+        private final List<StatusEffectEntry> attackEffects;
+        private int attackEffectBound;
 
-    @NotNull
-    public abstract Map<StatusEffect, Integer> getEnrichEffects();
+        public Settings() {
+            super();
+            this.enrichEffects = new ArrayList<>(List.of(
+                    new StatusEffectEntry(StatusEffects.RESISTANCE, 0, 2 * 20)
+            ));
+            this.attackEffects = new ArrayList<>(List.of(
+                    new StatusEffectEntry(StatusEffects.APPROACHING_EXTINCTION, 0, 15 * 20)
+            ));
+            this.attackEffectBound = 100;
+        }
 
-    public int getAttackEffectsDuration() {
-        return 5 * 20;
-    }
+        public Settings ignoreEnrichEffects() {
+            this.enrichEffects.clear();
+            return this;
+        }
 
-    public int getAttackEffectsBound() {
-        return 100;
-    }
+        public Settings enrichEffect(StatusEffectEntry effectEntry) {
+            this.enrichEffects.add(effectEntry);
+            return this;
+        }
 
-    @NotNull
-    public abstract Map<StatusEffect, Integer> getAttackEffects();
+        public Settings ignoreAttackEffects() {
+            this.attackEffects.clear();
+            return this;
+        }
 
-    @NotNull
-    public abstract Multimap<EntityAttribute, EntityAttributeModifier> getCustomModifiers(EquipmentSlot slot);
+        public Settings attackEffect(StatusEffectEntry effectEntry) {
+            this.attackEffects.add(effectEntry);
+            return this;
+        }
 
-    @Override
-    public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot slot) {
-        ImmutableMultimap.Builder<EntityAttribute, EntityAttributeModifier> builder = ImmutableMultimap.builder();
-        builder.putAll(super.getAttributeModifiers(slot));
-        builder.putAll(this.getCustomModifiers(slot));
-        return builder.build();
+        public Settings attackEffectBound(int bound) {
+            this.attackEffectBound = bound;
+            return this;
+        }
     }
 }

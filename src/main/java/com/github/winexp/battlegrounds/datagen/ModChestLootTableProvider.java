@@ -47,7 +47,7 @@ public class ModChestLootTableProvider extends SimpleFabricLootTableProvider {
                         )
                         .pool(LootPool.builder().rolls(ConstantLootNumberProvider.create(1.0F))
                                 .with(ItemEntry.builder(Items.FLASH_BANG).weight(7)
-                                        .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(1.0F, 2.0F))))
+                                        .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(1.0F, 3.0F))))
                                 .with(ItemEntry.builder(Items.RUPERTS_TEAR).weight(2))
                                 .with(ItemEntry.builder(Items.BUTCHERS_AXE).weight(1)
                                         .apply(SetDamageLootFunction.builder(new UniformLootNumberProvider(

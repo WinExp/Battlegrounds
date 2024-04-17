@@ -1,7 +1,7 @@
 package com.github.winexp.battlegrounds.client.render;
 
 import com.github.winexp.battlegrounds.util.MathUtil;
-import com.github.winexp.battlegrounds.util.WorldUtil;
+import com.github.winexp.battlegrounds.util.BlockUtil;
 import com.github.winexp.battlegrounds.util.raycast.BlockRaycastResult;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -27,6 +27,8 @@ import java.util.function.Predicate;
 public class FlashRenderer implements HudRenderCallback {
     public static final float STRENGTH_LEFT_SPEED = 0.02F;
     public static final float MAX_FLASH_TICKS = 5 * 20;
+    public static final float DISABLE_SPRINTING_STRENGTH = 0.7F;
+    public static final float DECREASE_SOUND_BEGIN_STRENGTH = 0.5F;
     private static final BiFunction<World, BlockPos, Float> TRANSPARENCY_STRENGTH_FUNCTION = (world, blockPos) -> {
         BlockState blockState = world.getBlockState(blockPos);
         Block block = blockState.getBlock();
@@ -37,7 +39,7 @@ public class FlashRenderer implements HudRenderCallback {
         } else if (block instanceof TransparentBlock) {
             return 0.85F;
         } else {
-            float transparency = 1.0F - WorldUtil.getOpacityFloat(world, blockPos);
+            float transparency = 1.0F - BlockUtil.getOpacityFloat(world, blockPos);
             if (transparency == 0) return 0F;
             else return Math.max(transparency, 0.1F);
         }
@@ -47,15 +49,16 @@ public class FlashRenderer implements HudRenderCallback {
         BlockHitResult hitResult = raycastResult.hitResult();
         BlockPos blockPos = hitResult.getBlockPos();
         return hitResult.getType() == HitResult.Type.MISS
-        || TRANSPARENCY_STRENGTH_FUNCTION.apply(world, blockPos) == 0F;
+        || BlockUtil.isOpaque(world, blockPos);
     };
     private static final Predicate<BlockRaycastResult> FLASH_PREDICATE = (raycastResult) -> {
         World world = raycastResult.world();
         BlockHitResult hitResult = raycastResult.hitResult();
         BlockPos blockPos = hitResult.getBlockPos();
         return raycastResult.hitResult().getType() == HitResult.Type.MISS
-                || TRANSPARENCY_STRENGTH_FUNCTION.apply(world, blockPos) > 0F;
+                || !BlockUtil.isOpaque(world, blockPos);
     };
+    private static final RaycastContext.ShapeType RAYCAST_SHAPE_TYPE = RaycastContext.ShapeType.valueOf("CULLING");
 
     private float flashStrength;
 
@@ -63,16 +66,18 @@ public class FlashRenderer implements HudRenderCallback {
         ClientTickEvents.END_CLIENT_TICK.register(this::tick);
     }
 
-    public static float getFlashStrength(Entity entity, Vec3d flashPos, float distance, float tickDelta) {
-        Vec3d vec3d = entity.getCameraPosVec(tickDelta);
-        Vec3d vec3d2 = MathUtil.getRotationToPos(entity.getEyePos(), flashPos);
-        Vec3d playerRotation = entity.getRotationVec(1.0F);
+    public static float computeFlashStrength(Entity cameraEntity, Vec3d flashPos, float distance, float tickDelta) {
+        Vec3d vec3d = cameraEntity.getCameraPosVec(tickDelta);
+        Vec3d vec3d2 = MathUtil.getRotationToPos(cameraEntity.getEyePos(), flashPos);
+        Vec3d playerRotation = cameraEntity.getRotationVec(1.0F);
         float rotationOffset = MathUtil.getRotationOffset(vec3d2, playerRotation);
         float rotationAttenuate = Math.max(0, Math.min(distance - 0.1F, rotationOffset - 0.7F));
-        BlockRaycastResult raycastResult = MathUtil.raycastBlock(entity, flashPos, vec3d, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, ABORT_PREDICATE, TRANSPARENCY_STRENGTH_FUNCTION);
-        if (FLASH_PREDICATE.test(raycastResult)) {
+        BlockRaycastResult raycastResult1 = MathUtil.raycastBlock(cameraEntity, flashPos, vec3d, RAYCAST_SHAPE_TYPE, RaycastContext.FluidHandling.NONE, ABORT_PREDICATE, TRANSPARENCY_STRENGTH_FUNCTION);
+        BlockRaycastResult raycastResult2 = MathUtil.raycastBlock(cameraEntity, vec3d, flashPos, RAYCAST_SHAPE_TYPE, RaycastContext.FluidHandling.NONE, ABORT_PREDICATE, TRANSPARENCY_STRENGTH_FUNCTION);
+        if (FLASH_PREDICATE.test(raycastResult1)
+        && FLASH_PREDICATE.test(raycastResult2)) {
             return (distance - rotationAttenuate) * (MAX_FLASH_TICKS + 20)
-                    * STRENGTH_LEFT_SPEED * raycastResult.strength();
+                    * STRENGTH_LEFT_SPEED * Math.min(raycastResult1.strength(), raycastResult2.strength());
         } else return 0;
     }
 

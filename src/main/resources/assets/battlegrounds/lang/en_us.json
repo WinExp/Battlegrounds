@@ -95,7 +95,8 @@
   "key.categories.battlegrounds": "Battlegrounds",
 
   "subtitles.battlegrounds.entity.flash_bang.explode": "Flash Bang: Explode",
-  "subtitles.battlegrounds.entity.flash_bang.rebound": "Thrown objects: Rebounding",
+  "subtitles.battlegrounds.entity.prop.generic.trigger": "Thrown Entity: Trigger",
+  "subtitles.battlegrounds.entity.prop.generic.rebound": "Thrown Entity: Rebound",
   "subtitles.battlegrounds.player.tube_fall": "Tube: Landing",
 
   "vote.battlegrounds.already_voting.feedback": "There is already a vote in progress!",

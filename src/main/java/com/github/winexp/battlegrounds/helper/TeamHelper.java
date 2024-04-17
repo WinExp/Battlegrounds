@@ -9,11 +9,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class TeamHelper {
-    private final HashMap<String, Team> teams = new HashMap<>();
-    private final HashMap<GameProfile, Team> playerMap = new HashMap<>();
+    private final Map<String, Team> teams = new HashMap<>();
+    private final Map<GameProfile, Team> playerMap = new HashMap<>();
     private final Scoreboard scoreboard;
     private int maxPlayers = 1;
 
