@@ -125,7 +125,6 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
             for (int j = 0; j < amount; ++j) {
                 this.getWorld().addParticle(ParticleTypes.ENTITY_EFFECT, this.getParticleX(0.5), this.getRandomBodyY(), this.getParticleZ(0.5), d, e, f);
             }
-
         }
     }
 
@@ -265,7 +264,7 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
             }
         } else if (status == 3) {
             ParticleUtil.spawnParticlesWithOffset(this.getWorld(), ParticleTypes.FLASH, this.getX(), this.getY(), this.getZ(), 0, 0, 20);
-            ParticleUtil.spawnParticlesWithOffset(this.getWorld(), ParticleTypes.FLASH, this.getX(), this.getY(), this.getZ(), 0, 0.3, 30);
+            ParticleUtil.spawnParticlesWithOffset(this.getWorld(), ParticleTypes.END_ROD, this.getX(), this.getY(), this.getZ(), 0, 0.3, 30);
         } else {
             super.handleStatus(status);
         }

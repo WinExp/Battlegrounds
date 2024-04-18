@@ -2,9 +2,7 @@ package com.github.winexp.battlegrounds.entity.projectile.thrown;
 
 import com.github.winexp.battlegrounds.entity.data.ModTrackedDataHandlers;
 import com.github.winexp.battlegrounds.sound.SoundEvents;
-import com.github.winexp.battlegrounds.util.MathUtil;
 import com.github.winexp.battlegrounds.util.RandomUtil;
-import com.github.winexp.battlegrounds.util.raycast.BlockRaycastResult;
 import com.mojang.serialization.Codec;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -23,20 +21,17 @@ import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.Util;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-
-import java.util.LinkedList;
-import java.util.Queue;
 
 public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
     private static final byte STATUS_DISCARD_PARTICLES = 3;
     private static final TrackedData<Integer> FUSE = DataTracker.registerData(AbstractThrownPropEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<FuseMode> FUSE_MODE = DataTracker.registerData(AbstractThrownPropEntity.class, ModTrackedDataHandlers.PROP_THROWN_FUSE_MODE);
+
+    private BlockHitResult lastBlockHitResult;
 
     public AbstractThrownPropEntity(EntityType<? extends AbstractThrownPropEntity> entityType, World world) {
         super(entityType, world);
@@ -65,6 +60,24 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
             if (this.getFuse() <= 0) {
                 this.trigger();
             }
+        }
+        if (this.lastBlockHitResult != null && !this.isRemoved()) {
+            Vec3d velocity = this.computeBlockReboundVelocity(this.getVelocity(), this.lastBlockHitResult.getSide(), this.lastBlockHitResult.isInsideBlock());
+            this.refreshPositionAfterTeleport(this.lastBlockHitResult.getPos());
+            double speed = velocity.length();
+            if (speed <= this.getTriggerThresholdSpeed() && this.lastBlockHitResult.getSide() == Direction.UP) {
+                int detonationFuse = this.getDefaultDetonationFuse();
+                this.refreshPositionAfterTeleport(this.lastBlockHitResult.getPos());
+                velocity = Vec3d.ZERO;
+                this.setNoGravity(true);
+                this.noClip = true;
+                this.setFuseMode(AbstractThrownPropEntity.FuseMode.DETONATION_FUSE);
+                this.setFuse(Math.min(this.getFuse() < 0 ? detonationFuse
+                        : this.getFuse(), detonationFuse));
+            }
+            this.setVelocity(velocity);
+            this.playReboundSound();
+            this.lastBlockHitResult = null;
         }
     }
 
@@ -108,9 +121,7 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
     private void reboundEntity(Entity target) {
         Vec3d velocity = this.getVelocity();
         this.setVelocity(velocity.negate().add(target.getVelocity()).multiply(this.getEntityReboundVelocityMultiplier()));
-        if (!this.getWorld().isClient) {
-            this.playReboundSound();
-        }
+        this.playReboundSound();
     }
 
     private Vec3d computeBlockReboundVelocity(Vec3d velocity, Direction side, boolean insideBlock) {
@@ -127,49 +138,18 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
         return velocity;
     }
 
-    private void reboundBlock(BlockHitResult hitResult) {
-        Queue<BlockHitResult> reboundQueue = new LinkedList<>();
-        reboundQueue.add(hitResult);
-        while (!reboundQueue.isEmpty()) {
-            BlockHitResult blockHitResult = reboundQueue.poll();
-            Vec3d velocity = this.computeBlockReboundVelocity(this.getVelocity(), blockHitResult.getSide(), blockHitResult.isInsideBlock());
-            this.refreshPositionAfterTeleport(blockHitResult.getPos());
-            if (!blockHitResult.isInsideBlock()) {
-                Vec3d targetPos = this.getPos().add(velocity);
-                BlockRaycastResult raycastResult = MathUtil.raycastBlock(this, this.getPos(), targetPos, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE,
-                        MathUtil.NONE_ABORT_PREDICATE, MathUtil.NONE_STRENGTH_FUNCTION);
-                BlockHitResult raycastHitResult = raycastResult.hitResult();
-                if (raycastHitResult.getType() != HitResult.Type.MISS) {
-                    this.refreshPositionAfterTeleport(raycastHitResult.getPos());
-                    reboundQueue.add(raycastHitResult);
-                }
-            }
-            double speed = velocity.length();
-            if (speed <= this.getTriggerThresholdSpeed() && blockHitResult.getSide() == Direction.UP) {
-                int detonationFuse = this.getDefaultDetonationFuse();
-                this.refreshPositionAfterTeleport(blockHitResult.getPos());
-                velocity = Vec3d.ZERO;
-                this.setNoGravity(true);
-                this.noClip = true;
-                this.setFuseMode(AbstractThrownPropEntity.FuseMode.DETONATION_FUSE);
-                this.setFuse(Math.min(this.getFuse() < 0 ? detonationFuse
-                        : this.getFuse(), detonationFuse));
-                reboundQueue.clear();
-            }
-            this.setVelocity(velocity);
-            if (!this.getWorld().isClient) {
-                this.playReboundSound();
-            }
-        }
+    private void reboundBlock(BlockHitResult blockHitResult) {
+        this.lastBlockHitResult = blockHitResult;
     }
 
     private void trigger() {
         World world = this.getWorld();
         if (!world.isClient) {
             world.sendEntityStatus(this, STATUS_DISCARD_PARTICLES);
-            this.playTriggerSound();
             this.onTrigger();
             this.discard();
+        } else {
+            this.playTriggerSound();
         }
     }
 

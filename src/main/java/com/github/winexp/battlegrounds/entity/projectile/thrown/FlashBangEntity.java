@@ -8,14 +8,18 @@ import com.github.winexp.battlegrounds.util.MathUtil;
 import com.github.winexp.battlegrounds.util.ParticleUtil;
 import com.github.winexp.battlegrounds.util.RandomUtil;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.EntityExplosionBehavior;
+import net.minecraft.world.explosion.Explosion;
 
 import java.util.List;
 
@@ -36,16 +40,23 @@ public class FlashBangEntity extends AbstractThrownPropEntity {
     }
 
     public static void summonFlash(World world, Vec3d pos) {
-        List<? extends PlayerEntity> players = world.getPlayers();
-        for (PlayerEntity player1 : players) {
-            ServerPlayerEntity player = (ServerPlayerEntity) player1;
-            float distance = MathUtil.distanceTo(pos, player.getEyePos());
-            if (distance <= MAX_DISTANCE + DISTANCE_INCREMENT) {
-                float distanceStrength = (MAX_DISTANCE - distance + DISTANCE_INCREMENT) / MAX_DISTANCE;
-                FlashS2CPacket packet = new FlashS2CPacket(pos, distanceStrength);
-                ServerPlayNetworking.send(player, packet);
+        if (!world.isClient) {
+            List<ServerPlayerEntity> players = world.getPlayers().stream().map(player ->
+                    (ServerPlayerEntity) player).toList();
+            for (ServerPlayerEntity player : players) {
+                float distance = MathUtil.distanceTo(pos, player.getEyePos());
+                if (distance <= MAX_DISTANCE + DISTANCE_INCREMENT) {
+                    float distanceStrength = (MAX_DISTANCE - distance + DISTANCE_INCREMENT) / MAX_DISTANCE;
+                    FlashS2CPacket packet = new FlashS2CPacket(pos, distanceStrength);
+                    ServerPlayNetworking.send(player, packet);
+                }
             }
         }
+    }
+
+    @Override
+    public boolean canExplosionDestroyBlock(Explosion explosion, BlockView world, BlockPos pos, BlockState state, float explosionPower) {
+        return false;
     }
 
     @Override
@@ -56,12 +67,12 @@ public class FlashBangEntity extends AbstractThrownPropEntity {
     @Override
     protected void spawnTriggerParticles() {
         super.spawnTriggerParticles();
-        ParticleUtil.spawnParticlesWithOffset(this.getWorld(), ParticleTypes.EXPLOSION, this.getX(), this.getY(), this.getZ(), 1, 1, 4);
+        ParticleUtil.spawnParticlesWithOffset(this.getWorld(), ParticleTypes.FLASH, this.getX(), this.getY(), this.getZ(), 0, 0, 20);
+        ParticleUtil.spawnParticlesWithOffset(this.getWorld(), ParticleTypes.END_ROD, this.getX(), this.getY(), this.getZ(), 0, 0.3, 30);
     }
 
     @Override
     protected void playTriggerSound() {
-        this.playSound(SoundEvents.ENTITY_FLASH_BANG_EXPLODE, 2, 1.0F);
     }
 
     @Override
@@ -75,6 +86,8 @@ public class FlashBangEntity extends AbstractThrownPropEntity {
         World world = this.getWorld();
         if (!world.isClient) {
             summonFlash(world, this.getPos());
+            world.createExplosion(this, Explosion.createDamageSource(world, this),
+                    new EntityExplosionBehavior(this), this.getPos(), 0.5F, false, World.ExplosionSourceType.NONE);
         }
     }
 
