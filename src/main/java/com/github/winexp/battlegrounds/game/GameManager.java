@@ -78,11 +78,11 @@ public class GameManager extends PersistentState implements GameListener {
             StatusEffects.RESISTANCE, 1,
             StatusEffects.SPEED, 1
     );
-    private final static int ENRICH_EFFECTS_DURATION = 25 * 20;
+    private final static int ENRICH_EFFECTS_DURATION = 24 * 20;
     private final static Map<StatusEffect, Integer> RESIDENT_EFFECTS = Map.of(
             StatusEffects.HASTE, 1
     );
-    private final static int RESIDENT_EFFECTS_DURATION = 25 * 20;
+    private final static int RESIDENT_EFFECTS_DURATION = 24 * 20;
     private final static Identifier RESIZE_BOSS_BAR_ID = new Identifier("battlegrounds", "resize_boss_bar");
     private final static Identifier HEALTH_MODIFIER_ID = new Identifier("battlegrounds", "game/main");
     private final static double HEALTH_MODIFIER_ADD_VALUE = 20;
@@ -300,10 +300,10 @@ public class GameManager extends PersistentState implements GameListener {
             if (player != null) {
                 if (permission.hasEnrichEffects) {
                     ENRICH_EFFECTS.forEach((effect, amplifier) ->
-                            player.addStatusEffect(new StatusEffectInstance(effect, ENRICH_EFFECTS_DURATION, amplifier)));
+                            player.addStatusEffect(new StatusEffectInstance(effect, ENRICH_EFFECTS_DURATION, amplifier, false, false , true)));
                 }
                 RESIDENT_EFFECTS.forEach((effect, amplifier) ->
-                        player.addStatusEffect(new StatusEffectInstance(effect, RESIDENT_EFFECTS_DURATION, amplifier)));
+                        player.addStatusEffect(new StatusEffectInstance(effect, RESIDENT_EFFECTS_DURATION, amplifier, false, false , true)));
             }
         });
     }

@@ -2,7 +2,6 @@ package com.github.winexp.battlegrounds.entity.projectile.thrown;
 
 import com.github.winexp.battlegrounds.entity.data.ModTrackedDataHandlers;
 import com.github.winexp.battlegrounds.sound.SoundEvents;
-import com.github.winexp.battlegrounds.util.Constants;
 import com.github.winexp.battlegrounds.util.MathUtil;
 import com.github.winexp.battlegrounds.util.RandomUtil;
 import com.github.winexp.battlegrounds.util.raycast.BlockRaycastResult;
@@ -60,13 +59,13 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
 
     @Override
     public void tick() {
-        if (this.getFuse() >= 0) {
+        super.tick();
+        if (this.getFuse() >= 0 && !this.isRemoved()) {
             this.setFuse(this.getFuse() - 1);
             if (this.getFuse() <= 0) {
                 this.trigger();
             }
         }
-        super.tick();
     }
 
     @Override
@@ -94,7 +93,7 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
     protected void onEntityHit(EntityHitResult entityHitResult) {
         super.onEntityHit(entityHitResult);
         if (this.isReboundable()) {
-            this.reboundEntity();
+            this.reboundEntity(entityHitResult.getEntity());
         }
         Entity entity = entityHitResult.getEntity();
         entity.damage(this.getDamageSources().thrown(this, this.getOwner()), this.getEntityReboundDamage());
@@ -106,10 +105,12 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
         this.reboundBlock(blockHitResult);
     }
 
-    private void reboundEntity() {
+    private void reboundEntity(Entity target) {
         Vec3d velocity = this.getVelocity();
-        this.setVelocity(velocity.negate().multiply(this.getEntityReboundVelocityMultiplier()));
-        this.playReboundSound();
+        this.setVelocity(velocity.negate().add(target.getVelocity()).multiply(this.getEntityReboundVelocityMultiplier()));
+        if (!this.getWorld().isClient) {
+            this.playReboundSound();
+        }
     }
 
     private Vec3d computeBlockReboundVelocity(Vec3d velocity, Direction side, boolean insideBlock) {
@@ -127,13 +128,11 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
     }
 
     private void reboundBlock(BlockHitResult hitResult) {
-        Constants.LOGGER.debug("\n\n------------Start rebounding------------\n\n");
         Queue<BlockHitResult> reboundQueue = new LinkedList<>();
         reboundQueue.add(hitResult);
         while (!reboundQueue.isEmpty()) {
             BlockHitResult blockHitResult = reboundQueue.poll();
             Vec3d velocity = this.computeBlockReboundVelocity(this.getVelocity(), blockHitResult.getSide(), blockHitResult.isInsideBlock());
-            Constants.LOGGER.debug("Rebound :\nLocation: {}\nSide: {}\nInside block: {}\nBefore velocity: {}\nAfter Velocity: {}", this.getPos(), blockHitResult.getSide(), blockHitResult.isInsideBlock(), this.getVelocity(), velocity);
             this.refreshPositionAfterTeleport(blockHitResult.getPos());
             if (!blockHitResult.isInsideBlock()) {
                 Vec3d targetPos = this.getPos().add(velocity);
@@ -141,7 +140,6 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
                         MathUtil.NONE_ABORT_PREDICATE, MathUtil.NONE_STRENGTH_FUNCTION);
                 BlockHitResult raycastHitResult = raycastResult.hitResult();
                 if (raycastHitResult.getType() != HitResult.Type.MISS) {
-                    Constants.LOGGER.debug("Refresh Position:\nBefore position: {}\nAfter position: {}", this.getPos(), raycastHitResult.getPos());
                     this.refreshPositionAfterTeleport(raycastHitResult.getPos());
                     reboundQueue.add(raycastHitResult);
                 }
@@ -159,7 +157,9 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
                 reboundQueue.clear();
             }
             this.setVelocity(velocity);
-            this.playReboundSound();
+            if (!this.getWorld().isClient) {
+                this.playReboundSound();
+            }
         }
     }
 
