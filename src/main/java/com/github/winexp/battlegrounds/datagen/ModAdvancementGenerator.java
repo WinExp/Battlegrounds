@@ -22,8 +22,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Consumer;
 
-public class ModAdvancementProvider extends FabricAdvancementProvider {
-    protected ModAdvancementProvider(FabricDataOutput output) {
+public class ModAdvancementGenerator extends FabricAdvancementProvider {
+    protected ModAdvancementGenerator(FabricDataOutput output) {
         super(output);
     }
 

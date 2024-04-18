@@ -3,18 +3,20 @@ package com.github.winexp.battlegrounds.item.weapon;
 import com.github.winexp.battlegrounds.entity.effect.StatusEffectEntry;
 import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.item.v1.CustomDamageHandler;
+import net.fabricmc.fabric.api.item.v1.EquipmentSlotProvider;
+import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.SwordItem;
-import net.minecraft.item.ToolMaterial;
+import net.minecraft.item.*;
+import net.minecraft.resource.featuretoggle.FeatureFlag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Rarity;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -70,7 +72,7 @@ public abstract class LegendarySwordItem extends SwordItem {
         return true;
     }
 
-    public static class Settings extends Item.Settings {
+    public static class Settings extends FabricItemSettings {
         private final List<StatusEffectEntry> enrichEffects;
         private final List<StatusEffectEntry> attackEffects;
         private int attackEffectBound;
@@ -84,6 +86,66 @@ public abstract class LegendarySwordItem extends SwordItem {
                     new StatusEffectEntry(StatusEffects.APPROACHING_EXTINCTION, 0, 15 * 20)
             ));
             this.attackEffectBound = 100;
+        }
+
+        @Override
+        public Settings equipmentSlot(EquipmentSlotProvider equipmentSlotProvider) {
+            super.equipmentSlot(equipmentSlotProvider);
+            return this;
+        }
+
+        @Override
+        public Settings customDamage(CustomDamageHandler handler) {
+            super.customDamage(handler);
+            return this;
+        }
+
+        @Override
+        public Settings food(FoodComponent foodComponent) {
+            super.food(foodComponent);
+            return this;
+        }
+
+        @Override
+        public Settings maxCount(int maxCount) {
+            super.maxCount(maxCount);
+            return this;
+        }
+
+        @Override
+        public Settings maxDamageIfAbsent(int maxDamage) {
+            super.maxDamageIfAbsent(maxDamage);
+            return this;
+        }
+
+        @Override
+        public Settings maxDamage(int maxDamage) {
+            super.maxDamage(maxDamage);
+            return this;
+        }
+
+        @Override
+        public Settings recipeRemainder(Item recipeRemainder) {
+            super.recipeRemainder(recipeRemainder);
+            return this;
+        }
+
+        @Override
+        public Settings rarity(Rarity rarity) {
+            super.rarity(rarity);
+            return this;
+        }
+
+        @Override
+        public Settings fireproof() {
+            super.fireproof();
+            return this;
+        }
+
+        @Override
+        public Settings requires(FeatureFlag... features) {
+            super.requires(features);
+            return this;
         }
 
         public Settings ignoreEnrichEffects() {

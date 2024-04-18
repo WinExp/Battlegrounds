@@ -2,6 +2,7 @@ package com.github.winexp.battlegrounds.entity.projectile.thrown;
 
 import com.github.winexp.battlegrounds.entity.data.ModTrackedDataHandlers;
 import com.github.winexp.battlegrounds.sound.SoundEvents;
+import com.github.winexp.battlegrounds.util.EntityUtil;
 import com.github.winexp.battlegrounds.util.RandomUtil;
 import com.mojang.serialization.Codec;
 import net.minecraft.entity.Entity;
@@ -63,11 +64,10 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
         }
         if (this.lastBlockHitResult != null && !this.isRemoved()) {
             Vec3d velocity = this.computeBlockReboundVelocity(this.getVelocity(), this.lastBlockHitResult.getSide(), this.lastBlockHitResult.isInsideBlock());
-            this.refreshPositionAfterTeleport(this.lastBlockHitResult.getPos());
+            this.setPosition(EntityUtil.getEntitySidePos(this, this.lastBlockHitResult.getPos(), this.lastBlockHitResult.getSide()));
             double speed = velocity.length();
             if (speed <= this.getTriggerThresholdSpeed() && this.lastBlockHitResult.getSide() == Direction.UP) {
                 int detonationFuse = this.getDefaultDetonationFuse();
-                this.refreshPositionAfterTeleport(this.lastBlockHitResult.getPos());
                 velocity = Vec3d.ZERO;
                 this.setNoGravity(true);
                 this.noClip = true;
@@ -129,9 +129,9 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
         if (insideBlock) {
             velocity = this.getVelocity().multiply(velocityMultiplier);
         } else {
-            double deltaX = side.getAxis() == Direction.Axis.X ? -1 : 1;
-            double deltaY = side.getAxis() == Direction.Axis.Y ? -1 : 1;
-            double deltaZ = side.getAxis() == Direction.Axis.Z ? -1 : 1;
+            double deltaX = side.getAxis() == Direction.Axis.X ? side.getOffsetX() : 1;
+            double deltaY = side.getAxis() == Direction.Axis.Y ? side.getOffsetY() : 1;
+            double deltaZ = side.getAxis() == Direction.Axis.Z ? side.getOffsetZ() : 1;
             velocity = new Vec3d(velocity.x * deltaX, velocity.y * deltaY, velocity.z * deltaZ)
                     .multiply(velocityMultiplier);
         }

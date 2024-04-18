@@ -21,8 +21,8 @@ import net.minecraft.util.Identifier;
 
 import java.util.function.BiConsumer;
 
-public class ModChestLootTableProvider extends SimpleFabricLootTableProvider {
-    public ModChestLootTableProvider(FabricDataOutput output) {
+public class ModChestLootTableGenerator extends SimpleFabricLootTableProvider {
+    public ModChestLootTableGenerator(FabricDataOutput output) {
         super(output, LootContextTypes.CHEST);
     }
 

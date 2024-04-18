@@ -9,8 +9,8 @@ import net.minecraft.util.Identifier;
 
 import java.util.function.Consumer;
 
-public class ModGamePropertiesProvider extends GamePropertiesProvider {
-    protected ModGamePropertiesProvider(FabricDataOutput output) {
+public class ModGamePropertiesGenerator extends GamePropertiesProvider {
+    protected ModGamePropertiesGenerator(FabricDataOutput output) {
         super(output);
     }
 

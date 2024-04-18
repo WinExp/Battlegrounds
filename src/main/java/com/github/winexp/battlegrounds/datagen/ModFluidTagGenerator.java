@@ -8,8 +8,8 @@ import net.minecraft.registry.tag.FluidTags;
 
 import java.util.concurrent.CompletableFuture;
 
-public class ModFluidTagProvider extends FabricTagProvider.FluidTagProvider {
-    public ModFluidTagProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> completableFuture) {
+public class ModFluidTagGenerator extends FabricTagProvider.FluidTagProvider {
+    public ModFluidTagGenerator(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> completableFuture) {
         super(output, completableFuture);
     }
 

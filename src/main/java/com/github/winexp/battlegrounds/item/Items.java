@@ -16,6 +16,7 @@ import com.github.winexp.battlegrounds.item.tool.*;
 import com.github.winexp.battlegrounds.util.RecipeUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.dispenser.ProjectileDispenserBehavior;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
@@ -42,27 +43,30 @@ import java.util.Map;
 
 public class Items extends net.minecraft.item.Items {
     private static final List<NbtCrafting> nbtCraftingItems = new ArrayList<>();
-    public static final PVPProSwordItem PVP_PRO_SWORD = registerItem("pvp_pro_sword", new PVPProSwordItem(ToolMaterials.PVP_PRO_SWORD, 3, -2.4F, (LegendarySwordItem.Settings) new LegendarySwordItem.Settings()
+    public static final PVPProSwordItem PVP_PRO_SWORD = registerItem("pvp_pro_sword", new PVPProSwordItem(ToolMaterials.PVP_PRO_SWORD, 3, -2.4F, new LegendarySwordItem.Settings()
+            .rarity(Rarity.EPIC).fireproof()
             .enrichEffect(new StatusEffectEntry(StatusEffects.FIRE_RESISTANCE, 0, 2 * 20))
             .enrichEffect(new StatusEffectEntry(StatusEffects.STRENGTH, 0, 2 * 20))
-            .rarity(Rarity.EPIC).fireproof()));
-    public static final SevenElevenSwordItem SEVEN_ELEVEN_SWORD = registerItem("seven_eleven_sword", new SevenElevenSwordItem(ToolMaterials.SEVEN_ELEVEN_SWORD, 3, -2.4F, (LegendarySwordItem.Settings) new LegendarySwordItem.Settings()
+    ));
+    public static final SevenElevenSwordItem SEVEN_ELEVEN_SWORD = registerItem("seven_eleven_sword", new SevenElevenSwordItem(ToolMaterials.SEVEN_ELEVEN_SWORD, 3, -2.4F, new LegendarySwordItem.Settings()
+            .rarity(Rarity.EPIC).fireproof()
             .enrichEffect(new StatusEffectEntry(StatusEffects.JUMP_BOOST, 1, 2 * 20))
             .enrichEffect(new StatusEffectEntry(StatusEffects.SPEED, 1, 2 * 20))
             .attackEffect(new StatusEffectEntry(StatusEffects.SLOWNESS, 1, 5 * 20))
             .attackEffect(new StatusEffectEntry(StatusEffects.WEAKNESS, 0, 5 * 20))
             .attackEffectBound(35)
-            .rarity(Rarity.EPIC).fireproof()));
-    public static final StevesPainSwordItem STEVES_PAIN_SWORD = registerItem("steves_pain_sword", new StevesPainSwordItem(ToolMaterials.STEVES_PAIN_SWORD, 3, -2.4F, (LegendarySwordItem.Settings) new LegendarySwordItem.Settings()
-            .rarity(Rarity.EPIC).fireproof()));
-    public static final LeachingSwordItem LEACHING_SWORD = registerItem("leaching_sword", new LeachingSwordItem(ToolMaterials.LEACHING_SWORD, 3, -2.0F, new Item.Settings().rarity(Rarity.UNCOMMON)));
-    public static final MinersPickaxeItem MINERS_PICKAXE = registerItem("miners_pickaxe", new MinersPickaxeItem(ToolMaterials.MINERS_PICKAXE, 1, -2.8F, new Item.Settings().rarity(Rarity.UNCOMMON)));
-    public static final ButchersAxeItem BUTCHERS_AXE = registerItem("butchers_axe", new ButchersAxeItem(ToolMaterials.BUTCHERS_AXE, 5, -3.3F, new Item.Settings().rarity(Rarity.EPIC).fireproof()));
-    public static final ChannelingBowItem CHANNELING_BOW = registerItem("channeling_bow", new ChannelingBowItem(new Item.Settings().rarity(Rarity.RARE).fireproof().maxDamage(ChannelingBowItem.DURABILITY)));
-    public static final FlashBangItem FLASH_BANG = registerItem("flash_bang", new FlashBangItem(new Item.Settings().maxCount(16).rarity(Rarity.UNCOMMON)));
-    public static final MolotovItem MOLOTOV = registerItem("molotov", new MolotovItem(new Item.Settings().maxCount(16).rarity(Rarity.UNCOMMON)));
-    public static final RupertsTearItem RUPERTS_TEAR = registerItem("ruperts_tear", new RupertsTearItem(ToolMaterials.RUPERTS_TEAR, new Item.Settings().maxCount(1).rarity(Rarity.RARE)));
-    public static final KnockbackStickItem KNOCKBACK_STICK = registerItem("knockback_stick", new KnockbackStickItem(ToolMaterials.KNOCKBACK_STICK, new Item.Settings().maxCount(1).rarity(Rarity.RARE)));
+    ));
+    public static final StevesPainSwordItem STEVES_PAIN_SWORD = registerItem("steves_pain_sword", new StevesPainSwordItem(ToolMaterials.STEVES_PAIN_SWORD, 3, -2.4F, new LegendarySwordItem.Settings()
+            .rarity(Rarity.EPIC).fireproof()
+    ));
+    public static final LeachingSwordItem LEACHING_SWORD = registerItem("leaching_sword", new LeachingSwordItem(ToolMaterials.LEACHING_SWORD, 3, -2.0F, new FabricItemSettings().rarity(Rarity.UNCOMMON)));
+    public static final MinersPickaxeItem MINERS_PICKAXE = registerItem("miners_pickaxe", new MinersPickaxeItem(ToolMaterials.MINERS_PICKAXE, 1, -2.8F, new FabricItemSettings().rarity(Rarity.UNCOMMON)));
+    public static final ButchersAxeItem BUTCHERS_AXE = registerItem("butchers_axe", new ButchersAxeItem(ToolMaterials.BUTCHERS_AXE, 5, -3.3F, new FabricItemSettings().rarity(Rarity.EPIC).fireproof()));
+    public static final ChannelingBowItem CHANNELING_BOW = registerItem("channeling_bow", new ChannelingBowItem(new FabricItemSettings().rarity(Rarity.RARE).fireproof().maxDamage(ChannelingBowItem.DURABILITY)));
+    public static final FlashBangItem FLASH_BANG = registerItem("flash_bang", new FlashBangItem(new FabricItemSettings().maxCount(16).rarity(Rarity.UNCOMMON)));
+    public static final MolotovItem MOLOTOV = registerItem("molotov", new MolotovItem(new FabricItemSettings().maxCount(16).rarity(Rarity.UNCOMMON)));
+    public static final RupertsTearItem RUPERTS_TEAR = registerItem("ruperts_tear", new RupertsTearItem(ToolMaterials.RUPERTS_TEAR, new FabricItemSettings().maxCount(1).rarity(Rarity.RARE)));
+    public static final KnockbackStickItem KNOCKBACK_STICK = registerItem("knockback_stick", new KnockbackStickItem(ToolMaterials.KNOCKBACK_STICK, new FabricItemSettings().maxCount(1).rarity(Rarity.RARE)));
 
     public static <T extends Item> T registerItem(String name, T item) {
         T result = Registry.register(Registries.ITEM, new Identifier("battlegrounds", name), item);
