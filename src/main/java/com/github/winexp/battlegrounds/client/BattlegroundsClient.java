@@ -33,7 +33,7 @@ public class BattlegroundsClient implements ClientModInitializer {
 
         // 自定义渲染器
         HudRenderCallback.EVENT.register(ClientConstants.FLASH_RENDERER);
-        WorldRenderEvents.BEFORE_DEBUG_RENDER.register(ClientConstants.RUPERTS_TEAR_BLOCK_OUTLINE_RENDERER);
+        WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register(ClientConstants.RUPERTS_TEAR_BLOCK_OUTLINE_RENDERER);
     }
 
     @Override

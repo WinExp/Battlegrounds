@@ -1,4 +1,4 @@
-package com.github.winexp.battlegrounds.util;
+package com.github.winexp.battlegrounds.util.data;
 
 import net.fabricmc.loader.api.Version;
 import net.minecraft.network.PacketByteBuf;

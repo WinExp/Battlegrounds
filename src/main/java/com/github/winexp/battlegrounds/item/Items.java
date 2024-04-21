@@ -242,7 +242,6 @@ public class Items extends net.minecraft.item.Items {
                         )
                 )
         );
-
         List<NbtRecipe> items = new ArrayList<>();
         items.addAll(shapedRecipes);
         items.addAll(shapelessRecipes);

@@ -27,9 +27,9 @@ import net.minecraft.world.World;
 
 import java.util.Objects;
 
-public class RupertsTearBlockOutlineRenderer implements WorldRenderEvents.DebugRender {
-    private static final double LERP_DELTA = 0.1;
-    private static final int LERP_DURATION = 5;
+public class RupertsTearBlockOutlineRenderer implements WorldRenderEvents.BeforeBlockOutline {
+    private static final double LERP_DELTA = 0.02;
+    private static final int LERP_DURATION = 1;
     private static final Vec3d NaN = new Vec3d(Double.NaN, Double.NaN, Double.NaN);
 
     private Vec3d prevPos = NaN;
@@ -40,7 +40,7 @@ public class RupertsTearBlockOutlineRenderer implements WorldRenderEvents.DebugR
     }
 
     @Override
-    public void beforeDebugRender(WorldRenderContext context) {
+    public boolean beforeBlockOutline(WorldRenderContext context, HitResult hitResult) {
         VertexConsumerProvider vertexConsumerProvider = Objects.requireNonNull(context.consumers());
         Camera camera = context.camera();
         World world = context.world();
@@ -48,28 +48,29 @@ public class RupertsTearBlockOutlineRenderer implements WorldRenderEvents.DebugR
         VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(RenderLayer.getLines());
         Vec3d cameraPos = camera.getPos();
         Entity entity = camera.getFocusedEntity();
+        float tickDelta = context.tickDelta();
         if (entity instanceof PlayerEntity player
                 && world != null
                 && (player.getEquippedStack(EquipmentSlot.MAINHAND).isOf(Items.RUPERTS_TEAR)
                 || player.getEquippedStack(EquipmentSlot.OFFHAND).isOf(Items.RUPERTS_TEAR))
                 && !player.getItemCooldownManager().isCoolingDown(Items.RUPERTS_TEAR)) {
-            Vec3d begin = entity.getEyePos();
-            Vec3d rotation = entity.getRotationVector();
+            Vec3d begin = entity.getCameraPosVec(tickDelta);
+            Vec3d rotation = entity.getRotationVec(tickDelta);
             Vec3d end = begin.add(rotation.multiply(RupertsTearItem.MAX_DISTANCE));
-            BlockRaycastResult raycastResult = MathUtil.raycastBlock(entity, begin, end, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, MathUtil.NONE_ABORT_PREDICATE, MathUtil.NONE_STRENGTH_FUNCTION);
-            BlockHitResult blockHitResult = raycastResult.hitResult();
+            BlockHitResult blockHitResult;
+            if (hitResult.getType() == HitResult.Type.BLOCK) {
+                blockHitResult = (BlockHitResult) hitResult;
+            } else {
+                BlockRaycastResult raycastResult = MathUtil.raycastBlock(entity, begin, end, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, MathUtil.NONE_ABORT_PREDICATE, MathUtil.NONE_STRENGTH_FUNCTION);
+                blockHitResult = raycastResult.hitResult();
+            }
             BlockPos blockPos = blockHitResult.getBlockPos();
-            BlockState blockState = world.getBlockState(blockPos);
             long currentTime = System.currentTimeMillis();
-            double delta = Math.pow(LERP_DELTA, Math.max((currentTime - this.prevTime) / LERP_DURATION, 1));
             float colorR, colorG, colorB, colorA;
-            double lerpX = MathHelper.lerp(delta, Double.isNaN(this.prevPos.x) ? blockPos.getX() : this.prevPos.x, blockPos.getX());
-            double lerpY = MathHelper.lerp(delta, Double.isNaN(this.prevPos.y) ? blockPos.getY() : this.prevPos.y, blockPos.getY());
-            double lerpZ = MathHelper.lerp(delta, Double.isNaN(this.prevPos.z) ? blockPos.getZ() : this.prevPos.z, blockPos.getZ());
             if (blockHitResult.getType() == HitResult.Type.MISS
                     || !world.getWorldBorder().contains(blockPos)) {
                 this.resetPrevPos();
-                return;
+                return true;
             }
             if (RupertsTearItem.isSafe(world, blockHitResult)) {
                 colorR = 0.4F;
@@ -82,14 +83,33 @@ public class RupertsTearBlockOutlineRenderer implements WorldRenderEvents.DebugR
                 colorB = 0.3F;
                 colorA = 0.8F;
             }
-            drawCuboidShapeOutline(matrices, vertexConsumer, blockState.getOutlineShape(world, blockPos, ShapeContext.of(entity)), lerpX - cameraPos.x, lerpY - cameraPos.y, lerpZ - cameraPos.z, colorR, colorG, colorB, colorA);
+            double lerpX = this.calculateLerp(currentTime, Double.isNaN(this.prevPos.x) ? blockPos.getX() : this.prevPos.x, blockPos.getX());
+            double lerpY = this.calculateLerp(currentTime, Double.isNaN(this.prevPos.y) ? blockPos.getY() : this.prevPos.y, blockPos.getY());
+            double lerpZ = this.calculateLerp(currentTime, Double.isNaN(this.prevPos.z) ? blockPos.getZ() : this.prevPos.z, blockPos.getZ());
+            BlockPos roundedPos = new BlockPos(
+                    (int) Math.round(lerpX),
+                    (int) Math.round(lerpY),
+                    (int) Math.round(lerpZ)
+            );
+            BlockState blockState = world.getBlockState(roundedPos);
+            this.drawCuboidShapeOutline(matrices, vertexConsumer, blockState.getOutlineShape(world, roundedPos, ShapeContext.of(entity)), lerpX - cameraPos.x, lerpY - cameraPos.y, lerpZ - cameraPos.z, colorR, colorG, colorB, colorA);
             if (currentTime - this.prevTime >= LERP_DURATION) {
                 this.prevPos = new Vec3d(lerpX, lerpY, lerpZ);
                 this.prevTime = System.currentTimeMillis();
             }
+            return false;
         } else {
             this.resetPrevPos();
+            return true;
         }
+    }
+
+    private double calculateLerp(long currentTime, double start, double end) {
+        double result = start;
+        for (int i = 0; i < (currentTime - this.prevTime) / LERP_DURATION; i++) {
+            result = MathHelper.lerp(RupertsTearBlockOutlineRenderer.LERP_DELTA, result, end);
+        }
+        return result;
     }
 
     private void drawCuboidShapeOutline(MatrixStack matrices, VertexConsumer vertexConsumer, VoxelShape shape, double offsetX, double offsetY, double offsetZ, float red, float green, float blue, float alpha) {

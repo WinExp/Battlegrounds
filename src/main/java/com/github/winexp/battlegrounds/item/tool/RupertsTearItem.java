@@ -1,19 +1,18 @@
 package com.github.winexp.battlegrounds.item.tool;
 
 import com.github.winexp.battlegrounds.item.EnchantRestrict;
+import com.github.winexp.battlegrounds.network.packet.c2s.play.RupertsTearTeleportS2CPacket;
 import com.github.winexp.battlegrounds.registry.tag.ModFluidTags;
 import com.github.winexp.battlegrounds.util.MathUtil;
 import com.github.winexp.battlegrounds.util.BlockUtil;
 import com.github.winexp.battlegrounds.util.raycast.BlockRaycastResult;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ToolItem;
 import net.minecraft.item.ToolMaterial;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
@@ -28,18 +27,12 @@ import net.minecraft.world.World;
 
 public class RupertsTearItem extends ToolItem implements EnchantRestrict {
     public static final int MAX_DISTANCE = 100;
-    private static final int DISTANCE_DECREMENT = 15;
-    private static final int MAX_COOLDOWN = 30 * 20;
-    private static final int MIN_COOLDOWN = 3 * 20;
-    private static final int FAILED_COOLDOWN = 20;
+    public static final int MAX_COOLDOWN = 30 * 20;
+    public static final int MIN_COOLDOWN = 3 * 20;
+    public static final int FAILED_COOLDOWN = 20;
 
     public RupertsTearItem(ToolMaterial toolMaterial, Settings settings) {
         super(toolMaterial, settings);
-    }
-
-    private void damageStack(ItemStack stack, LivingEntity entity) {
-        stack.damage(1, entity, (e) ->
-                e.sendToolBreakStatus(Hand.MAIN_HAND));
     }
 
     private void onUseFailed(PlayerEntity player) {
@@ -74,7 +67,7 @@ public class RupertsTearItem extends ToolItem implements EnchantRestrict {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack stack = user.getStackInHand(hand);
-        if (!world.isClient) {
+        if (world.isClient) {
             Vec3d begin = user.getEyePos();
             Vec3d rotation = user.getRotationVector();
             Vec3d end = begin.add(rotation.multiply(MAX_DISTANCE));
@@ -83,18 +76,13 @@ public class RupertsTearItem extends ToolItem implements EnchantRestrict {
             BlockPos pos = raycastResult.hitResult().getBlockPos();
             if (!isSafe(world,raycastResult.hitResult())) {
                 this.onUseFailed(user);
-                return TypedActionResult.fail(stack);
+                return TypedActionResult.success(stack);
             }
             double y = BlockUtil.getBlockMaxY(world, pos);
             Box boundingBox = BlockUtil.getCollisionShape(world, pos).getBoundingBox();
             Vec3d tpPos = boundingBox.getCenter().add(Vec3d.of(pos)).withAxis(Direction.Axis.Y, y);
-            double distance = tpPos.distanceTo(user.getPos());
-            int cooldown = (int) (MAX_COOLDOWN * (Math.pow(Math.max(distance - DISTANCE_DECREMENT, 0), 1.5) / Math.pow(MAX_DISTANCE, 1.5)));
-            user.getItemCooldownManager().set(this, Math.max(MIN_COOLDOWN, cooldown));
-            user.teleport(tpPos.x, tpPos.y, tpPos.z);
-            user.onLanding();
-            world.playSound(null, user.getX(), user.getY(), user.getZ(), SoundEvents.ENTITY_PLAYER_TELEPORT, SoundCategory.PLAYERS);
-            this.damageStack(stack, user);
+            RupertsTearTeleportS2CPacket packet = new RupertsTearTeleportS2CPacket(stack, tpPos);
+            ClientPlayNetworking.send(packet);
         }
         return TypedActionResult.success(stack, world.isClient);
     }

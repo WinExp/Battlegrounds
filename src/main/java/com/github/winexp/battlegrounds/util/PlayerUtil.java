@@ -2,6 +2,7 @@ package com.github.winexp.battlegrounds.util;
 
 import com.github.winexp.battlegrounds.game.GameStage;
 import com.github.winexp.battlegrounds.game.PlayerPermission;
+import com.github.winexp.battlegrounds.util.data.ModVersion;
 import net.fabricmc.fabric.api.networking.v1.FabricPacket;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.player.PlayerEntity;

@@ -16,7 +16,8 @@
   ],
   "client": [
     "client.flashSound_AbstractSoundInstanceMixin",
-    "client.flashSprinting_ClientPlayerEntityMixin"
+    "client.flashSprinting_ClientPlayerEntityMixin",
+    "client.nameLabel_EntityRendererMixin"
   ],
   "server": [
   ],

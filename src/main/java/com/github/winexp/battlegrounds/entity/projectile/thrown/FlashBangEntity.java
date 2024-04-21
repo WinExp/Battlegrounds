@@ -84,9 +84,10 @@ public class FlashBangEntity extends AbstractThrownPropEntity {
     protected void onTrigger() {
         World world = this.getWorld();
         if (!world.isClient) {
-            summonFlash(world, this.getPos());
             world.createExplosion(this, Explosion.createDamageSource(world, this),
-                    new EntityExplosionBehavior(this), this.getPos(), 1.0F, false, World.ExplosionSourceType.NONE);
+                    new EntityExplosionBehavior(this), this.getX(), this.getY(), this.getZ(), 1.0F, false, World.ExplosionSourceType.NONE,
+                    ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER, SoundEvents.ENTITY_FLASH_BANG_EXPLODE);
+            summonFlash(world, this.getPos());
         }
     }
 

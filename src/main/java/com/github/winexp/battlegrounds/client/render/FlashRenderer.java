@@ -67,7 +67,7 @@ public class FlashRenderer implements HudRenderCallback {
         ClientTickEvents.END_CLIENT_TICK.register(this::tick);
     }
 
-    public static float computeFlashStrength(Entity cameraEntity, Vec3d flashPos, float distance, float tickDelta) {
+    public static float calculateFlashStrength(Entity cameraEntity, Vec3d flashPos, float distance, float tickDelta) {
         Vec3d vec3d = cameraEntity.getCameraPosVec(tickDelta);
         Vec3d vec3d2 = MathUtil.getRotationToPos(cameraEntity.getEyePos(), flashPos);
         Vec3d playerRotation = cameraEntity.getRotationVec(1.0F);
