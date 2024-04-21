@@ -17,6 +17,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
 import net.minecraft.client.sound.PositionedSoundInstance;
@@ -32,6 +33,7 @@ public class BattlegroundsClient implements ClientModInitializer {
 
         // 自定义渲染器
         HudRenderCallback.EVENT.register(ClientConstants.FLASH_RENDERER);
+        WorldRenderEvents.BEFORE_DEBUG_RENDER.register(ClientConstants.RUPERTS_TEAR_BLOCK_OUTLINE_RENDERER);
     }
 
     @Override

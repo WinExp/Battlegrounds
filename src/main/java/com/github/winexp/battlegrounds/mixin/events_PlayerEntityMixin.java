@@ -21,11 +21,11 @@ public abstract class events_PlayerEntityMixin {
         }
     }
 
-    @Inject(method = "canFoodHeal", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "canFoodHeal", at = @At("RETURN"), cancellable = true)
     private void canHeal(CallbackInfoReturnable<Boolean> cir) {
         PlayerEntity player = (PlayerEntity) (Object) this;
         if (player instanceof ServerPlayerEntity serverPlayer) {
-            boolean result = ModServerPlayerEvents.ALLOW_NATURAL_REGEN.invoker().allowPlayerNaturalRegen(serverPlayer);
+            boolean result = cir.getReturnValue() && ModServerPlayerEvents.ALLOW_NATURAL_REGEN.invoker().allowPlayerNaturalRegen(serverPlayer);
             cir.setReturnValue(result);
         }
     }

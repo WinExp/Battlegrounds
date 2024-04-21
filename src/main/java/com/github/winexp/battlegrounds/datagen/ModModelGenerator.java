@@ -28,5 +28,6 @@ public class ModModelGenerator extends FabricModelProvider {
         itemModelGenerator.register(Items.MOLOTOV, Models.GENERATED);
         itemModelGenerator.register(Items.RUPERTS_TEAR, Models.GENERATED);
         itemModelGenerator.register(Items.KNOCKBACK_STICK, Models.GENERATED);
+        itemModelGenerator.register(Items.BEEF_NOODLE_SOUP, Models.GENERATED);
     }
 }

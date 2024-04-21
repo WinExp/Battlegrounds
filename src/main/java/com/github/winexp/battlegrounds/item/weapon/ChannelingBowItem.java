@@ -3,7 +3,7 @@ package com.github.winexp.battlegrounds.item.weapon;
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.item.Items;
-import com.github.winexp.battlegrounds.item.recipe.ItemNbtCrafting;
+import com.github.winexp.battlegrounds.item.recipe.ItemNbtRecipe;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.BowItem;
 import net.minecraft.item.ItemStack;
@@ -14,7 +14,7 @@ import net.minecraft.recipe.book.CraftingRecipeCategory;
 
 import java.util.Map;
 
-public class ChannelingBowItem extends BowItem implements ItemNbtCrafting, EnchantRestrict {
+public class ChannelingBowItem extends BowItem implements ItemNbtRecipe, EnchantRestrict {
     public static final int DURABILITY = 500;
     public static final Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
             Enchantments.CHANNELING_PRO, 1,

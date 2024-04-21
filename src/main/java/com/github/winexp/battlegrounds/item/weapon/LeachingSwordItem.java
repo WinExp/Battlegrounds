@@ -2,7 +2,7 @@ package com.github.winexp.battlegrounds.item.weapon;
 
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.item.Items;
-import com.github.winexp.battlegrounds.item.recipe.ItemNbtCrafting;
+import com.github.winexp.battlegrounds.item.recipe.ItemNbtRecipe;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SwordItem;
@@ -14,7 +14,7 @@ import net.minecraft.recipe.book.CraftingRecipeCategory;
 
 import java.util.Map;
 
-public class LeachingSwordItem extends SwordItem implements ItemNbtCrafting {
+public class LeachingSwordItem extends SwordItem implements ItemNbtRecipe {
     public static final Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
             Enchantments.LEACHING, 1,
             Enchantments.KNOCKBACK, 3,

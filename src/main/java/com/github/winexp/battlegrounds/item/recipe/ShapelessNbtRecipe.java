@@ -10,15 +10,15 @@ import net.minecraft.util.collection.DefaultedList;
 
 import java.util.List;
 
-public class ShapelessNbtCrafting implements NbtCrafting {
+public class ShapelessNbtRecipe implements NbtRecipe {
     private final ItemStack result;
     private final ShapelessRecipe recipe;
     private final Identifier identifier;
 
-    public ShapelessNbtCrafting(Identifier identifier,
-                                CraftingRecipeCategory category,
-                                ItemStack result,
-                                List<Ingredient> ingredients) {
+    public ShapelessNbtRecipe(Identifier identifier,
+                              CraftingRecipeCategory category,
+                              ItemStack result,
+                              List<Ingredient> ingredients) {
         this.identifier = identifier;
         this.result = result;
         this.recipe = new ShapelessRecipe(identifier.toString(), category, result,
@@ -27,16 +27,16 @@ public class ShapelessNbtCrafting implements NbtCrafting {
 
     @Override
     public Identifier getIdentifier() {
-        return identifier;
+        return this.identifier;
     }
 
     @Override
     public ItemStack getDefaultStack() {
-        return result;
+        return this.result;
     }
 
     @Override
     public CraftingRecipe getRecipe() {
-        return recipe;
+        return this.recipe;
     }
 }

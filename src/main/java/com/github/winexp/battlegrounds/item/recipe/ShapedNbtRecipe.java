@@ -7,15 +7,15 @@ import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.util.Identifier;
 
-public class ShapedNbtCrafting implements NbtCrafting {
+public class ShapedNbtRecipe implements NbtRecipe {
     private final ItemStack result;
     private final ShapedRecipe recipe;
     private final Identifier identifier;
 
-    public ShapedNbtCrafting(Identifier identifier,
-                             RawShapedRecipe raw,
-                             CraftingRecipeCategory category,
-                             ItemStack result) {
+    public ShapedNbtRecipe(Identifier identifier,
+                           RawShapedRecipe raw,
+                           CraftingRecipeCategory category,
+                           ItemStack result) {
         this.identifier = identifier;
         this.result = result;
         this.recipe = new ShapedRecipe(identifier.toString(), category, raw, result);
@@ -23,16 +23,16 @@ public class ShapedNbtCrafting implements NbtCrafting {
 
     @Override
     public Identifier getIdentifier() {
-        return identifier;
+        return this.identifier;
     }
 
     @Override
     public ItemStack getDefaultStack() {
-        return result;
+        return this.result;
     }
 
     @Override
     public CraftingRecipe getRecipe() {
-        return recipe;
+        return this.recipe;
     }
 }

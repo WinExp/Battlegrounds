@@ -8,7 +8,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 
 public class StatusEffects extends net.minecraft.entity.effect.StatusEffects {
-    public static final AdrenalineStatusEffect PULSE = register("adrenaline",
+    public static final AdrenalineStatusEffect ADRENALINE = register("adrenaline",
             new AdrenalineStatusEffect(StatusEffectCategory.BENEFICIAL, ColorHelper.Argb.getArgb(255, 120, 180, 20)));
     public static final ApproachingExtinctionStatusEffect APPROACHING_EXTINCTION = register("approaching_extinction",
             new ApproachingExtinctionStatusEffect(StatusEffectCategory.HARMFUL, ColorHelper.Argb.getArgb(255, 180, 80, 80)));

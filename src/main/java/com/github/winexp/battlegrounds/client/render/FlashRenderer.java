@@ -3,6 +3,7 @@ package com.github.winexp.battlegrounds.client.render;
 import com.github.winexp.battlegrounds.util.MathUtil;
 import com.github.winexp.battlegrounds.util.BlockUtil;
 import com.github.winexp.battlegrounds.util.raycast.BlockRaycastResult;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -99,6 +100,7 @@ public class FlashRenderer implements HudRenderCallback {
 
     @Override
     public void onHudRender(DrawContext context, float tickDelta) {
+        RenderSystem.enableBlend();
         float strength = this.flashStrength;
         if (strength > 0) {
             if (strength > 1.0F) strength = 1.0F;

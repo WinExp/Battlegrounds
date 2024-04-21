@@ -12,6 +12,6 @@ public class ApproachingExtinctionStatusEffect extends StatusEffect {
     }
 
     private boolean allowPlayerNaturalRegen(ServerPlayerEntity player) {
-        return !player.hasStatusEffect(this) || player.hasStatusEffect(StatusEffects.PULSE);
+        return !player.hasStatusEffect(this) || player.hasStatusEffect(StatusEffects.ADRENALINE);
     }
 }

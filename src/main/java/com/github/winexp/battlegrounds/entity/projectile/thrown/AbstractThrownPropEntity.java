@@ -22,6 +22,7 @@ import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.Util;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
@@ -29,10 +30,11 @@ import net.minecraft.world.World;
 
 public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
     private static final byte STATUS_DISCARD_PARTICLES = 3;
+    private static final double SPEED_LIMIT = 5;
     private static final TrackedData<Integer> FUSE = DataTracker.registerData(AbstractThrownPropEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<FuseMode> FUSE_MODE = DataTracker.registerData(AbstractThrownPropEntity.class, ModTrackedDataHandlers.PROP_THROWN_FUSE_MODE);
 
-    private BlockHitResult lastBlockHitResult;
+    private HitResult lastHitResult;
 
     public AbstractThrownPropEntity(EntityType<? extends AbstractThrownPropEntity> entityType, World world) {
         super(entityType, world);
@@ -62,22 +64,37 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
                 this.trigger();
             }
         }
-        if (this.lastBlockHitResult != null && !this.isRemoved()) {
-            Vec3d velocity = this.computeBlockReboundVelocity(this.getVelocity(), this.lastBlockHitResult.getSide(), this.lastBlockHitResult.isInsideBlock());
-            this.setPosition(EntityUtil.getEntitySidePos(this, this.lastBlockHitResult.getPos(), this.lastBlockHitResult.getSide()));
-            double speed = velocity.length();
-            if (speed <= this.getTriggerThresholdSpeed() && this.lastBlockHitResult.getSide() == Direction.UP) {
-                int detonationFuse = this.getDefaultDetonationFuse();
-                velocity = Vec3d.ZERO;
-                this.setNoGravity(true);
-                this.noClip = true;
-                this.setFuseMode(AbstractThrownPropEntity.FuseMode.DETONATION_FUSE);
-                this.setFuse(Math.min(this.getFuse() < 0 ? detonationFuse
-                        : this.getFuse(), detonationFuse));
+        if (this.lastHitResult != null) {
+            HitResult.Type type = this.lastHitResult.getType();
+            if (type == HitResult.Type.BLOCK) {
+                BlockHitResult blockHitResult = (BlockHitResult) this.lastHitResult;
+                if (blockHitResult != null && !this.isRemoved()) {
+                    Direction side = blockHitResult.getSide();
+                    boolean insideBlock = blockHitResult.isInsideBlock();
+                    Vec3d velocity = this.computeBlockReboundVelocity(this.getVelocity(), side, insideBlock);
+                    Vec3d pos = EntityUtil.getEntitySidePos(this, blockHitResult.getPos(), side.getOpposite());
+                    this.setPosition(pos);
+                    double speed = velocity.length();
+                    if (speed <= this.getTriggerThresholdSpeed() && side == Direction.UP) {
+                        int detonationFuse = this.getDefaultDetonationFuse();
+                        velocity = Vec3d.ZERO;
+                        this.setNoGravity(true);
+                        this.noClip = true;
+                        this.setFuseMode(AbstractThrownPropEntity.FuseMode.DETONATION_FUSE);
+                        this.setFuse(Math.min(this.getFuse() < 0 ? detonationFuse
+                                : this.getFuse(), detonationFuse));
+                    }
+                    this.setVelocity(velocity);
+                    this.playReboundSound();
+                }
+            } else if (type == HitResult.Type.ENTITY) {
+                this.setPosition(this.prevX, this.prevY, this.prevZ);
+                Vec3d velocity = this.getVelocity();
+                this.setVelocity(velocity.negate()
+                        .multiply(this.getEntityReboundVelocityMultiplier()));
+                this.playReboundSound();
             }
-            this.setVelocity(velocity);
-            this.playReboundSound();
-            this.lastBlockHitResult = null;
+            this.lastHitResult = null;
         }
     }
 
@@ -106,7 +123,7 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
     protected void onEntityHit(EntityHitResult entityHitResult) {
         super.onEntityHit(entityHitResult);
         if (this.isReboundable()) {
-            this.reboundEntity(entityHitResult.getEntity());
+            this.reboundEntity(entityHitResult);
         }
         Entity entity = entityHitResult.getEntity();
         entity.damage(this.getDamageSources().thrown(this, this.getOwner()), this.getEntityReboundDamage());
@@ -118,28 +135,32 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
         this.reboundBlock(blockHitResult);
     }
 
-    private void reboundEntity(Entity target) {
-        Vec3d velocity = this.getVelocity();
-        this.setVelocity(velocity.negate().add(target.getVelocity()).multiply(this.getEntityReboundVelocityMultiplier()));
-        this.playReboundSound();
+    private void reboundEntity(EntityHitResult entityHitResult) {
+        this.lastHitResult = entityHitResult;
     }
 
     private Vec3d computeBlockReboundVelocity(Vec3d velocity, Direction side, boolean insideBlock) {
+        Vec3d newVelocity;
         double velocityMultiplier = this.getBlockReboundVelocityMultiplier(insideBlock);
+        Direction.Axis axis = side.getAxis();
         if (insideBlock) {
-            velocity = this.getVelocity().multiply(velocityMultiplier);
+            newVelocity = velocity.multiply(velocityMultiplier);
         } else {
-            double deltaX = side.getAxis() == Direction.Axis.X ? side.getOffsetX() : 1;
-            double deltaY = side.getAxis() == Direction.Axis.Y ? side.getOffsetY() : 1;
-            double deltaZ = side.getAxis() == Direction.Axis.Z ? side.getOffsetZ() : 1;
-            velocity = new Vec3d(velocity.x * deltaX, velocity.y * deltaY, velocity.z * deltaZ)
+            double deltaX = axis == Direction.Axis.X ? -1 : 1;
+            double deltaY = axis == Direction.Axis.Y ? -1 : 1;
+            double deltaZ = axis == Direction.Axis.Z ? -1 : 1;
+            newVelocity = new Vec3d(velocity.x * deltaX, velocity.y * deltaY, velocity.z * deltaZ)
                     .multiply(velocityMultiplier);
         }
-        return velocity;
+        double speed = newVelocity.length();
+        if (speed >= SPEED_LIMIT) {
+            newVelocity = newVelocity.multiply(0.9);
+        }
+        return newVelocity;
     }
 
     private void reboundBlock(BlockHitResult blockHitResult) {
-        this.lastBlockHitResult = blockHitResult;
+        this.lastHitResult = blockHitResult;
     }
 
     private void trigger() {
@@ -179,7 +200,7 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
     }
 
     public double getTriggerThresholdSpeed() {
-        return 0.1;
+        return 0.13;
     }
 
     public boolean isReboundable() {
@@ -188,7 +209,7 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
 
     public double getBlockReboundVelocityMultiplier(boolean insideBlock) {
         if (insideBlock) return 1.05;
-        else return 0.4;
+        else return 0.5;
     }
     
     public double getEntityReboundVelocityMultiplier() {

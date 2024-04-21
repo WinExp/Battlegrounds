@@ -1,6 +1,6 @@
 package com.github.winexp.battlegrounds.util;
 
-import com.github.winexp.battlegrounds.item.recipe.NbtCrafting;
+import com.github.winexp.battlegrounds.item.recipe.NbtRecipe;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.util.Identifier;
@@ -20,8 +20,8 @@ public class RecipeUtil {
         return recipeMap.get(id);
     }
 
-    public static void addRecipe(NbtCrafting nbtCrafting) {
-        addRecipe(nbtCrafting.toRecipeEntry());
+    public static void addRecipe(NbtRecipe nbtRecipe) {
+        addRecipe(nbtRecipe.toRecipeEntry());
     }
 
     public static <T extends Recipe<?>> void addRecipe(RecipeEntry<T> entry) {

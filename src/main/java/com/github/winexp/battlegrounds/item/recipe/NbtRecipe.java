@@ -5,7 +5,24 @@ import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.util.Identifier;
 
-public interface NbtCrafting {
+public interface NbtRecipe {
+    NbtRecipe EMPTY = new NbtRecipe() {
+        @Override
+        public Identifier getIdentifier() {
+            return null;
+        }
+
+        @Override
+        public ItemStack getDefaultStack() {
+            return ItemStack.EMPTY;
+        }
+
+        @Override
+        public CraftingRecipe getRecipe() {
+            return null;
+        }
+    };
+
     Identifier getIdentifier();
 
     ItemStack getDefaultStack();

@@ -1,12 +1,11 @@
 package com.github.winexp.battlegrounds.item.recipe;
 
-import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 
-public interface ItemNbtCrafting extends NbtCrafting {
+public interface ItemNbtRecipe extends NbtRecipe {
     @Override
     default Identifier getIdentifier() {
-        return Registries.ITEM.getId((Item) this);
+        return Registries.ITEM.getId(this.getDefaultStack().getItem());
     }
 }

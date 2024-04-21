@@ -3,7 +3,7 @@ package com.github.winexp.battlegrounds.item.tool;
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.item.Items;
-import com.github.winexp.battlegrounds.item.recipe.ItemNbtCrafting;
+import com.github.winexp.battlegrounds.item.recipe.ItemNbtRecipe;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -20,7 +20,7 @@ import net.minecraft.util.Hand;
 
 import java.util.Map;
 
-public class KnockbackStickItem extends ToolItem implements ItemNbtCrafting, EnchantRestrict {
+public class KnockbackStickItem extends ToolItem implements ItemNbtRecipe, EnchantRestrict {
     private static final int DURATION = 5 * 20;
     public static final Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
             Enchantments.KNOCKBACK, 7,

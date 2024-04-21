@@ -12,6 +12,7 @@ import java.util.UUID;
 
 public class EntityUtil {
     public static Vec3d getEntitySidePos(Entity entity, Vec3d pos, Direction side) {
+        side = side.getOpposite();
         Box box = entity.getBoundingBox();
         Direction.Axis axis = side.getAxis();
         return pos.withAxis(axis,

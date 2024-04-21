@@ -15,7 +15,7 @@
     "shield_LivingEntityMixin"
   ],
   "client": [
-    "client.flash_AbstractSoundInstanceMixin",
+    "client.flashSound_AbstractSoundInstanceMixin",
     "client.flashSprinting_ClientPlayerEntityMixin"
   ],
   "server": [

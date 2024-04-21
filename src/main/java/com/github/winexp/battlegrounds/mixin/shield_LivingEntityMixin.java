@@ -34,11 +34,12 @@ public abstract class shield_LivingEntityMixin {
 
     @Inject(method = "damage", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;damageShield(F)V"))
     private void onDamageShield(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        if (!this.shieldDamaged) {
-            this.shieldDamaged = true;
-            this.damage(source, amount * 0.5F);
-            this.shieldDamaged = true;
+        if (this.shieldDamaged) {
+            return;
         }
+        this.shieldDamaged = true;
+        this.damage(source, amount * 0.5F);
+        this.shieldDamaged = true;
     }
 
     @Inject(method = "damage", at = @At("RETURN"))

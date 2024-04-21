@@ -1,9 +1,7 @@
 package com.github.winexp.battlegrounds.item.weapon;
 
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
-import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.item.Items;
-import com.github.winexp.battlegrounds.item.recipe.ItemNbtCrafting;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EquipmentSlot;
@@ -20,7 +18,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 
 import java.util.Map;
 
-public class StevesPainSwordItem extends LegendarySwordItem implements ItemNbtCrafting, EnchantRestrict {
+public class StevesPainSwordItem extends LegendarySwordItem {
     public static final Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
             Enchantments.STEVES_PAIN, 1,
             Enchantments.FIRE_ASPECT, 2,
