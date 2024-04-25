@@ -4,11 +4,12 @@ import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
 import com.github.winexp.battlegrounds.entity.projectile.thrown.FlashBangEntity;
 import com.github.winexp.battlegrounds.entity.projectile.thrown.MolotovEntity;
+import com.github.winexp.battlegrounds.item.food.*;
+import com.github.winexp.battlegrounds.item.ingredient.*;
 import com.github.winexp.battlegrounds.item.recipe.*;
 import com.github.winexp.battlegrounds.item.weapon.*;
-import com.github.winexp.battlegrounds.item.mining.MinersPickaxeItem;
-import com.github.winexp.battlegrounds.item.thrown.FlashBangItem;
-import com.github.winexp.battlegrounds.item.thrown.MolotovItem;
+import com.github.winexp.battlegrounds.item.mining.*;
+import com.github.winexp.battlegrounds.item.thrown.*;
 import com.github.winexp.battlegrounds.item.tool.*;
 import com.github.winexp.battlegrounds.util.RecipeUtil;
 import net.fabricmc.api.EnvType;
@@ -24,15 +25,12 @@ import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.FoodComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionUtil;
-import net.minecraft.potion.Potions;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RawShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.Util;
@@ -45,89 +43,34 @@ import java.util.Map;
 
 public class Items extends net.minecraft.item.Items {
     private static final List<NbtRecipe> NBT_RECIPE_ITEMS = new ArrayList<>();
-    public static final LegendarySwordItem PVP_PRO_SWORD = registerItem("pvp_pro_sword", new LegendarySwordItem(ToolMaterials.PVP_PRO_SWORD, 3, -2.4F, new LegendarySwordItem.Settings()
+    public static final PVPProSwordItem PVP_PRO_SWORD = registerItem("pvp_pro_sword", new PVPProSwordItem(ToolMaterials.PVP_PRO_SWORD, 3, -2.4F, new LegendarySwordItem.Settings()
             .rarity(Rarity.EPIC)
             .fireproof()
-            .enrichEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 0, 2 * 20))
+            .enrichEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 2 * 20, 0))
+            .enrichEffect(new StatusEffectInstance(StatusEffects.SPEED, 2 * 20, 0))
             .glint()
-            .recipe(() -> new ShapedItemNbtRecipe(
-                    RawShapedRecipe.create(
-                            Map.of(
-                                    'a', Ingredient.ofItems(Items.DIAMOND),
-                                    'b', Ingredient.ofItems(Items.GOLD_BLOCK),
-                                    'c', Ingredient.ofItems(Items.TOTEM_OF_UNDYING, Items.GOLDEN_APPLE),
-                                    'd', Ingredient.ofItems(Items.DIAMOND_SWORD),
-                                    'e', Ingredient.ofItems(Items.DIAMOND_BLOCK)
-                            ),
-                            "aba",
-                            "cdc",
-                            "ebe"
-                    ),
-                    CraftingRecipeCategory.EQUIPMENT,
-                    Util.make(() -> {
-                        ItemStack stack = new ItemStack(Items.PVP_PRO_SWORD);
-                        stack.addEnchantment(Enchantments.FIRE_ASPECT, 2);
-                        stack.addEnchantment(Enchantments.KNOCKBACK, 3);
-                        stack.addEnchantment(Enchantments.SWEEPING, 2);
-                        stack.addEnchantment(Enchantments.LOOTING, 3);
-                        return stack;
-                    })
-            ))
-            .tooltip(Text.translatable("item.battlegrounds.pvp_pro_sword.tooltip.1")
-                    .formatted(Formatting.GOLD)
-                    .styled(style -> style.withBold(true)))
-            .tooltip(Text.translatable("item.battlegrounds.pvp_pro_sword.tooltip.2")
-                    .formatted(Formatting.GOLD)
-                    .styled(style -> style.withBold(true)))
-            .tooltip(Text.translatable("item.battlegrounds.pvp_pro_sword.tooltip.3")
-                    .formatted(Formatting.GOLD)
-                    .styled(style -> style.withBold(true)))
     ));
-    public static final LegendarySwordItem SEVEN_ELEVEN_SWORD = registerItem("seven_eleven_sword", new LegendarySwordItem(ToolMaterials.SEVEN_ELEVEN_SWORD, 3, -2.4F, new LegendarySwordItem.Settings()
+    public static final SevenElevenSwordItem SEVEN_ELEVEN_SWORD = registerItem("seven_eleven_sword", new SevenElevenSwordItem(ToolMaterials.SEVEN_ELEVEN_SWORD, 3, -2.4F, new LegendarySwordItem.Settings()
             .rarity(Rarity.EPIC)
             .fireproof()
             .glint()
-            .enrichEffect(new StatusEffectInstance(StatusEffects.JUMP_BOOST, 1, 2 * 20))
-            .enrichEffect(new StatusEffectInstance(StatusEffects.SPEED, 1, 2 * 20))
-            .attackEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 1, 5 * 20))
-            .attackEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 0, 5 * 20))
+            .enrichEffect(new StatusEffectInstance(StatusEffects.JUMP_BOOST, 2 * 20, 1))
+            .enrichEffect(new StatusEffectInstance(StatusEffects.SPEED, 2 * 20, 1))
+            .attackEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 5 * 20, 1))
+            .attackEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 5 * 20, 0))
             .attackEffectBound(35)
-            .recipe(() -> new ShapedItemNbtRecipe(
-                    RawShapedRecipe.create(
-                            Map.of(
-                                    'a', Ingredient.ofItems(Items.DIAMOND),
-                                    'b', Ingredient.ofItems(Items.AMETHYST_SHARD),
-                                    'c', Ingredient.ofStacks(PotionUtil.setPotion(Items.SPLASH_POTION.getDefaultStack(), Potions.TURTLE_MASTER)),
-                                    'd', Ingredient.ofItems(Items.NETHERITE_SWORD),
-                                    'e', Ingredient.ofStacks(PotionUtil.setPotion(Items.SPLASH_POTION.getDefaultStack(), Potions.STRONG_SWIFTNESS)),
-                                    'f', Ingredient.ofItems(Items.DIAMOND_BLOCK),
-                                    'g', Ingredient.ofItems(Items.EMERALD)
-                            ),
-                            "aba",
-                            "cde",
-                            "fgf"
-                    ),
-                    CraftingRecipeCategory.EQUIPMENT,
-                    Util.make(() -> {
-                        ItemStack stack = new ItemStack(Items.SEVEN_ELEVEN_SWORD);
-                        stack.addEnchantment(Enchantments.FIRE_ASPECT, 2);
-                        stack.addEnchantment(Enchantments.KNOCKBACK, 2);
-                        stack.addEnchantment(Enchantments.SWEEPING, 3);
-                        stack.addEnchantment(Enchantments.LOOTING, 3);
-                        return stack;
-                    })
-            ))
-            .tooltip(Text.translatable("item.battlegrounds.seven_eleven_sword.tooltip.1")
-                    .formatted(Formatting.GOLD)
-                    .styled(style -> style.withBold(true)))
-            .tooltip(Text.translatable("item.battlegrounds.seven_eleven_sword.tooltip.2")
-                    .formatted(Formatting.GOLD)
-                    .styled(style -> style.withBold(true)))
     ));
     public static final StevesPainSwordItem STEVES_PAIN_SWORD = registerItem("steves_pain_sword", new StevesPainSwordItem(ToolMaterials.STEVES_PAIN_SWORD, 3, -2.4F, new LegendarySwordItem.Settings()
             .rarity(Rarity.EPIC)
             .fireproof()
             .glint()
+    ));
+    public static final MyHolySwordItem MY_HOLY_SWORD = registerItem("my_holy_sword", new MyHolySwordItem(ToolMaterials.MY_HOLY_SWORD, 3, -2.4F, new LegendarySwordItem.Settings()
+            .rarity(Rarity.EPIC)
+            .fireproof()
+            .glint()
+            .enrichEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 2 * 20, 0))
+            .attackEffect(new StatusEffectInstance(StatusEffects.WITHER, 6 * 20, 1))
     ));
     public static final LeachingSwordItem LEACHING_SWORD = registerItem("leaching_sword", new LeachingSwordItem(ToolMaterials.LEACHING_SWORD, 3, -2.0F, new FabricItemSettings().rarity(Rarity.UNCOMMON)));
     public static final MinersPickaxeItem MINERS_PICKAXE = registerItem("miners_pickaxe", new MinersPickaxeItem(ToolMaterials.MINERS_PICKAXE, 1, -2.8F, new FabricItemSettings().rarity(Rarity.UNCOMMON)));
@@ -138,16 +81,43 @@ public class Items extends net.minecraft.item.Items {
     public static final MolotovItem MOLOTOV = registerItem("molotov", new MolotovItem(new FabricItemSettings().maxCount(16).rarity(Rarity.UNCOMMON)));
     public static final RupertsTearItem RUPERTS_TEAR = registerItem("ruperts_tear", new RupertsTearItem(ToolMaterials.RUPERTS_TEAR, new FabricItemSettings().maxCount(1).rarity(Rarity.RARE)));
     public static final KnockbackStickItem KNOCKBACK_STICK = registerItem("knockback_stick", new KnockbackStickItem(ToolMaterials.KNOCKBACK_STICK, new FabricItemSettings().maxCount(1).rarity(Rarity.RARE)));
+
+    public static final Item PRECISION_CORE = registerItem("precision_core", new Item(new FabricItemSettings()
+            .rarity(Rarity.COMMON)
+            .maxCount(16)
+    ));
+    public static final Item ADVANCED_PRECISION_CORE = registerItem("advanced_precision_core", new AdvancedPrecisionCoreItem(new FabricItemSettings()
+            .rarity(Rarity.UNCOMMON)
+            .maxCount(8)
+    ));
+
     public static final Item BEEF_NOODLE_SOUP = registerItem("beef_noodle_soup", new Item(new FabricItemSettings()
             .rarity(Rarity.UNCOMMON)
+            .maxCount(1)
             .food(new FoodComponent.Builder()
                     .alwaysEdible()
                     .meat()
-                    .hunger(6)
-                    .saturationModifier(0.7F)
-                    .statusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 15 * 20, 0), 1.0F)
-                    .statusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 15 * 20, 0), 1.0F)
-                    .statusEffect(new StatusEffectInstance(StatusEffects.ADRENALINE, 15 * 20, 0), 1.0F)
+                    .hunger(8)
+                    .saturationModifier(0.75F)
+                    .statusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 30 * 20, 0), 1.0F)
+                    .statusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 30 * 20, 0), 1.0F)
+                    .statusEffect(new StatusEffectInstance(StatusEffects.ADRENALINE, 10 * 20, 0), 1.0F)
+                    .build()
+            )
+    ));
+    public static final Item SIX_FLAVOURED_DIHUANG_PILL = registerItem("six_flavoured_dihuang_pill", new SixFlavouredDihuangPillItem(new FabricItemSettings()
+            .rarity(Rarity.UNCOMMON)
+            .maxCount(16)
+            .food(new FoodComponent.Builder()
+                    .alwaysEdible()
+                    .snack()
+                    .hunger(4)
+                    .saturationModifier(0.75F)
+                    .statusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 8 * 20, 2), 1.0F)
+                    .statusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 8 * 20, 1), 1.0F)
+                    .statusEffect(new StatusEffectInstance(StatusEffects.SPEED, 8 * 20, 1), 1.0F)
+                    .statusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 8 * 20, 2), 1.0F)
+                    .statusEffect(new StatusEffectInstance(StatusEffects.ADRENALINE, 8 * 20, 0), 1.0F)
                     .build()
             )
     ));

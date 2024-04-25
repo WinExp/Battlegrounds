@@ -7,10 +7,11 @@
     "ArgumentTypesInvoker",
     "channeling_BowItemMixin",
     "customRecipe_RecipeManagerMixin",
+    "effectRestraint_StatusEffectMixin",
+    "enchantRestrict_EnchantmentMixin",
+    "enchantRestrict_GrindstoneScreenHandlerMixin",
     "events_PlayerEntityMixin",
     "events_PlayerManagerMixin",
-    "restrict_EnchantmentMixin",
-    "restrict_GrindstoneScreenHandlerMixin",
     "shapeType_RaycastContextMixin",
     "shield_LivingEntityMixin"
   ],

@@ -10,7 +10,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientConfigurationNetworkHandler;
 
 @Environment(EnvType.CLIENT)
-public class ModClientConfigurationNetworkHandler {
+public final class ModClientConfigurationNetworkHandler {
     public static void register() {
         ClientConfigurationConnectionEvents.INIT.register(ModClientConfigurationNetworkHandler::onConfigurationInit);
     }

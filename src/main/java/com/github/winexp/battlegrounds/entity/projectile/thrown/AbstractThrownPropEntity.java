@@ -2,7 +2,6 @@ package com.github.winexp.battlegrounds.entity.projectile.thrown;
 
 import com.github.winexp.battlegrounds.entity.data.ModTrackedDataHandlers;
 import com.github.winexp.battlegrounds.sound.SoundEvents;
-import com.github.winexp.battlegrounds.util.EntityUtil;
 import com.github.winexp.battlegrounds.util.RandomUtil;
 import com.mojang.serialization.Codec;
 import net.minecraft.entity.Entity;
@@ -70,7 +69,7 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
                 if (blockHitResult != null && !this.isRemoved()) {
                     Direction side = blockHitResult.getSide();
                     Vec3d velocity = this.computeBlockReboundVelocity(this.getVelocity(), side);
-                    Vec3d pos = EntityUtil.getEntitySidePos(this, blockHitResult.getPos(), side.getOpposite());
+                    Vec3d pos = blockHitResult.getPos();
                     this.setPosition(pos);
                     double speed = velocity.length();
                     if (speed <= this.getTriggerThresholdSpeed() && side == Direction.UP) {

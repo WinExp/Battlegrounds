@@ -28,19 +28,20 @@ import net.minecraft.world.World;
 import java.util.Objects;
 
 public class RupertsTearBlockOutlineRenderer implements WorldRenderEvents.BeforeBlockOutline {
-    private static final double LERP_DELTA = 0.02;
-    private static final int LERP_DURATION = 1;
+    private static final double LERP_DELTA = 0.0165;
+    private static final long LERP_DURATION = 1000 * 1000;
     private static final Vec3d NaN = new Vec3d(Double.NaN, Double.NaN, Double.NaN);
 
     private Vec3d prevPos = NaN;
-    private long prevTime = System.currentTimeMillis();
+    private long prevTime = System.nanoTime();
 
-    private void resetPrevPos() {
+    private void resetData() {
         this.prevPos = NaN;
     }
 
     @Override
     public boolean beforeBlockOutline(WorldRenderContext context, HitResult hitResult) {
+        BlockHitResult crosshairBlockTarget = (hitResult == null || hitResult.getType() != HitResult.Type.BLOCK) ? BlockHitResult.createMissed(null, null, null) : (BlockHitResult) hitResult;
         VertexConsumerProvider vertexConsumerProvider = Objects.requireNonNull(context.consumers());
         Camera camera = context.camera();
         World world = context.world();
@@ -57,19 +58,14 @@ public class RupertsTearBlockOutlineRenderer implements WorldRenderEvents.Before
             Vec3d begin = entity.getCameraPosVec(tickDelta);
             Vec3d rotation = entity.getRotationVec(tickDelta);
             Vec3d end = begin.add(rotation.multiply(RupertsTearItem.MAX_DISTANCE));
-            BlockHitResult blockHitResult;
-            if (hitResult.getType() == HitResult.Type.BLOCK) {
-                blockHitResult = (BlockHitResult) hitResult;
-            } else {
-                BlockRaycastResult raycastResult = MathUtil.raycastBlock(entity, begin, end, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, MathUtil.NONE_ABORT_PREDICATE, MathUtil.NONE_STRENGTH_FUNCTION);
-                blockHitResult = raycastResult.hitResult();
-            }
+            BlockRaycastResult raycastResult = MathUtil.raycastBlock(entity, begin, end, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, MathUtil.NONE_ABORT_PREDICATE, MathUtil.NONE_STRENGTH_FUNCTION);
+            BlockHitResult blockHitResult = raycastResult.hitResult();
             BlockPos blockPos = blockHitResult.getBlockPos();
-            long currentTime = System.currentTimeMillis();
+            long currentTime = System.nanoTime();
             float colorR, colorG, colorB, colorA;
             if (blockHitResult.getType() == HitResult.Type.MISS
                     || !world.getWorldBorder().contains(blockPos)) {
-                this.resetPrevPos();
+                this.resetData();
                 return true;
             }
             if (RupertsTearItem.isSafe(world, blockHitResult)) {
@@ -95,19 +91,24 @@ public class RupertsTearBlockOutlineRenderer implements WorldRenderEvents.Before
             this.drawCuboidShapeOutline(matrices, vertexConsumer, blockState.getOutlineShape(world, roundedPos, ShapeContext.of(entity)), lerpX - cameraPos.x, lerpY - cameraPos.y, lerpZ - cameraPos.z, colorR, colorG, colorB, colorA);
             if (currentTime - this.prevTime >= LERP_DURATION) {
                 this.prevPos = new Vec3d(lerpX, lerpY, lerpZ);
-                this.prevTime = System.currentTimeMillis();
+                this.prevTime = System.nanoTime();
             }
-            return false;
+            return !(crosshairBlockTarget.getType() == HitResult.Type.BLOCK && blockPos.equals(crosshairBlockTarget.getBlockPos()));
         } else {
-            this.resetPrevPos();
+            this.resetData();
             return true;
         }
     }
 
     private double calculateLerp(long currentTime, double start, double end) {
         double result = start;
-        for (int i = 0; i < (currentTime - this.prevTime) / LERP_DURATION; i++) {
-            result = MathHelper.lerp(RupertsTearBlockOutlineRenderer.LERP_DELTA, result, end);
+        double count = (double) (currentTime - this.prevTime) / LERP_DURATION;
+        for (int i = 0; i < count; i++) {
+            result = MathHelper.lerp(LERP_DELTA, result, end);
+        }
+        double odd = count - Math.floor(count);
+        if (odd > 0) {
+            result = MathHelper.lerp(odd * LERP_DELTA, result, end);
         }
         return result;
     }

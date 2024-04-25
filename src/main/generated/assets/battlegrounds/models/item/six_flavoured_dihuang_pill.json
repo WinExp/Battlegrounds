@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "battlegrounds:item/six_flavoured_dihuang_pill"
+  }
+}
