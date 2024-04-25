@@ -17,17 +17,19 @@ import net.minecraft.loot.function.SetPotionLootFunction;
 import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
 import net.minecraft.loot.provider.number.UniformLootNumberProvider;
 import net.minecraft.potion.Potions;
-import net.minecraft.util.Identifier;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryWrapper;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
 public class ModChestLootTableGenerator extends SimpleFabricLootTableProvider {
-    public ModChestLootTableGenerator(FabricDataOutput output) {
-        super(output, LootContextTypes.CHEST);
+    public ModChestLootTableGenerator(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> wrapperLookup) {
+        super(output, wrapperLookup, LootContextTypes.CHEST);
     }
 
     @Override
-    public void accept(BiConsumer<Identifier, LootTable.Builder> exporter) {
+    public void accept(RegistryWrapper.WrapperLookup wrapperLookup, BiConsumer<RegistryKey<LootTable>, LootTable.Builder> exporter) {
         // metals
         exporter.accept(LootTables.METALS,
                 LootTable.builder()

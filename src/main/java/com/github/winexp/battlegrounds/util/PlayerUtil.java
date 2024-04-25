@@ -3,16 +3,15 @@ package com.github.winexp.battlegrounds.util;
 import com.github.winexp.battlegrounds.game.GameStage;
 import com.github.winexp.battlegrounds.game.PlayerPermission;
 import com.github.winexp.battlegrounds.util.data.ModVersion;
-import net.fabricmc.fabric.api.networking.v1.FabricPacket;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.network.packet.s2c.play.SubtitleS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
@@ -52,9 +51,9 @@ public class PlayerUtil {
         player.networkHandler.sendPacket(new TitleFadeS2CPacket(5, 10, 15));
     }
 
-    public static void broadcastSound(MinecraftServer server, SoundCategory category, SoundEvent sound, float volume, float pitch) {
+    public static void broadcastSound(MinecraftServer server, SoundEvent sound, float volume, float pitch) {
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-            player.playSound(sound, category, volume, pitch);
+            player.playSound(sound, volume, pitch);
         }
     }
 
@@ -68,11 +67,11 @@ public class PlayerUtil {
         }
     }
 
-    public static <T extends FabricPacket> void broadcastPacket(MinecraftServer server, T packet) {
+    public static <T extends CustomPayload> void broadcastPacket(MinecraftServer server, T packet) {
         broadcastPacket(server, packet, (p, player) -> {});
     }
 
-    public static <T extends FabricPacket> void broadcastPacket(MinecraftServer server, T packet, BiConsumer<T, ServerPlayerEntity> preprocessor) {
+    public static <T extends CustomPayload> void broadcastPacket(MinecraftServer server, T packet, BiConsumer<T, ServerPlayerEntity> preprocessor) {
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
             preprocessor.accept(packet, player);
             ServerPlayNetworking.send(player, packet);

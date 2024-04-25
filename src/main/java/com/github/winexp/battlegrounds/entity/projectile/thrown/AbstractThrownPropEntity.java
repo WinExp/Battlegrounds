@@ -4,6 +4,7 @@ import com.github.winexp.battlegrounds.entity.data.ModTrackedDataHandlers;
 import com.github.winexp.battlegrounds.sound.SoundEvents;
 import com.github.winexp.battlegrounds.util.RandomUtil;
 import com.mojang.serialization.Codec;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -14,11 +15,13 @@ import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.Util;
+import net.minecraft.util.function.ValueLists;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -26,6 +29,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
+
+import java.util.function.IntFunction;
 
 public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
     private static final byte STATUS_DISCARD_PARTICLES = 3;
@@ -47,10 +52,10 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
     }
 
     @Override
-    protected void initDataTracker() {
-        super.initDataTracker();
-        this.getDataTracker().startTracking(FUSE, 0);
-        this.getDataTracker().startTracking(FUSE_MODE, FuseMode.NORMAL_FUSE);
+    protected void initDataTracker(DataTracker.Builder builder) {
+        super.initDataTracker(builder);
+        builder.add(FUSE, 0);
+        builder.add(FUSE_MODE, FuseMode.NORMAL_FUSE);
     }
 
     @Override
@@ -113,7 +118,7 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         nbt.putInt("fuse", this.getFuse() < 0 ? -1 : this.getFuse());
-        nbt.put("fuse_status", Util.getResult(FuseMode.CODEC.encodeStart(NbtOps.INSTANCE, this.getFuseMode()), IllegalStateException::new));
+        nbt.put("fuse_status", FuseMode.CODEC.encodeStart(NbtOps.INSTANCE, this.getFuseMode()).getOrThrow());
     }
 
     @Override
@@ -164,7 +169,7 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
     }
 
     private ParticleEffect getParticleParameters() {
-        ItemStack itemStack = this.getItem();
+        ItemStack itemStack = this.getStack();
         return (itemStack.isEmpty() ? ParticleTypes.ITEM_SNOWBALL : new ItemStackParticleEffect(ParticleTypes.ITEM, itemStack));
     }
 
@@ -229,7 +234,9 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
     public enum FuseMode implements StringIdentifiable {
         NORMAL_FUSE, DETONATION_FUSE;
 
-        public final static Codec<FuseMode> CODEC = StringIdentifiable.createCodec(FuseMode::values);
+        public static final Codec<FuseMode> CODEC = StringIdentifiable.createCodec(FuseMode::values);
+        public static final IntFunction<FuseMode> ID_TO_VALUE_FUNCTION = ValueLists.createIdToValueFunction(FuseMode::ordinal, FuseMode.values(), FuseMode.NORMAL_FUSE);
+        public static final PacketCodec<ByteBuf, FuseMode> PACKET_CODEC = PacketCodecs.indexed(ID_TO_VALUE_FUNCTION, FuseMode::ordinal);
 
         @Override
         public String asString() {

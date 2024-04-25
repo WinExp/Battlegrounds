@@ -1,31 +1,24 @@
 package com.github.winexp.battlegrounds.enchantment;
 
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentTarget;
-import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.registry.tag.ItemTags;
 
 public class SmeltingEnchantment extends Enchantment {
-
     public SmeltingEnchantment() {
-        this(Rarity.COMMON, EnchantmentTarget.DIGGER, EquipmentSlot.MAINHAND);
+        this(Enchantment.properties(
+                ItemTags.MINING_LOOT_ENCHANTABLE,
+                0, 1,
+                Enchantment.leveledCost(1, 6),
+                Enchantment.leveledCost(15, 6), 1
+        ));
     }
 
-    protected SmeltingEnchantment(Rarity rarity, EnchantmentTarget target, EquipmentSlot... slots) {
-        super(rarity, target, slots);
+    protected SmeltingEnchantment(Properties properties) {
+        super(properties);
     }
 
     @Override
     protected boolean canAccept(Enchantment other) {
         return super.canAccept(other) && other != Enchantments.SILK_TOUCH;
-    }
-
-    @Override
-    public int getMinPower(int level) {
-        return 5;
-    }
-
-    @Override
-    public int getMaxPower(int level) {
-        return super.getMinPower(level) + 30;
     }
 }

@@ -8,7 +8,6 @@ import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 
 import java.io.BufferedReader;
 
@@ -34,7 +33,7 @@ public class DataPackResourceReloadListener implements SimpleSynchronousResource
                     }
                 }
                 JsonElement json = Constants.GSON.fromJson(stringBuilder.toString(), JsonElement.class);
-                GameProperties gameProperties = Util.getResult(GameProperties.CODEC.parse(JsonOps.INSTANCE, json), IllegalStateException::new);
+                GameProperties gameProperties = GameProperties.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow();
                 Constants.GAME_PROPERTIES.put(gameProperties.id(), gameProperties);
             } catch (Exception e) {
                 Constants.LOGGER.error("Unable to load game properties: ", e);

@@ -12,6 +12,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -86,7 +87,7 @@ public class FlashBangEntity extends AbstractThrownPropEntity {
         if (!world.isClient) {
             world.createExplosion(this, Explosion.createDamageSource(world, this),
                     new EntityExplosionBehavior(this), this.getX(), this.getY(), this.getZ(), 1.0F, false, World.ExplosionSourceType.NONE,
-                    ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER, SoundEvents.ENTITY_FLASH_BANG_EXPLODE);
+                    ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER, RegistryEntry.of(SoundEvents.ENTITY_FLASH_BANG_EXPLODE));
             summonFlash(world, this.getPos());
         }
     }

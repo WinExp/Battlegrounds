@@ -126,7 +126,6 @@ public class VoteScreen extends Screen {
     @Override
     protected void init() {
         this.voteList = this.addDrawableChild(new VoteListWidget(this, this.client, this.width, this.height / 2 - 20, 50, 36));
-        this.voteList.setRenderBackground(false);
         this.acceptButton = this.addDrawableChild(ButtonWidget
                 .builder(Text.translatable("gui.battlegrounds.vote.accept"),
                         button -> this.onVoteButtonClicked(true))

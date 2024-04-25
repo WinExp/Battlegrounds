@@ -4,10 +4,11 @@ import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
 import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import net.fabricmc.fabric.api.item.v1.CustomDamageHandler;
 import net.fabricmc.fabric.api.item.v1.EquipmentSlotProvider;
-import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
-import net.minecraft.client.item.TooltipContext;
+import net.minecraft.client.item.TooltipType;
+import net.minecraft.component.DataComponentType;
+import net.minecraft.component.type.AttributeModifiersComponent;
+import net.minecraft.component.type.FoodComponent;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentTarget;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -19,7 +20,6 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +32,8 @@ public class LegendarySwordItem extends SwordItem implements EnchantRestrict {
     private final boolean grindable;
     private final boolean hasGlint;
 
-    public LegendarySwordItem(ToolMaterial toolMaterial, int attackDamage, float attackSpeed, Settings settings) {
-        super(toolMaterial, attackDamage, attackSpeed, settings);
+    public LegendarySwordItem(ToolMaterial toolMaterial, Settings settings) {
+        super(toolMaterial, settings);
         this.enrichEffects = settings.enrichEffects;
         this.attackEffects = settings.attackEffects;
         this.attackEffectBound = settings.attackEffectBound;
@@ -54,7 +54,7 @@ public class LegendarySwordItem extends SwordItem implements EnchantRestrict {
     }
 
     @Override
-    public boolean isEnchantable(Enchantment enchantment, EnchantmentTarget target) {
+    public boolean isEnchantable(Enchantment enchantment, Enchantment.Properties properties) {
         return this.enchantable;
     }
 
@@ -69,8 +69,8 @@ public class LegendarySwordItem extends SwordItem implements EnchantRestrict {
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        super.appendTooltip(stack, world, tooltip, context);
+    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+        super.appendTooltip(stack, context, tooltip, type);
         tooltip.add(Text.translatable("item.battlegrounds.legendary")
                 .formatted(Formatting.GOLD)
                 .styled(style -> style.withBold(true)));
@@ -88,7 +88,7 @@ public class LegendarySwordItem extends SwordItem implements EnchantRestrict {
         return true;
     }
 
-    public static class Settings extends FabricItemSettings {
+    public static class Settings extends Item.Settings {
         private final List<StatusEffectInstance> enrichEffects = new ArrayList<>(List.of(
                 new StatusEffectInstance(StatusEffects.RESISTANCE, 2 * 20, 0)
         ));
@@ -129,12 +129,6 @@ public class LegendarySwordItem extends SwordItem implements EnchantRestrict {
         }
 
         @Override
-        public Settings maxDamageIfAbsent(int maxDamage) {
-            super.maxDamageIfAbsent(maxDamage);
-            return this;
-        }
-
-        @Override
         public Settings maxDamage(int maxDamage) {
             super.maxDamage(maxDamage);
             return this;
@@ -161,6 +155,18 @@ public class LegendarySwordItem extends SwordItem implements EnchantRestrict {
         @Override
         public Settings requires(FeatureFlag... features) {
             super.requires(features);
+            return this;
+        }
+
+        @Override
+        public <T> Settings component(DataComponentType<T> type, T value) {
+            super.component(type, value);
+            return this;
+        }
+
+        @Override
+        public Settings attributeModifiers(AttributeModifiersComponent attributeModifiersComponent) {
+            super.attributeModifiers(attributeModifiersComponent);
             return this;
         }
 

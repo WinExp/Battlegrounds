@@ -1,6 +1,6 @@
 package com.github.winexp.battlegrounds.loot.function;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
@@ -12,8 +12,8 @@ import net.minecraft.loot.function.LootFunctionType;
 import java.util.List;
 
 public class ReplaceItemLootFunction extends ConditionalLootFunction {
-    public static final Codec<ReplaceItemLootFunction> CODEC = RecordCodecBuilder.create((instance) ->
-            addConditionsField(instance).and(ItemStack.CODEC.fieldOf("item").forGetter((function) ->
+    public static final MapCodec<ReplaceItemLootFunction> CODEC = RecordCodecBuilder.mapCodec(instance ->
+            addConditionsField(instance).and(ItemStack.CODEC.fieldOf("item").forGetter(function ->
                     function.stack)).apply(instance, ReplaceItemLootFunction::new));
 
     private final ItemStack stack;
@@ -29,7 +29,7 @@ public class ReplaceItemLootFunction extends ConditionalLootFunction {
     }
 
     @Override
-    public LootFunctionType getType() {
+    public LootFunctionType<ReplaceItemLootFunction> getType() {
         return LootFunctionTypes.REPLACE_ITEM;
     }
 

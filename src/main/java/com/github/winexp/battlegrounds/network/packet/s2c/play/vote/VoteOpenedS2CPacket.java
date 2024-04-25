@@ -1,26 +1,24 @@
 package com.github.winexp.battlegrounds.network.packet.s2c.play.vote;
 
 import com.github.winexp.battlegrounds.discussion.vote.VoteInfo;
-import net.fabricmc.fabric.api.networking.v1.FabricPacket;
-import net.fabricmc.fabric.api.networking.v1.PacketType;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.packet.CustomPayload;
 
-public record VoteOpenedS2CPacket(VoteInfo voteInfo) implements FabricPacket {
-    public static final Identifier ID = new Identifier("battlegrounds", "play/vote/vote_opened");
-    public static final PacketType<VoteOpenedS2CPacket> TYPE = PacketType.create(ID, VoteOpenedS2CPacket::new);
+public record VoteOpenedS2CPacket(VoteInfo voteInfo) implements CustomPayload {
+    public static final Id<VoteOpenedS2CPacket> ID = CustomPayload.id("battlegrounds:play/vote/vote_opened");
+    public static final PacketCodec<PacketByteBuf, VoteOpenedS2CPacket> PACKET_CODEC = CustomPayload.codecOf(VoteOpenedS2CPacket::write, VoteOpenedS2CPacket::new);
 
     public VoteOpenedS2CPacket(PacketByteBuf buf) {
-        this(VoteInfo.PACKET_READER.apply(buf));
+        this(VoteInfo.PACKET_CODEC.decode(buf));
     }
 
-    @Override
     public void write(PacketByteBuf buf) {
-        VoteInfo.PACKET_WRITER.accept(buf, this.voteInfo);
+        VoteInfo.PACKET_CODEC.encode(buf, this.voteInfo);
     }
 
     @Override
-    public PacketType<?> getType() {
-        return TYPE;
+    public Id<? extends CustomPayload> getId() {
+        return ID;
     }
 }

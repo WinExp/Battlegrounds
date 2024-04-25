@@ -6,17 +6,19 @@ import com.github.winexp.battlegrounds.util.data.ModGameConfig;
 import com.github.winexp.battlegrounds.util.time.Duration;
 import com.google.common.collect.ImmutableList;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public class ModGamePropertiesGenerator extends GamePropertiesProvider {
-    protected ModGamePropertiesGenerator(FabricDataOutput output) {
-        super(output);
+    protected ModGamePropertiesGenerator(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> wrapperLookup) {
+        super(output, wrapperLookup);
     }
 
     @Override
-    public void generateGameProperties(Consumer<GameProperties> exporter) {
+    public void generateGameProperties(RegistryWrapper.WrapperLookup wrapperLookup, Consumer<GameProperties> exporter) {
         exporter.accept(new GameProperties(
                 new Identifier("battlegrounds", "normal"),
                 ImmutableList.of(

@@ -88,7 +88,7 @@ public class RupertsTearBlockOutlineRenderer implements WorldRenderEvents.Before
                     (int) Math.round(lerpZ)
             );
             BlockState blockState = world.getBlockState(roundedPos);
-            this.drawCuboidShapeOutline(matrices, vertexConsumer, blockState.getOutlineShape(world, roundedPos, ShapeContext.of(entity)), lerpX - cameraPos.x, lerpY - cameraPos.y, lerpZ - cameraPos.z, colorR, colorG, colorB, colorA);
+            this.drawCuboidShapeOutline(Objects.requireNonNull(matrices), vertexConsumer, blockState.getOutlineShape(world, roundedPos, ShapeContext.of(entity)), lerpX - cameraPos.x, lerpY - cameraPos.y, lerpZ - cameraPos.z, colorR, colorG, colorB, colorA);
             if (currentTime - this.prevTime >= LERP_DURATION) {
                 this.prevPos = new Vec3d(lerpX, lerpY, lerpZ);
                 this.prevTime = System.nanoTime();
@@ -123,8 +123,8 @@ public class RupertsTearBlockOutlineRenderer implements WorldRenderEvents.Before
             k /= n;
             l /= n;
             m /= n;
-            vertexConsumer.vertex(entry.getPositionMatrix(), (float) (minX + offsetX), (float) (minY + offsetY), (float) (minZ + offsetZ)).color(red, green, blue, alpha).normal(entry.getNormalMatrix(), k, l, m).next();
-            vertexConsumer.vertex(entry.getPositionMatrix(), (float) (maxX + offsetX), (float) (maxY + offsetY), (float) (maxZ + offsetZ)).color(red, green, blue, alpha).normal(entry.getNormalMatrix(), k, l, m).next();
+            vertexConsumer.vertex(entry.getPositionMatrix(), (float) (minX + offsetX), (float) (minY + offsetY), (float) (minZ + offsetZ)).color(red, green, blue, alpha).normal(entry, k, l, m).next();
+            vertexConsumer.vertex(entry.getPositionMatrix(), (float) (maxX + offsetX), (float) (maxY + offsetY), (float) (maxZ + offsetZ)).color(red, green, blue, alpha).normal(entry, k, l, m).next();
         });
     }
 }

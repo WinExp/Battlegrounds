@@ -10,28 +10,30 @@ import net.minecraft.advancement.AdvancementFrame;
 import net.minecraft.advancement.AdvancementRewards;
 import net.minecraft.advancement.criterion.InventoryChangedCriterion;
 import net.minecraft.advancement.criterion.TickCriterion;
-import net.minecraft.potion.PotionUtil;
+import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.potion.Potions;
 import net.minecraft.predicate.entity.LocationPredicate;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.gen.structure.Structure;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public class ModAdvancementGenerator extends FabricAdvancementProvider {
-    protected ModAdvancementGenerator(FabricDataOutput output) {
-        super(output);
+    protected ModAdvancementGenerator(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> wrapperLookup) {
+        super(output, wrapperLookup);
     }
 
     @Override
-    public void generateAdvancement(Consumer<AdvancementEntry> exporter) {
+    public void generateAdvancement(RegistryWrapper.WrapperLookup wrapperLookup, Consumer<AdvancementEntry> exporter) {
         AdvancementEntry rootAdvancement = Advancement.Builder.create()
                 .display(
-                        Items.BUTCHERS_AXE.getDefaultStack(),
+                        Items.BUTCHERS_AXE,
                         Text.translatable("advancements.battlegrounds.root.title"),
                         Text.translatable("advancements.battlegrounds.root.description"),
                         new Identifier("textures/gui/advancements/backgrounds/adventure.png"),
@@ -40,26 +42,30 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
                 )
                 .criterion("tick", TickCriterion.Conditions.createTick())
                 .build(exporter, "battlegrounds:story/root");
-        this.generateItemAdvancements(rootAdvancement, exporter);
-        this.generateStructureAdvancements(rootAdvancement, exporter);
+        this.generateItemAdvancements(wrapperLookup ,rootAdvancement, exporter);
+        this.generateStructureAdvancements(wrapperLookup, rootAdvancement, exporter);
     }
 
     @SafeVarargs
-    private Advancement.Builder requiredAllStructuresArrived(Advancement.Builder builder, RegistryKey<Structure>... structures) {
-        return this.requiredAllStructuresArrived(builder, Arrays.stream(structures).toList());
+    private Advancement.Builder requiredAllStructuresArrived(RegistryWrapper.WrapperLookup wrapperLookup, Advancement.Builder builder, RegistryKey<Structure>... structures) {
+        return this.requiredAllStructuresArrived(wrapperLookup, builder, Arrays.stream(structures).toList());
     }
 
-    private Advancement.Builder requiredAllStructuresArrived(Advancement.Builder builder, Collection<RegistryKey<Structure>> structures) {
+    private Advancement.Builder requiredAllStructuresArrived(RegistryWrapper.WrapperLookup wrapperLookup, Advancement.Builder builder, Collection<RegistryKey<Structure>> structures) {
         for (RegistryKey<Structure> structure : structures) {
             builder.criterion(structure.getValue().getPath(), TickCriterion.Conditions.createLocation(
-                    LocationPredicate.Builder.createStructure(structure)
+                    LocationPredicate.Builder.createStructure(wrapperLookup.createRegistryLookup().getOptionalEntry(
+                            RegistryKeys.STRUCTURE,
+                            structure
+                    ).orElseThrow())
             ));
         }
         return builder;
     }
 
-    public void generateStructureAdvancements(AdvancementEntry rootAdvancement, Consumer<AdvancementEntry> exporter) {
+    public void generateStructureAdvancements(RegistryWrapper.WrapperLookup wrapperLookup, AdvancementEntry rootAdvancement, Consumer<AdvancementEntry> exporter) {
         AdvancementEntry medievalFortressAdvancement = this.requiredAllStructuresArrived(
+                        wrapperLookup,
                         Advancement.Builder.create(),
                         RegistryKey.of(
                                 RegistryKeys.STRUCTURE,
@@ -68,7 +74,7 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
                 )
                 .parent(rootAdvancement)
                 .display(
-                        Items.STONE_BRICKS.getDefaultStack(),
+                        Items.STONE_BRICKS,
                         Text.translatable("advancements.battlegrounds.medieval_fortress.title"),
                         Text.translatable("advancements.battlegrounds.medieval_fortress.description"),
                         null,
@@ -78,6 +84,7 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
                 .rewards(AdvancementRewards.Builder.experience(100))
                 .build(exporter, "battlegrounds:story/medieval_fortress");
         AdvancementEntry relicOfFantasyAdvancement = this.requiredAllStructuresArrived(
+                        wrapperLookup,
                         Advancement.Builder.create(),
                         RegistryKey.of(
                                 RegistryKeys.STRUCTURE,
@@ -86,7 +93,7 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
                 )
                 .parent(rootAdvancement)
                 .display(
-                        Items.SMOOTH_QUARTZ.getDefaultStack(),
+                        Items.SMOOTH_QUARTZ,
                         Text.translatable("advancements.battlegrounds.relic_of_fantasy.title"),
                         Text.translatable("advancements.battlegrounds.relic_of_fantasy.description"),
                         null,
@@ -96,6 +103,7 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
                 .rewards(AdvancementRewards.Builder.experience(100))
                 .build(exporter, "battlegrounds:story/relic_of_fantasy");
         AdvancementEntry wineShopAdvancement = this.requiredAllStructuresArrived(
+                        wrapperLookup,
                         Advancement.Builder.create(),
                         RegistryKey.of(
                                 RegistryKeys.STRUCTURE,
@@ -104,7 +112,7 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
                 )
                 .parent(rootAdvancement)
                 .display(
-                        PotionUtil.setPotion(Items.POTION.getDefaultStack(), Potions.SWIFTNESS),
+                        PotionContentsComponent.createStack(Items.SPLASH_POTION, Potions.STRONG_SWIFTNESS),
                         Text.translatable("advancements.battlegrounds.wine_shop.title"),
                         Text.translatable("advancements.battlegrounds.wine_shop.description"),
                         null,
@@ -114,6 +122,7 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
                 .rewards(AdvancementRewards.Builder.experience(100))
                 .build(exporter, "battlegrounds:story/wine_shop");
         AdvancementEntry libraryAdvancement = this.requiredAllStructuresArrived(
+                        wrapperLookup,
                         Advancement.Builder.create(),
                         RegistryKey.of(
                                 RegistryKeys.STRUCTURE,
@@ -122,7 +131,7 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
                 )
                 .parent(rootAdvancement)
                 .display(
-                        Items.BOOKSHELF.getDefaultStack(),
+                        Items.BOOKSHELF,
                         Text.translatable("advancements.battlegrounds.library.title"),
                         Text.translatable("advancements.battlegrounds.library.description"),
                         null,
@@ -132,6 +141,7 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
                 .rewards(AdvancementRewards.Builder.experience(100))
                 .build(exporter, "battlegrounds:story/library");
         AdvancementEntry allStructuresAdvancement = this.requiredAllStructuresArrived(
+                        wrapperLookup,
                         Advancement.Builder.create(),
                         RegistryKey.of(
                                 RegistryKeys.STRUCTURE,
@@ -183,11 +193,11 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
                 .build(exporter, "battlegrounds:story/arrived_all_structures");
     }
 
-    public void generateItemAdvancements(AdvancementEntry rootAdvancement, Consumer<AdvancementEntry> exporter) {
+    public void generateItemAdvancements(RegistryWrapper.WrapperLookup wrapperLookup, AdvancementEntry rootAdvancement, Consumer<AdvancementEntry> exporter) {
         AdvancementEntry pvpProAdvancement = Advancement.Builder.create()
                 .parent(rootAdvancement)
                 .display(
-                        Items.PVP_PRO_SWORD.getDefaultStack(),
+                        Items.PVP_PRO_SWORD,
                         Text.translatable("advancements.battlegrounds.pvp_pro.title"),
                         Text.translatable("advancements.battlegrounds.pvp_pro.description"),
                         null,
@@ -202,7 +212,7 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
         AdvancementEntry sevenElevenAdvancement = Advancement.Builder.create()
                 .parent(rootAdvancement)
                 .display(
-                        Items.SEVEN_ELEVEN_SWORD.getDefaultStack(),
+                        Items.SEVEN_ELEVEN_SWORD,
                         Text.translatable("advancements.battlegrounds.seven_eleven.title"),
                         Text.translatable("advancements.battlegrounds.seven_eleven.description"),
                         null,
@@ -217,7 +227,7 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
         AdvancementEntry stevesPainAdvancement = Advancement.Builder.create()
                 .parent(rootAdvancement)
                 .display(
-                        Items.STEVES_PAIN_SWORD.getDefaultStack(),
+                        Items.STEVES_PAIN_SWORD,
                         Text.translatable("advancements.battlegrounds.steves_pain.title"),
                         Text.translatable("advancements.battlegrounds.steves_pain.description"),
                         null,
@@ -232,7 +242,7 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
         AdvancementEntry channelingBowAdvancement = Advancement.Builder.create()
                 .parent(rootAdvancement)
                 .display(
-                        Items.CHANNELING_BOW.getDefaultStack(),
+                        Items.CHANNELING_BOW,
                         Text.translatable("advancements.battlegrounds.channeling_bow.title"),
                         Text.translatable("advancements.battlegrounds.channeling_bow.description"),
                         null,
@@ -247,7 +257,7 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
         AdvancementEntry butchersAxeAdvancement = Advancement.Builder.create()
                 .parent(rootAdvancement)
                 .display(
-                        Items.BUTCHERS_AXE.getDefaultStack(),
+                        Items.BUTCHERS_AXE,
                         Text.translatable("advancements.battlegrounds.butchers_axe.title"),
                         Text.translatable("advancements.battlegrounds.butchers_axe.description"),
                         null,

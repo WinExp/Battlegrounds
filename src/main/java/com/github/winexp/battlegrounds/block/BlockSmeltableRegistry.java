@@ -5,30 +5,37 @@ import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.loot.function.ReplaceItemLootFunction;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
+import net.minecraft.loot.LootTable;
 import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.condition.MatchToolLootCondition;
 import net.minecraft.loot.function.ConditionalLootFunction;
 import net.minecraft.loot.function.FurnaceSmeltLootFunction;
-import net.minecraft.predicate.NumberRange;
-import net.minecraft.predicate.item.EnchantmentPredicate;
+import net.minecraft.predicate.ComponentPredicate;
 import net.minecraft.predicate.item.ItemPredicate;
-import net.minecraft.util.Identifier;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.util.Util;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class BlockSmeltableRegistry {
     private static final LootCondition.Builder DEFAULT_SMELTABLE_CONDITION = MatchToolLootCondition.builder(ItemPredicate.Builder.create()
-            .enchantment(new EnchantmentPredicate(Enchantments.SMELTING, NumberRange.IntRange.atLeast(1))));
+            .component(ComponentPredicate.builder()
+                    .add(DataComponentTypes.ENCHANTMENTS, Util.make(
+                            new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT), builder ->
+                                    builder.add(Enchantments.SMELTING, 1)).build())
+                    .build()));
     public static final ConditionalLootFunction.Builder<?> DEFAULT_SMELTABLE_FUNCTION = FurnaceSmeltLootFunction.builder();
-    private static final Map<Identifier, ConditionalLootFunction.Builder<?>> smeltableBlocks = new HashMap<>();
+    private static final Map<RegistryKey<LootTable>, ConditionalLootFunction.Builder<?>> smeltableBlocks = new HashMap<>();
 
-    public static boolean isSmeltable(Identifier lootTableId) {
-        return smeltableBlocks.containsKey(lootTableId);
+    public static boolean isSmeltable(RegistryKey<LootTable> key) {
+        return smeltableBlocks.containsKey(key);
     }
 
-    public static ConditionalLootFunction.Builder<?> getLootFunction(Identifier lootTableId) {
-        return smeltableBlocks.get(lootTableId);
+    public static ConditionalLootFunction.Builder<?> getLootFunction(RegistryKey<LootTable> key) {
+        return smeltableBlocks.get(key);
     }
 
     public static void registerDefaults() {
@@ -45,10 +52,10 @@ public class BlockSmeltableRegistry {
     }
 
     public static void register(Block block, ConditionalLootFunction.Builder<?> lootFunction) {
-        register(block.getLootTableId(), lootFunction);
+        register(block.getLootTableKey(), lootFunction);
     }
 
-    public static void register(Identifier lootTableId, ConditionalLootFunction.Builder<?> lootFunction) {
-        smeltableBlocks.put(lootTableId, lootFunction.conditionally(DEFAULT_SMELTABLE_CONDITION));
+    public static void register(RegistryKey<LootTable> key, ConditionalLootFunction.Builder<?> lootFunction) {
+        smeltableBlocks.put(key, lootFunction.conditionally(DEFAULT_SMELTABLE_CONDITION));
     }
 }

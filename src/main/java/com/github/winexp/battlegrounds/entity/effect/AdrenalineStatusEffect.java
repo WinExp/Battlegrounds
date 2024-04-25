@@ -11,6 +11,6 @@ public class AdrenalineStatusEffect extends StatusEffect implements StatusEffect
 
     @Override
     public boolean isStatusEffectAllowed(StatusEffectInstance statusEffectInstance) {
-        return statusEffectInstance.getEffectType().getCategory() != StatusEffectCategory.HARMFUL;
+        return statusEffectInstance.getEffectType().value().getCategory() != StatusEffectCategory.HARMFUL;
     }
 }

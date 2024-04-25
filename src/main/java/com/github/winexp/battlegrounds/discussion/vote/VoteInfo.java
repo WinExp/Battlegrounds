@@ -1,21 +1,37 @@
 package com.github.winexp.battlegrounds.discussion.vote;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.text.Text;
+import net.minecraft.text.TextCodecs;
 import net.minecraft.util.Identifier;
 
 import java.util.UUID;
 
 public class VoteInfo {
-    public static final PacketByteBuf.PacketReader<VoteInfo> PACKET_READER = (buf) ->
-            new VoteInfo(buf.readIdentifier(), buf.readUuid(), buf.readText(), buf.readText(), buf.readInt(), buf.readBoolean());
-    public static final PacketByteBuf.PacketWriter<VoteInfo> PACKET_WRITER = (buf, voteInfo) -> {
-        buf.writeIdentifier(voteInfo.identifier);
-        buf.writeUuid(voteInfo.uuid);
-        buf.writeText(voteInfo.name);
-        buf.writeText(voteInfo.description);
-        buf.writeInt(voteInfo.timeLeft);
-        buf.writeBoolean(voteInfo.available);
+    public static final PacketCodec<ByteBuf, VoteInfo> PACKET_CODEC = new PacketCodec<>() {
+        @Override
+        public VoteInfo decode(ByteBuf buf) {
+            return new VoteInfo(
+                    Identifier.PACKET_CODEC.decode(buf),
+                    PacketByteBuf.readUuid(buf),
+                    TextCodecs.PACKET_CODEC.decode(buf),
+                    TextCodecs.PACKET_CODEC.decode(buf),
+                    buf.readInt(),
+                    buf.readBoolean()
+            );
+        }
+
+        @Override
+        public void encode(ByteBuf buf, VoteInfo value) {
+            Identifier.PACKET_CODEC.encode(buf, value.identifier);
+            PacketByteBuf.writeUuid(buf, value.uuid);
+            TextCodecs.PACKET_CODEC.encode(buf, value.name);
+            TextCodecs.PACKET_CODEC.encode(buf, value.description);
+            buf.writeInt(value.timeLeft);
+            buf.writeBoolean(value.available);
+        }
     };
 
     public final Identifier identifier;

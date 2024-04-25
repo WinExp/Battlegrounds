@@ -1,29 +1,12 @@
 package com.github.winexp.battlegrounds.item.weapon;
 
-import com.github.winexp.battlegrounds.enchantment.Enchantments;
-import com.github.winexp.battlegrounds.item.Items;
-import com.github.winexp.battlegrounds.item.recipe.ItemNbtRecipe;
-import com.github.winexp.battlegrounds.item.recipe.ShapedItemNbtRecipe;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SwordItem;
 import net.minecraft.item.ToolMaterial;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RawShapedRecipe;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.book.CraftingRecipeCategory;
 
-import java.util.Map;
-
-public class LeachingSwordItem extends SwordItem implements ItemNbtRecipe {
-    public static final Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
-            Enchantments.LEACHING, 1,
-            Enchantments.KNOCKBACK, 3,
-            Enchantments.FIRE_ASPECT, 3
-    );
-
-    public LeachingSwordItem(ToolMaterial toolMaterial, int attackDamage, float attackSpeed, Settings settings) {
-        super(toolMaterial, attackDamage, attackSpeed, settings);
+public class LeachingSwordItem extends SwordItem {
+    public LeachingSwordItem(ToolMaterial toolMaterial, Settings settings) {
+        super(toolMaterial, settings);
     }
 
     @Override
@@ -31,16 +14,8 @@ public class LeachingSwordItem extends SwordItem implements ItemNbtRecipe {
         return true;
     }
 
-    @Override
-    public ItemStack getDefaultStack() {
-        ItemStack stack = new ItemStack(this, 1);
-        ENCHANTMENTS.forEach(stack::addEnchantment);
-        return stack;
-    }
-
-    @Override
-    public Recipe<?> getRecipe() {
-        return new ShapedItemNbtRecipe(
+    /*
+    return new ShapedItemNbtRecipe(
                 RawShapedRecipe.create(Map.of(
                                 'a', Ingredient.ofItems(Items.DIAMOND),
                                 'b', Ingredient.ofItems(Items.COBWEB),
@@ -55,5 +30,5 @@ public class LeachingSwordItem extends SwordItem implements ItemNbtRecipe {
                 CraftingRecipeCategory.EQUIPMENT,
                 this.getDefaultStack()
         ).getRecipe();
-    }
+    */
 }

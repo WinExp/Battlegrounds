@@ -3,16 +3,10 @@ package com.github.winexp.battlegrounds.util;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Stream;
 
 public class FileUtil {
-    public static Collection<File> listFiles(Path path) {
-        return Arrays.stream(Objects.requireNonNull(path.toFile().listFiles())).toList();
-    }
-
     public static void delete(Path path, boolean deleteRoot, String... excludes) {
         if (!path.toFile().exists()) return;
         if (Stream.of(excludes).anyMatch(path::endsWith)) return;

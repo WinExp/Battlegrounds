@@ -3,6 +3,7 @@ package com.github.winexp.battlegrounds.entity.effect;
 import com.github.winexp.battlegrounds.event.ModServerPlayerEvents;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public class ApproachingExtinctionStatusEffect extends StatusEffect {
@@ -12,6 +13,6 @@ public class ApproachingExtinctionStatusEffect extends StatusEffect {
     }
 
     private boolean allowPlayerNaturalRegen(ServerPlayerEntity player) {
-        return !player.hasStatusEffect(this) || player.hasStatusEffect(StatusEffects.ADRENALINE);
+        return !player.hasStatusEffect(RegistryEntry.of(this)) || player.hasStatusEffect(StatusEffects.ADRENALINE);
     }
 }

@@ -5,6 +5,7 @@ import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.item.recipe.ItemNbtRecipe;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -16,7 +17,6 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RawShapedRecipe;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
-import net.minecraft.util.Hand;
 
 import java.util.Map;
 
@@ -38,7 +38,7 @@ public class KnockbackStickItem extends ToolItem implements ItemNbtRecipe, Encha
 
     @Override
     public boolean postHit(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-        stack.damage(1, attacker, e -> e.sendToolBreakStatus(Hand.MAIN_HAND));
+        stack.damage(1, attacker, EquipmentSlot.MAINHAND);
         this.giveEffects(attacker, target);
         return true;
     }

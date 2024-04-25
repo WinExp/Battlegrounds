@@ -34,8 +34,8 @@ public class VoteListWidget extends AlwaysSelectedEntryListWidget<VoteListWidget
     }
 
     @Override
-    protected int getScrollbarPositionX() {
-        return super.getScrollbarPositionX() + 20;
+    protected int getScrollbarX() {
+        return super.getScrollbarX() + 20;
     }
 
     @Override

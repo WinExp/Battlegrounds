@@ -4,13 +4,13 @@ import com.github.winexp.battlegrounds.util.EntityUtil;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.EnchantmentTarget;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.Identifier;
 
 public class VitalityEnchantment extends Enchantment {
@@ -18,11 +18,16 @@ public class VitalityEnchantment extends Enchantment {
     private final static double HEALTH_MODIFIER_ADD_VALUE_PER_LEVEL = 4;
 
     public VitalityEnchantment() {
-        this(Rarity.VERY_RARE, EnchantmentTarget.ARMOR_CHEST, EquipmentSlot.CHEST);
+        this(Enchantment.properties(
+                ItemTags.CHEST_ARMOR_ENCHANTABLE,
+                0, 3,
+                Enchantment.leveledCost(7, 12),
+                Enchantment.leveledCost(19, 12), 0
+        ));
     }
 
-    protected VitalityEnchantment(Rarity rarity, EnchantmentTarget target, EquipmentSlot... slots) {
-        super(rarity, target, slots);
+    protected VitalityEnchantment(Properties properties) {
+        super(properties);
         ServerEntityEvents.EQUIPMENT_CHANGE.register(this::onEquipmentChange);
     }
 
@@ -38,7 +43,7 @@ public class VitalityEnchantment extends Enchantment {
         assert attribute != null;
         if (level > 0) {
             EntityUtil.addAttributeModifier(attribute, HEALTH_MODIFIER_ID,
-                    level * HEALTH_MODIFIER_ADD_VALUE_PER_LEVEL, EntityAttributeModifier.Operation.ADDITION);
+                    level * HEALTH_MODIFIER_ADD_VALUE_PER_LEVEL, EntityAttributeModifier.Operation.ADD_VALUE);
         } else {
             EntityUtil.removeAttributeModifier(attribute, HEALTH_MODIFIER_ID);
         }
@@ -47,20 +52,5 @@ public class VitalityEnchantment extends Enchantment {
     @Override
     public boolean isTreasure() {
         return true;
-    }
-
-    @Override
-    public int getMaxLevel() {
-        return 3;
-    }
-
-    @Override
-    public int getMinPower(int level) {
-        return 15;
-    }
-
-    @Override
-    public int getMaxPower(int level) {
-        return super.getMaxPower(level) + 30;
     }
 }

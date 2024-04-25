@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(EntityRenderer.class)
 public abstract class nameLabel_EntityRendererMixin {
     @Inject(method = "renderLabelIfPresent", at = @At("HEAD"), cancellable = true)
-    private void shouldRenderName(Entity entity, Text text, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
+    private void shouldRenderName(Entity entity, Text text, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float tickDelta, CallbackInfo ci) {
         if (entity.isPlayer() && !ClientVariables.gameConfig.displayPlayerNameLabel()) {
             ci.cancel();
         }

@@ -3,17 +3,20 @@ package com.github.winexp.battlegrounds.game;
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.util.Constants;
 import com.github.winexp.battlegrounds.util.FileUtil;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
+import net.minecraft.component.ComponentChanges;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.FireworkExplosionComponent;
+import net.minecraft.component.type.FireworksComponent;
 import net.minecraft.entity.projectile.FireworkRocketEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
 public class GameUtil {
@@ -37,28 +40,24 @@ public class GameUtil {
             double zOffset = (random.nextFloat() * offset * 2) - offset;
             double z = player.getZ() + 0.5 + zOffset;
             int flightTime = random.nextBetween(2, 3);
-            NbtCompound nbt = new NbtCompound();
-            nbt.putByte("Flight", (byte) flightTime);
-            NbtList explosionsList = new NbtList();
-            NbtCompound explosion = new NbtCompound();
-            List<Integer> colors = new ArrayList<>();
+            FireworkExplosionComponent.Type shape = FireworkExplosionComponent.Type.byId(random.nextBetween(0, 4));
+            IntList colors = new IntArrayList();
             for (int j = 0; j < random.nextBetween(3, 4); j++) {
                 int idx = random.nextInt(DyeColor.values().length);
                 colors.add(DyeColor.values()[idx].getFireworkColor());
             }
-            explosion.putIntArray("Colors", colors);
-            List<Integer> fadeColors = new ArrayList<>();
+            IntList fadeColors = new IntArrayList();
             for (int j = 0; j < random.nextBetween(2, 3); j++) {
                 int idx = random.nextInt(DyeColor.values().length);
                 fadeColors.add(DyeColor.values()[idx].getFireworkColor());
             }
-            explosion.putIntArray("FadeColors", fadeColors);
-            explosion.putBoolean("Flicker", random.nextBoolean());
-            explosion.putByte("Type", (byte) random.nextBetween(1, 3));
-            explosionsList.add(explosion);
-            nbt.put("Explosions", explosionsList);
-            ItemStack stack = Items.FIREWORK_ROCKET.getDefaultStack();
-            stack.setNbt(nbt);
+            boolean hasTrail = random.nextBoolean();
+            boolean hasTwinkle = random.nextBoolean();
+            FireworkExplosionComponent explosion = new FireworkExplosionComponent(shape, colors, fadeColors, hasTrail, hasTwinkle);
+            ItemStack stack = new ItemStack(Items.FIREWORK_ROCKET);
+            stack.applyChanges(ComponentChanges.builder()
+                    .add(DataComponentTypes.FIREWORKS, new FireworksComponent(flightTime, List.of(explosion)))
+                    .build());
             FireworkRocketEntity firework = new FireworkRocketEntity(world, x, y, z, stack);
             firework.noClip = true;
             world.spawnEntity(firework);

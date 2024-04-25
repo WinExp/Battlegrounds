@@ -1,16 +1,20 @@
 package com.github.winexp.battlegrounds.enchantment;
 
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentTarget;
-import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.registry.tag.ItemTags;
 
 public class ChannelingProEnchantment extends Enchantment {
     public ChannelingProEnchantment() {
-        this(Rarity.VERY_RARE, EnchantmentTarget.BOW, EquipmentSlot.MAINHAND);
+        this(Enchantment.properties(
+                ItemTags.BOW_ENCHANTABLE,
+                0, 1,
+                Enchantment.leveledCost(12, 13),
+                Enchantment.leveledCost(25, 13), 1
+        ));
     }
 
-    protected ChannelingProEnchantment(Rarity rarity, EnchantmentTarget target, EquipmentSlot... slots) {
-        super(rarity, target, slots);
+    protected ChannelingProEnchantment(Properties properties) {
+        super(properties);
     }
 
     @Override
@@ -26,15 +30,5 @@ public class ChannelingProEnchantment extends Enchantment {
     @Override
     public boolean isAvailableForRandomSelection() {
         return false;
-    }
-
-    @Override
-    public int getMinPower(int level) {
-        return 30;
-    }
-
-    @Override
-    public int getMaxPower(int level) {
-        return this.getMinPower(level) + 40;
     }
 }

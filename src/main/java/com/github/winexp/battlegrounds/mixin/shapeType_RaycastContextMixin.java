@@ -32,13 +32,13 @@ public abstract class shapeType_RaycastContextMixin {
     private static final RaycastContext.ShapeType CULLING = addVariant("CULLING",
             (state, world, pos, context) -> state.getCullingShape(world, pos));
 
-    @Contract(pure = true)
+    @Contract
     @Invoker("<init>")
     public static RaycastContext.ShapeType invokeInit(String internalName, int internalId, RaycastContext.ShapeProvider provider) {
         throw new AssertionError();
     }
 
-    @Contract(value = "_, _ -> new", pure = true)
+    @Contract(value = "_, _ -> new")
     @Unique
     private static RaycastContext.ShapeType addVariant(String internalName, RaycastContext.ShapeProvider provider) {
         ArrayList<RaycastContext.ShapeType> variants = new ArrayList<>(List.of(RaycastContext.ShapeType.values()));

@@ -3,33 +3,32 @@ package com.github.winexp.battlegrounds.item.weapon;
 import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
 import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.sound.SoundEvents;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ToolMaterial;
-import net.minecraft.util.Hand;
 
-import java.util.Map;
+import java.util.List;
 
 public class ButchersAxeItem extends AxeItem implements EnchantRestrict {
-    private static final int PENALTY_DURATION = 7 * 20;
-    private static final Map<StatusEffect, Integer> penaltyEffects = Map.of(
-            StatusEffects.SLOWNESS, 1,
-            StatusEffects.WITHER, 0,
-            StatusEffects.POISON, 0,
-            StatusEffects.WEAKNESS, 0,
-            StatusEffects.APPROACHING_EXTINCTION, 0
+    private static final List<StatusEffectInstance> penaltyEffects = List.of(
+            new StatusEffectInstance(StatusEffects.SLOWNESS, 7 * 20, 1),
+            new StatusEffectInstance(StatusEffects.WITHER, 7 * 20, 0),
+            new StatusEffectInstance(StatusEffects.POISON, 7 * 20, 0),
+            new StatusEffectInstance(StatusEffects.WEAKNESS, 7 * 20, 0),
+            new StatusEffectInstance(StatusEffects.APPROACHING_EXTINCTION, 7 * 20, 0)
     );
 
-    public ButchersAxeItem(ToolMaterial material, float attackDamage, float attackSpeed, Settings settings) {
-        super(material, attackDamage, attackSpeed, settings);
+    public ButchersAxeItem(ToolMaterial material, Settings settings) {
+        super(material, settings);
     }
 
     private void givePenaltyEffects(LivingEntity target) {
-        penaltyEffects.forEach((effect, amplifier) ->
-                target.addStatusEffect(new StatusEffectInstance(effect, PENALTY_DURATION, amplifier), target));
+        for (StatusEffectInstance effectInstance : penaltyEffects) {
+            target.addStatusEffect(new StatusEffectInstance(effectInstance));
+        }
     }
 
     @Override
@@ -44,7 +43,7 @@ public class ButchersAxeItem extends AxeItem implements EnchantRestrict {
 
     @Override
     public boolean postHit(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-        stack.damage(1, attacker, e -> e.sendToolBreakStatus(Hand.MAIN_HAND));
+        stack.damage(1, attacker, EquipmentSlot.MAINHAND);
         if (!target.getWorld().isClient) {
             this.givePenaltyEffects(attacker);
             target.playSound(SoundEvents.PLAYER_TUBE_FALL, 2.0F, 1.0F);

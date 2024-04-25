@@ -2,8 +2,6 @@ package com.github.winexp.battlegrounds.item;
 
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
-import com.github.winexp.battlegrounds.entity.projectile.thrown.FlashBangEntity;
-import com.github.winexp.battlegrounds.entity.projectile.thrown.MolotovEntity;
 import com.github.winexp.battlegrounds.item.food.*;
 import com.github.winexp.battlegrounds.item.ingredient.*;
 import com.github.winexp.battlegrounds.item.recipe.*;
@@ -14,15 +12,16 @@ import com.github.winexp.battlegrounds.item.tool.*;
 import com.github.winexp.battlegrounds.util.RecipeUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.dispenser.ProjectileDispenserBehavior;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
+import net.minecraft.component.ComponentChanges;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.FoodComponent;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.EnchantmentLevelEntry;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.EnchantedBookItem;
-import net.minecraft.item.FoodComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
@@ -34,8 +33,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.Position;
-import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,61 +40,134 @@ import java.util.Map;
 
 public class Items extends net.minecraft.item.Items {
     private static final List<NbtRecipe> NBT_RECIPE_ITEMS = new ArrayList<>();
-    public static final PVPProSwordItem PVP_PRO_SWORD = registerItem("pvp_pro_sword", new PVPProSwordItem(ToolMaterials.PVP_PRO_SWORD, 3, -2.4F, new LegendarySwordItem.Settings()
+    public static final PVPProSwordItem PVP_PRO_SWORD = registerItem("pvp_pro_sword", new PVPProSwordItem(ToolMaterials.PVP_PRO_SWORD, new LegendarySwordItem.Settings()
             .rarity(Rarity.EPIC)
             .fireproof()
+            .attributeModifiers(MyHolySwordItem.createAttributeModifiers(ToolMaterials.PVP_PRO_SWORD, 3, -2.4F))
+            .component(DataComponentTypes.ENCHANTMENTS, Util.make(new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT), component -> {
+                component.add(Enchantments.FIRE_ASPECT, 2);
+                component.add(Enchantments.KNOCKBACK, 2);
+                component.add(Enchantments.SWEEPING_EDGE, 2);
+                component.add(Enchantments.LOOTING, 3);
+            }).build())
             .enrichEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 2 * 20, 0))
             .enrichEffect(new StatusEffectInstance(StatusEffects.SPEED, 2 * 20, 0))
             .glint()
     ));
-    public static final SevenElevenSwordItem SEVEN_ELEVEN_SWORD = registerItem("seven_eleven_sword", new SevenElevenSwordItem(ToolMaterials.SEVEN_ELEVEN_SWORD, 3, -2.4F, new LegendarySwordItem.Settings()
+    public static final SevenElevenSwordItem SEVEN_ELEVEN_SWORD = registerItem("seven_eleven_sword", new SevenElevenSwordItem(ToolMaterials.SEVEN_ELEVEN_SWORD, new LegendarySwordItem.Settings()
             .rarity(Rarity.EPIC)
             .fireproof()
             .glint()
+            .attributeModifiers(MyHolySwordItem.createAttributeModifiers(ToolMaterials.SEVEN_ELEVEN_SWORD, 3, -2.4F))
+            .component(DataComponentTypes.ENCHANTMENTS, Util.make(new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT), component -> {
+                component.add(Enchantments.FIRE_ASPECT, 2);
+                component.add(Enchantments.KNOCKBACK, 2);
+                component.add(Enchantments.SWEEPING_EDGE, 3);
+                component.add(Enchantments.LOOTING, 3);
+            }).build())
             .enrichEffect(new StatusEffectInstance(StatusEffects.JUMP_BOOST, 2 * 20, 1))
             .enrichEffect(new StatusEffectInstance(StatusEffects.SPEED, 2 * 20, 1))
             .attackEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 5 * 20, 1))
             .attackEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 5 * 20, 0))
             .attackEffectBound(35)
     ));
-    public static final StevesPainSwordItem STEVES_PAIN_SWORD = registerItem("steves_pain_sword", new StevesPainSwordItem(ToolMaterials.STEVES_PAIN_SWORD, 3, -2.4F, new LegendarySwordItem.Settings()
+    public static final StevesPainSwordItem STEVES_PAIN_SWORD = registerItem("steves_pain_sword", new StevesPainSwordItem(ToolMaterials.STEVES_PAIN_SWORD, new LegendarySwordItem.Settings()
             .rarity(Rarity.EPIC)
             .fireproof()
             .glint()
+            .attributeModifiers(MyHolySwordItem.createAttributeModifiers(ToolMaterials.STEVES_PAIN_SWORD, 3, -2.4F))
+            .component(DataComponentTypes.ENCHANTMENTS, Util.make(new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT), component -> {
+                component.add(Enchantments.STEVES_PAIN, 1);
+                component.add(Enchantments.FIRE_ASPECT, 2);
+                component.add(Enchantments.MENDING, 1);
+            }).build())
     ));
-    public static final MyHolySwordItem MY_HOLY_SWORD = registerItem("my_holy_sword", new MyHolySwordItem(ToolMaterials.MY_HOLY_SWORD, 3, -2.4F, new LegendarySwordItem.Settings()
+    public static final MyHolySwordItem MY_HOLY_SWORD = registerItem("my_holy_sword", new MyHolySwordItem(ToolMaterials.MY_HOLY_SWORD, new LegendarySwordItem.Settings()
             .rarity(Rarity.EPIC)
             .fireproof()
             .glint()
+            .attributeModifiers(MyHolySwordItem.createAttributeModifiers(ToolMaterials.MY_HOLY_SWORD, 3, -2.4F))
+            .component(DataComponentTypes.ENCHANTMENTS, Util.make(new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT), component -> {
+                component.add(Enchantments.SHARPNESS, 5);
+                component.add(Enchantments.FIRE_ASPECT, 2);
+                component.add(Enchantments.KNOCKBACK, 2);
+                component.add(Enchantments.SWEEPING_EDGE, 2);
+            }).build())
             .enrichEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 2 * 20, 0))
             .attackEffect(new StatusEffectInstance(StatusEffects.WITHER, 6 * 20, 1))
     ));
-    public static final LeachingSwordItem LEACHING_SWORD = registerItem("leaching_sword", new LeachingSwordItem(ToolMaterials.LEACHING_SWORD, 3, -2.0F, new FabricItemSettings().rarity(Rarity.UNCOMMON)));
-    public static final MinersPickaxeItem MINERS_PICKAXE = registerItem("miners_pickaxe", new MinersPickaxeItem(ToolMaterials.MINERS_PICKAXE, 1, -2.8F, new FabricItemSettings().rarity(Rarity.UNCOMMON)));
-    public static final ButchersAxeItem BUTCHERS_AXE = registerItem("butchers_axe", new ButchersAxeItem(ToolMaterials.BUTCHERS_AXE, 5, -3.3F, new FabricItemSettings().rarity(Rarity.EPIC).fireproof()));
-    public static final ChannelingBowItem CHANNELING_BOW = registerItem("channeling_bow", new ChannelingBowItem(new FabricItemSettings().rarity(Rarity.RARE).fireproof().maxDamage(ChannelingBowItem.DURABILITY)));
+    public static final LeachingSwordItem LEACHING_SWORD = registerItem("leaching_sword", new LeachingSwordItem(ToolMaterials.LEACHING_SWORD, new Item.Settings()
+            .rarity(Rarity.UNCOMMON)
+            .attributeModifiers(MyHolySwordItem.createAttributeModifiers(ToolMaterials.LEACHING_SWORD, 3, -2.0F))
+            .component(DataComponentTypes.ENCHANTMENTS, Util.make(new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT), component -> {
+                component.add(Enchantments.LEACHING, 1);
+                component.add(Enchantments.KNOCKBACK, 3);
+                component.add(Enchantments.FIRE_ASPECT, 3);
+            }).build())
+    ));
+    public static final MinersPickaxeItem MINERS_PICKAXE = registerItem("miners_pickaxe", new MinersPickaxeItem(ToolMaterials.MINERS_PICKAXE, new Item.Settings()
+            .rarity(Rarity.UNCOMMON)
+            .component(DataComponentTypes.ENCHANTMENTS, Util.make(new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT), component -> {
+                component.add(Enchantments.FORTUNE, 3);
+                component.add(Enchantments.EFFICIENCY, 5);
+                component.add(Enchantments.SMELTING, 1);
+                component.add(Enchantments.MENDING, 1);
+                component.add(Enchantments.UNBREAKING, 3);
+                component.add(Enchantments.FIRE_ASPECT, 2);
+                component.add(Enchantments.KNOCKBACK, 2);
+            }).build())
+    ));
+    public static final ButchersAxeItem BUTCHERS_AXE = registerItem("butchers_axe", new ButchersAxeItem(ToolMaterials.BUTCHERS_AXE, new Item.Settings()
+            .rarity(Rarity.EPIC)
+            .fireproof()
+    ));
+    public static final ChannelingBowItem CHANNELING_BOW = registerItem("channeling_bow", new ChannelingBowItem(new Item.Settings()
+            .rarity(Rarity.RARE)
+            .fireproof()
+            .maxDamage(ChannelingBowItem.DURABILITY)
+            .component(DataComponentTypes.ENCHANTMENTS, Util.make(new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT), component -> {
+                component.add(Enchantments.CHANNELING_PRO, 1);
+                component.add(Enchantments.POWER, 5);
+                component.add(Enchantments.PUNCH, 3);
+                component.add(Enchantments.FLAME, 1);
+                component.add(Enchantments.FIRE_ASPECT, 2);
+                component.add(Enchantments.SHARPNESS, 9);
+                component.add(Enchantments.INFINITY, 1);
+            }).build())
+    ));
 
-    public static final FlashBangItem FLASH_BANG = registerItem("flash_bang", new FlashBangItem(new FabricItemSettings().maxCount(16).rarity(Rarity.UNCOMMON)));
-    public static final MolotovItem MOLOTOV = registerItem("molotov", new MolotovItem(new FabricItemSettings().maxCount(16).rarity(Rarity.UNCOMMON)));
-    public static final RupertsTearItem RUPERTS_TEAR = registerItem("ruperts_tear", new RupertsTearItem(ToolMaterials.RUPERTS_TEAR, new FabricItemSettings().maxCount(1).rarity(Rarity.RARE)));
-    public static final KnockbackStickItem KNOCKBACK_STICK = registerItem("knockback_stick", new KnockbackStickItem(ToolMaterials.KNOCKBACK_STICK, new FabricItemSettings().maxCount(1).rarity(Rarity.RARE)));
+    public static final FlashBangItem FLASH_BANG = registerItem("flash_bang", new FlashBangItem(new Item.Settings()
+            .maxCount(16)
+            .rarity(Rarity.UNCOMMON)
+    ));
+    public static final MolotovItem MOLOTOV = registerItem("molotov", new MolotovItem(new Item.Settings()
+            .maxCount(16)
+            .rarity(Rarity.UNCOMMON)
+    ));
+    public static final RupertsTearItem RUPERTS_TEAR = registerItem("ruperts_tear", new RupertsTearItem(ToolMaterials.RUPERTS_TEAR, new Item.Settings()
+            .maxCount(1)
+            .rarity(Rarity.RARE)
+    ));
+    public static final KnockbackStickItem KNOCKBACK_STICK = registerItem("knockback_stick", new KnockbackStickItem(ToolMaterials.KNOCKBACK_STICK, new Item.Settings()
+            .maxCount(1)
+            .rarity(Rarity.RARE)
+    ));
 
-    public static final Item PRECISION_CORE = registerItem("precision_core", new Item(new FabricItemSettings()
+    public static final Item PRECISION_CORE = registerItem("precision_core", new Item(new Item.Settings()
             .rarity(Rarity.COMMON)
             .maxCount(16)
     ));
-    public static final Item ADVANCED_PRECISION_CORE = registerItem("advanced_precision_core", new AdvancedPrecisionCoreItem(new FabricItemSettings()
+    public static final Item ADVANCED_PRECISION_CORE = registerItem("advanced_precision_core", new AdvancedPrecisionCoreItem(new Item.Settings()
             .rarity(Rarity.UNCOMMON)
             .maxCount(8)
     ));
 
-    public static final Item BEEF_NOODLE_SOUP = registerItem("beef_noodle_soup", new Item(new FabricItemSettings()
+    public static final Item BEEF_NOODLE_SOUP = registerItem("beef_noodle_soup", new Item(new Item.Settings()
             .rarity(Rarity.UNCOMMON)
             .maxCount(1)
             .food(new FoodComponent.Builder()
                     .alwaysEdible()
-                    .meat()
-                    .hunger(8)
+                    .nutrition(8)
                     .saturationModifier(0.75F)
                     .statusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 30 * 20, 0), 1.0F)
                     .statusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 30 * 20, 0), 1.0F)
@@ -105,13 +175,13 @@ public class Items extends net.minecraft.item.Items {
                     .build()
             )
     ));
-    public static final Item SIX_FLAVOURED_DIHUANG_PILL = registerItem("six_flavoured_dihuang_pill", new SixFlavouredDihuangPillItem(new FabricItemSettings()
+    public static final Item SIX_FLAVOURED_DIHUANG_PILL = registerItem("six_flavoured_dihuang_pill", new SixFlavouredDihuangPillItem(new Item.Settings()
             .rarity(Rarity.UNCOMMON)
             .maxCount(16)
             .food(new FoodComponent.Builder()
                     .alwaysEdible()
                     .snack()
-                    .hunger(4)
+                    .nutrition(4)
                     .saturationModifier(0.75F)
                     .statusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 8 * 20, 2), 1.0F)
                     .statusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 8 * 20, 1), 1.0F)
@@ -165,9 +235,12 @@ public class Items extends net.minecraft.item.Items {
                                 "bcb",
                                 "bbb"),
                         CraftingRecipeCategory.EQUIPMENT,
-                        Util.make(NETHERITE_CHESTPLATE.getDefaultStack(), (stack) -> {
-                            stack.setCustomName(Text.translatable("item.battlegrounds.netherite_chestplate_special")
-                                    .styled(style -> style.withItalic(false)));
+                        Util.make(new ItemStack(NETHERITE_CHESTPLATE), (stack) -> {
+                            stack.applyChanges(ComponentChanges.builder()
+                                    .add(DataComponentTypes.ITEM_NAME, Text.translatable("item.battlegrounds.netherite_chestplate_special")
+                                            .styled(style -> style.withItalic(false)))
+                                    .build()
+                            );
                             stack.addEnchantment(Enchantments.PROTECTION, 3);
                             stack.addEnchantment(Enchantments.VITALITY, 3);
                             stack.addEnchantment(Enchantments.THORNS, 3);
@@ -221,24 +294,8 @@ public class Items extends net.minecraft.item.Items {
     }
 
     private static void registerDispenserBehaviors() {
-        DispenserBlock.registerBehavior(FLASH_BANG, new ProjectileDispenserBehavior() {
-            @Override
-            protected ProjectileEntity createProjectile(World world, Position position, ItemStack stack) {
-                return Util.make(new FlashBangEntity(world, position.getX(), position.getY(), position.getZ()), (entity) -> {
-                    entity.setItem(stack);
-                    entity.setFuse(FlashBangItem.FUSE);
-                });
-            }
-        });
-        DispenserBlock.registerBehavior(MOLOTOV, new ProjectileDispenserBehavior() {
-            @Override
-            protected ProjectileEntity createProjectile(World world, Position position, ItemStack stack) {
-                return Util.make(new MolotovEntity(world, position.getX(), position.getY(), position.getZ()), (entity) -> {
-                    entity.setItem(stack);
-                    entity.setFuse(MolotovItem.FUSE);
-                });
-            }
-        });
+        DispenserBlock.registerBehavior(FLASH_BANG, new ProjectileDispenserBehavior(Items.FLASH_BANG));
+        DispenserBlock.registerBehavior(MOLOTOV, new ProjectileDispenserBehavior(Items.MOLOTOV));
     }
 
     @Environment(EnvType.CLIENT)

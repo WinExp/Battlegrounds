@@ -17,7 +17,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.util.Colors;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -29,10 +28,6 @@ public class MolotovEntity extends ThrownItemEntity {
 
     public MolotovEntity(net.minecraft.entity.EntityType<? extends ThrownItemEntity> entityType, World world) {
         super(entityType, world);
-    }
-
-    public MolotovEntity(World world, double d, double e, double f) {
-        super(EntityTypes.MOLOTOV, d, e, f, world);
     }
 
     public MolotovEntity(LivingEntity livingEntity, World world) {
@@ -48,14 +43,14 @@ public class MolotovEntity extends ThrownItemEntity {
     }
 
     private ParticleEffect getParticleParameters() {
-        ItemStack itemStack = this.getItem();
+        ItemStack itemStack = this.getStack();
         return (itemStack.isEmpty() ? ParticleTypes.DRIPPING_LAVA : new ItemStackParticleEffect(ParticleTypes.ITEM, itemStack));
     }
 
     @Override
-    protected void initDataTracker() {
-        super.initDataTracker();
-        this.getDataTracker().startTracking(FUSE, 0);
+    protected void initDataTracker(DataTracker.Builder builder) {
+        super.initDataTracker(builder);
+        builder.add(FUSE, 0);
     }
 
     @Override
@@ -110,8 +105,7 @@ public class MolotovEntity extends ThrownItemEntity {
             areaEffectCloud.setDuration(12 * 20);
             areaEffectCloud.setWaitTime(20);
             areaEffectCloud.setRadius(5.0F);
-            areaEffectCloud.setRadiusGrowth(-(7 - areaEffectCloud.getRadius()) / areaEffectCloud.getDuration());
-            areaEffectCloud.setColor(Colors.RED);
+            areaEffectCloud.setRadiusGrowth((areaEffectCloud.getRadius() * 0.4F) / areaEffectCloud.getDuration());
             areaEffectCloud.setOwner(this.getOwner() == null ? null : (LivingEntity) this.getOwner());
             world.spawnEntity(areaEffectCloud);
             this.discard();

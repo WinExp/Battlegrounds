@@ -1,5 +1,6 @@
 package com.github.winexp.battlegrounds.game;
 
+import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
 import com.github.winexp.battlegrounds.event.ModServerPlayerEvents;
 import com.github.winexp.battlegrounds.helper.WorldHelper;
 import com.github.winexp.battlegrounds.network.packet.s2c.play.config.ModGameConfigS2CPacket;
@@ -25,9 +26,7 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.boss.BossBarManager;
 import net.minecraft.entity.boss.CommandBossBar;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
@@ -35,14 +34,13 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ConnectedClientData;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
@@ -53,7 +51,6 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.util.*;
 import java.util.concurrent.CancellationException;
 
@@ -75,16 +72,14 @@ public class GameManager extends PersistentState implements GameListener {
     private RepeatTask updateBossBarTask = RepeatTask.NONE_TASK;
     private CommandBossBar resizeBossBar;
     public final static String PERSISTENT_STATE_ID = "game_info";
-    private final static Map<StatusEffect, Integer> ENRICH_EFFECTS = Map.of(
-            StatusEffects.FIRE_RESISTANCE, 0,
-            StatusEffects.RESISTANCE, 1,
-            StatusEffects.SPEED, 1
+    private final static List<StatusEffectInstance> ENRICH_EFFECTS = List.of(
+            new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 24 * 20, 0, false, false, true),
+            new StatusEffectInstance(StatusEffects.RESISTANCE, 24 * 20, 1, false, false, true),
+            new StatusEffectInstance(StatusEffects.SPEED, 24 * 20, 1, false, false, true)
     );
-    private final static int ENRICH_EFFECTS_DURATION = 24 * 20;
-    private final static Map<StatusEffect, Integer> RESIDENT_EFFECTS = Map.of(
-            StatusEffects.HASTE, 1
+    private final static List<StatusEffectInstance> RESIDENT_EFFECTS = List.of(
+            new StatusEffectInstance(StatusEffects.HASTE, 24 * 20, 1, false, false, true)
     );
-    private final static int RESIDENT_EFFECTS_DURATION = 24 * 20;
     private final static Identifier RESIZE_BOSS_BAR_ID = new Identifier("battlegrounds", "resize_boss_bar");
     private final static Identifier HEALTH_MODIFIER_ID = new Identifier("battlegrounds", "game/main");
     private final static double HEALTH_MODIFIER_ADD_VALUE = 20;
@@ -217,10 +212,7 @@ public class GameManager extends PersistentState implements GameListener {
                         public void onTriggered() throws CancellationException {
                             PlayerUtil.broadcastTitle(server, Text.literal(String.valueOf(this.getCount()))
                                     .formatted(Formatting.GREEN));
-                            PlayerUtil.broadcastSound(server,
-                                    SoundCategory.NEUTRAL,
-                                    SoundEvents.BLOCK_NOTE_BLOCK_HAT.value(),
-                                    0.7F, 1.0F);
+                            PlayerUtil.broadcastSound(server, SoundEvents.BLOCK_NOTE_BLOCK_HAT.value(), 0.7F, 1.0F);
                             if (!GameManager.this.checkAllPlayersJoined()) {
                                 this.cancel();
                                 throw new CancellationException();
@@ -274,7 +266,7 @@ public class GameManager extends PersistentState implements GameListener {
                 PlayerUtil.setGameModeToMap(player, GameMode.SPECTATOR);
             } else if (permission.respawnChance > 0) {
                 player.setHealth(player.getMaxHealth());
-                player.playSound(SoundEvents.ITEM_TOTEM_USE, SoundCategory.NEUTRAL, 0.7F, 1.0F);
+                player.playSound(SoundEvents.ITEM_TOTEM_USE, 0.7F, 1.0F);
                 player.networkHandler.sendPacket(new ParticleS2CPacket(
                         ParticleTypes.TOTEM_OF_UNDYING,
                         false, 0, 0, 0,
@@ -302,11 +294,13 @@ public class GameManager extends PersistentState implements GameListener {
             ServerPlayerEntity player = server.getPlayerManager().getPlayer(uuid);
             if (player != null) {
                 if (permission.hasEnrichEffects) {
-                    ENRICH_EFFECTS.forEach((effect, amplifier) ->
-                            player.addStatusEffect(new StatusEffectInstance(effect, ENRICH_EFFECTS_DURATION, amplifier, false, false , true)));
+                    for (StatusEffectInstance effectInstance : ENRICH_EFFECTS) {
+                        player.addStatusEffect(new StatusEffectInstance(effectInstance));
+                    }
                 }
-                RESIDENT_EFFECTS.forEach((effect, amplifier) ->
-                        player.addStatusEffect(new StatusEffectInstance(effect, RESIDENT_EFFECTS_DURATION, amplifier, false, false , true)));
+                for (StatusEffectInstance effectInstance : RESIDENT_EFFECTS) {
+                    player.addStatusEffect(new StatusEffectInstance(effectInstance));
+                }
             }
         });
     }
@@ -512,10 +506,7 @@ public class GameManager extends PersistentState implements GameListener {
             public void onTriggered() throws CancellationException {
                 PlayerUtil.broadcastTitle(GameManager.this.server, Text.literal(String.valueOf(this.getCount()))
                         .formatted(Formatting.GREEN));
-                PlayerUtil.broadcastSound(GameManager.this.server,
-                        SoundCategory.NEUTRAL,
-                        SoundEvents.BLOCK_NOTE_BLOCK_HAT.value(),
-                        0.7F, 1.0F);
+                PlayerUtil.broadcastSound(GameManager.this.server, SoundEvents.BLOCK_NOTE_BLOCK_HAT.value(), 0.7F, 1.0F);
             }
 
             @Override
@@ -563,7 +554,7 @@ public class GameManager extends PersistentState implements GameListener {
                 PlayerUtil.changeGameMode(player, GameMode.SURVIVAL);
                 EntityAttributeInstance attributeInstance = player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
                 assert attributeInstance != null;
-                EntityUtil.addAttributeModifier(attributeInstance, HEALTH_MODIFIER_ID, HEALTH_MODIFIER_ADD_VALUE, EntityAttributeModifier.Operation.ADDITION);
+                EntityUtil.addAttributeModifier(attributeInstance, HEALTH_MODIFIER_ID, HEALTH_MODIFIER_ADD_VALUE, EntityAttributeModifier.Operation.ADD_VALUE);
                 player.heal((float) HEALTH_MODIFIER_ADD_VALUE);
                 player.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 30 * 20, 3), player);
                 player.addStatusEffect(new StatusEffectInstance(StatusEffects.SATURATION, 30 * 20, 1), player);
@@ -685,7 +676,7 @@ public class GameManager extends PersistentState implements GameListener {
 
     public static PersistentState.Type<GameManager> getPersistentStateType(MinecraftServer server) {
         return new Type<>(() -> new GameManager(server),
-                nbt -> createFromNbt(server, nbt), null);
+                (nbt, wrapperLookup) -> createFromNbt(server, nbt), null);
     }
 
     public static GameManager getManager(MinecraftServer server) {
@@ -696,9 +687,8 @@ public class GameManager extends PersistentState implements GameListener {
     }
 
     @Override
-    public void save(File file) {
-        super.save(file);
-        this.markDirty();
+    public boolean isDirty() {
+        return true;
     }
 
     public static GameManager createFromNbt(MinecraftServer server, NbtCompound nbt) {
@@ -740,11 +730,11 @@ public class GameManager extends PersistentState implements GameListener {
     }
 
     @Override
-    public NbtCompound writeNbt(NbtCompound nbt) {
+    public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup wrapperLookup) {
         nbt.putInt("resize_count", this.resizeCount);
-        nbt.put("pvp_mode", Util.getResult(PVPMode.CODEC.encodeStart(NbtOps.INSTANCE, this.pvpMode), IllegalStateException::new));
-        nbt.put("game_stage", Util.getResult(GameStage.CODEC.encodeStart(NbtOps.INSTANCE, this.gameStage), IllegalStateException::new));
-        nbt.put("border_stage", Util.getResult(GameBorderStage.CODEC.encodeStart(NbtOps.INSTANCE, this.borderStage), IllegalStateException::new));
+        nbt.put("pvp_mode", PVPMode.CODEC.encodeStart(NbtOps.INSTANCE, this.pvpMode).getOrThrow());
+        nbt.put("game_stage", GameStage.CODEC.encodeStart(NbtOps.INSTANCE, this.gameStage).getOrThrow());
+        nbt.put("border_stage", GameBorderStage.CODEC.encodeStart(NbtOps.INSTANCE, this.borderStage).getOrThrow());
         NbtList playerPermissionsList = new NbtList();
         this.playerPermissions.forEach((uuid, permission) -> {
             NbtCompound permissionNbt = permission.toNbt();
@@ -753,10 +743,10 @@ public class GameManager extends PersistentState implements GameListener {
         });
         nbt.put("player_permissions", playerPermissionsList);
         if (this.gameProperties != null) {
-            nbt.put("game_properties", Util.getResult(GameProperties.CODEC.encodeStart(NbtOps.INSTANCE, this.gameProperties), IllegalStateException::new));
+            nbt.put("game_properties", GameProperties.CODEC.encodeStart(NbtOps.INSTANCE, this.gameProperties).getOrThrow());
         }
         if (this.currentStage != null) {
-            nbt.put("current_stage", Util.getResult(GameProperties.StageInfo.CODEC.encodeStart(NbtOps.INSTANCE, this.currentStage), IllegalStateException::new));
+            nbt.put("current_stage", GameProperties.StageInfo.CODEC.encodeStart(NbtOps.INSTANCE, this.currentStage).getOrThrow());
         }
         if (this.gameStage.isGaming()) {
             nbt.putInt("resize_timer", this.resizeBorderTask.getDelayTicks());

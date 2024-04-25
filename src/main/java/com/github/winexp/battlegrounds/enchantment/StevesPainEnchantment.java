@@ -1,45 +1,50 @@
 package com.github.winexp.battlegrounds.enchantment;
 
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentTarget;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.math.random.Random;
 
+import java.util.List;
+
 public class StevesPainEnchantment extends Enchantment {
-    public static final int BOUND = 30;
-    public static final int DURATION_PER_LEVEL = 5 * 20;
+    private static final float EFFECT_CHANCE = 0.3F;
+    private static final List<StatusEffectInstance> ATTACK_EFFECTS = List.of(
+            new StatusEffectInstance(StatusEffects.SLOWNESS, 5 * 20, 1),
+            new StatusEffectInstance(StatusEffects.WITHER, 5 * 20, 2),
+            new StatusEffectInstance(StatusEffects.POISON, 5 * 20, 0),
+            new StatusEffectInstance(StatusEffects.WEAKNESS, 5 * 20, 0)
+    );
 
     public StevesPainEnchantment() {
-        this(Rarity.VERY_RARE, EnchantmentTarget.WEAPON, EquipmentSlot.MAINHAND);
+        this(Enchantment.properties(
+                ItemTags.SWORD_ENCHANTABLE,
+                0, 1,
+                Enchantment.leveledCost(10, 16),
+                Enchantment.leveledCost(27, 16), 0
+        ));
     }
 
-    protected StevesPainEnchantment(Rarity rarity, EnchantmentTarget target, EquipmentSlot... slots) {
-        super(rarity, target, slots);
-    }
-
-    private void giveEffects(LivingEntity source, LivingEntity target, int level) {
-        int duration = Math.min(DURATION_PER_LEVEL * level, 30 * 20);
-        target.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, duration, 1), source);
-        target.addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER, duration, 2), source);
-        target.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, duration, 0), source);
-        target.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, duration, 0), source);
-    }
-
-    @Override
-    public boolean isTreasure() {
-        return true;
+    protected StevesPainEnchantment(Properties properties) {
+        super(properties);
     }
 
     @Override
     public void onTargetDamaged(LivingEntity user, Entity target, int level) {
         Random random = user.getRandom();
-        if (random.nextInt(100) + 1 <= BOUND && target instanceof LivingEntity livingEntity) {
-            this.giveEffects(user, livingEntity, level);
+        if (random.nextFloat() <= EFFECT_CHANCE && target instanceof LivingEntity livingEntity) {
+            for (StatusEffectInstance effectInstance : ATTACK_EFFECTS) {
+                livingEntity.addStatusEffect(new StatusEffectInstance(effectInstance.getEffectType(), effectInstance.getDuration() * level, effectInstance.getAmplifier(), effectInstance.isAmbient(), effectInstance.shouldShowParticles(), effectInstance.shouldShowIcon()), user);
+            }
         }
+    }
+
+    @Override
+    public boolean isTreasure() {
+        return true;
     }
 
     @Override
@@ -50,15 +55,5 @@ public class StevesPainEnchantment extends Enchantment {
     @Override
     public boolean isAvailableForRandomSelection() {
         return false;
-    }
-
-    @Override
-    public int getMinPower(int level) {
-        return 15;
-    }
-
-    @Override
-    public int getMaxPower(int level) {
-        return this.getMinPower(level) + 50;
     }
 }

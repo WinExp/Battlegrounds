@@ -2,19 +2,23 @@ package com.github.winexp.battlegrounds.item.thrown;
 
 import com.github.winexp.battlegrounds.entity.projectile.thrown.FlashBangEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ProjectileItem;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Position;
 import net.minecraft.world.World;
 
-public class FlashBangItem extends Item {
+public class FlashBangItem extends Item implements ProjectileItem {
     public static final int FUSE = 30;
     private static final int COOLDOWN = 20;
 
-    public FlashBangItem(Settings settings) {
+    public FlashBangItem(Item.Settings settings) {
         super(settings);
     }
 
@@ -32,5 +36,13 @@ public class FlashBangItem extends Item {
         }
         if (!user.getAbilities().creativeMode) stack.decrement(1);
         return TypedActionResult.success(stack, world.isClient);
+    }
+
+    @Override
+    public ProjectileEntity createEntity(World world, Position pos, ItemStack stack, Direction direction) {
+        FlashBangEntity entity = new FlashBangEntity(world, pos.getX(), pos.getY(), pos.getZ());
+        entity.setItem(stack.copyWithCount(1));
+        entity.setFuse(FUSE);
+        return entity;
     }
 }
