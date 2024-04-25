@@ -2,14 +2,15 @@ package com.github.winexp.battlegrounds.util.time;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.util.dynamic.Codecs;
 
 public record Duration(int hours, int minutes, int seconds, int ticks, int millis) {
     public static final Codec<Duration> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.INT.optionalFieldOf("hours", 0).forGetter(Duration::hours),
-            Codec.INT.optionalFieldOf("minutes", 0).forGetter(Duration::minutes),
-            Codec.INT.optionalFieldOf("seconds", 0).forGetter(Duration::seconds),
-            Codec.INT.optionalFieldOf("ticks", 0).forGetter(Duration::ticks),
-            Codec.INT.optionalFieldOf("millis", 0).forGetter(Duration::millis)
+            Codecs.POSITIVE_INT.optionalFieldOf("hours", 0).forGetter(Duration::hours),
+            Codecs.POSITIVE_INT.optionalFieldOf("minutes", 0).forGetter(Duration::minutes),
+            Codecs.POSITIVE_INT.optionalFieldOf("seconds", 0).forGetter(Duration::seconds),
+            Codecs.POSITIVE_INT.optionalFieldOf("ticks", 0).forGetter(Duration::ticks),
+            Codecs.POSITIVE_INT.optionalFieldOf("millis", 0).forGetter(Duration::millis)
     ).apply(instance, Duration::new));
     public static final Duration ZERO = new Duration(0, 0, 0, 0, 0);
     public static final Duration INFINITY = new Duration(-1, -1, -1, -1, -1);

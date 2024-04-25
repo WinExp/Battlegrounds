@@ -7,7 +7,7 @@ import com.github.winexp.battlegrounds.discussion.vote.VotePreset;
 import com.github.winexp.battlegrounds.entity.projectile.thrown.FlashBangEntity;
 import com.github.winexp.battlegrounds.game.GameProperties;
 import com.github.winexp.battlegrounds.game.PVPMode;
-import com.github.winexp.battlegrounds.task.TaskScheduler;
+import com.github.winexp.battlegrounds.task.ServerTaskScheduler;
 import com.github.winexp.battlegrounds.util.*;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.ArgumentBuilder;
@@ -64,7 +64,7 @@ public class BattlegroundsCommand {
     }
 
     public static ArgumentBuilder<ServerCommandSource, ?> registerStart() {
-        var cStart = literal("begin");
+        var cStart = literal("start");
         var aProp = argument("gameProperties", IdentifierArgumentType.identifier())
                 .suggests(((context, builder) ->
                         CommandSource.suggestMatching(Constants.GAME_PROPERTIES.keySet().stream().map(Identifier::toString), builder)))
@@ -142,7 +142,7 @@ public class BattlegroundsCommand {
 
     private static int executeStop(CommandContext<ServerCommandSource> context) {
         VoteManager.INSTANCE.closeAllVotes();
-        TaskScheduler.INSTANCE.cancelAllTasks();
+        ServerTaskScheduler.INSTANCE.cancelAllTasks();
         Variables.gameManager.stopGame();
         context.getSource().sendFeedback(() -> Text.translatable("commands.battlegrounds.stop.feedback")
                 .formatted(Formatting.GREEN), true);

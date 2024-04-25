@@ -66,8 +66,8 @@ public class FlashBangEntity extends AbstractThrownPropEntity {
 
     @Override
     protected void spawnTriggerParticles() {
-        ParticleUtil.spawnParticlesWithOffset(this.getWorld(), ParticleTypes.FLASH, this.getX(), this.getY(), this.getZ(), 0, 0, 20);
-        ParticleUtil.spawnParticlesWithOffset(this.getWorld(), ParticleTypes.END_ROD, this.getX(), this.getY(), this.getZ(), 0, 0.3, 30);
+        ParticleUtil.addParticlesWithOffset(this.getWorld(), ParticleTypes.FLASH, this.getX(), this.getY(), this.getZ(), 0, 0, 20);
+        ParticleUtil.addParticlesWithOffset(this.getWorld(), ParticleTypes.END_ROD, this.getX(), this.getY(), this.getZ(), 0, 0.3, 30);
     }
 
     @Override

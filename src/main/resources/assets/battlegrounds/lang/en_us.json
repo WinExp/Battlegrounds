@@ -69,6 +69,7 @@
   "gui.battlegrounds.vote.time_left": "%d seconds remaining to close the vote",
   "gui.battlegrounds.vote.title": "Vote Screen",
 
+  "item.battlegrounds.advanced_precision_core": "Advanced Precision Core",
   "item.battlegrounds.beef_noodle_soup": "Beef Noodle Soup",
   "item.battlegrounds.butchers_axe": "Butcher's Axe",
   "item.battlegrounds.channeling_bow": "Channeling Bow",
@@ -78,7 +79,9 @@
   "item.battlegrounds.leaching_sword": "Leaching Sword",
   "item.battlegrounds.miners_pickaxe": "Miner's Pickaxe",
   "item.battlegrounds.molotov": "Molotov",
+  "item.battlegrounds.my_holy_sword": "My Holy Sword",
   "item.battlegrounds.netherite_chestplate_special": "Netherite Chestplate Special Edition",
+  "item.battlegrounds.precision_core": "Precision Core",
   "item.battlegrounds.pvp_pro_sword": "PVP Pro",
   "item.battlegrounds.pvp_pro_sword.tooltip.1": "「It's a story of legend.",
   "item.battlegrounds.pvp_pro_sword.tooltip.2": "The great GRW team called in the PVP pro...",
@@ -89,6 +92,8 @@
   "item.battlegrounds.seven_eleven_sword.tooltip.1": "「On a sunny afternoon,",
   "item.battlegrounds.seven_eleven_sword.tooltip.2": "the three men set out on a legendary journey to find 7-11...」",
   "item.battlegrounds.steves_pain_sword": "Steve's Pain",
+  "item.battlegrounds.six_flavoured_dihuang_pill": "Six-flavoured Dihuang Pill",
+  "item.battlegrounds.six_flavoured_dihuang_pill.tooltip": "Six-flavoured Dihuang Pill, 8 Seconds for Real Men, Ultimate Speed and Hardness",
 
   "itemGroup.battlegrounds.root": "Battlegrounds",
 

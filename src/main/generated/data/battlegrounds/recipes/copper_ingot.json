@@ -1,0 +1,37 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "c:raw_copper_ores"
+    },
+    {
+      "tag": "c:raw_copper_ores"
+    },
+    {
+      "tag": "c:raw_copper_ores"
+    },
+    {
+      "tag": "c:raw_copper_ores"
+    },
+    {
+      "tag": "c:raw_copper_ores"
+    },
+    {
+      "tag": "c:raw_copper_ores"
+    },
+    {
+      "tag": "c:raw_copper_ores"
+    },
+    {
+      "tag": "c:raw_copper_ores"
+    },
+    {
+      "tag": "minecraft:coals"
+    }
+  ],
+  "result": {
+    "count": 8,
+    "item": "minecraft:copper_ingot"
+  }
+}

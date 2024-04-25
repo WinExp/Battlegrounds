@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "minecraft:golden_apple"
+    },
+    "G": {
+      "item": "minecraft:gold_block"
+    },
+    "L": {
+      "tag": "c:lapis"
+    }
+  },
+  "pattern": [
+    "LGL",
+    "GAG",
+    "LGL"
+  ],
+  "result": {
+    "item": "minecraft:enchanted_golden_apple"
+  }
+}

@@ -20,7 +20,7 @@ import com.github.winexp.battlegrounds.network.ModServerConfigurationNetworkHand
 import com.github.winexp.battlegrounds.network.ModServerPlayNetworkHandler;
 import com.github.winexp.battlegrounds.resource.listener.DataPackResourceReloadListener;
 import com.github.winexp.battlegrounds.sound.SoundEvents;
-import com.github.winexp.battlegrounds.task.TaskScheduler;
+import com.github.winexp.battlegrounds.task.ServerTaskScheduler;
 import com.github.winexp.battlegrounds.util.Constants;
 import com.github.winexp.battlegrounds.util.FileUtil;
 import com.github.winexp.battlegrounds.util.Variables;
@@ -69,7 +69,7 @@ public class Battlegrounds implements ModInitializer {
     }
 
     private void onServerStopping(MinecraftServer server) {
-        TaskScheduler.INSTANCE.cancelAllTasks();
+        ServerTaskScheduler.INSTANCE.cancelAllTasks();
     }
 
     private void onSaving(MinecraftServer server, boolean flush, boolean force) {

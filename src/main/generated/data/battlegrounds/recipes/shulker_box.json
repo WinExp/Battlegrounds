@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "c:chests"
+    },
+    {
+      "tag": "c:chests"
+    },
+    {
+      "item": "minecraft:bundle"
+    }
+  ],
+  "result": {
+    "item": "minecraft:shulker_box"
+  }
+}

@@ -9,10 +9,11 @@ public enum ToolMaterials implements ToolMaterial {
     PVP_PRO_SWORD(2573, 9.0F, 5.0F, 4, 0),
     SEVEN_ELEVEN_SWORD(2081, 9.0F, 4.0F, 4, 0),
     STEVES_PAIN_SWORD(1837, 9.0F, 6.0F, 4, 0),
+    MY_HOLY_SWORD(1923, 9.0F, 5.0F, 4, 0),
     LEACHING_SWORD(1792, 8.0F, 3.0F, 3, 0),
     MINERS_PICKAXE(998, 8.0F, 3.0F, 3, 0),
     BUTCHERS_AXE(3, 8.0F, 24.0F, 3, 0),
-    RUPERTS_TEAR(20, 0, 0, 0, 0),
+    RUPERTS_TEAR(15, 0, 0, 0, 0),
     KNOCKBACK_STICK(15, 0, 0, 0, 0);
 
     private final int durability;

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "minecraft:apple"
+    },
+    "G": {
+      "tag": "c:gold_ingots"
+    }
+  },
+  "pattern": [
+    " G ",
+    "GAG",
+    " G "
+  ],
+  "result": {
+    "item": "minecraft:golden_apple"
+  }
+}

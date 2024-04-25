@@ -8,8 +8,8 @@ public abstract class AbstractTask {
     protected AbstractTask() {
     }
 
-    public TaskExecuteStage getExecuteStage() {
-        return TaskExecuteStage.END;
+    public ExecuteStage getExecuteStage() {
+        return ExecuteStage.END;
     }
 
     public boolean isCancelled() {
@@ -23,4 +23,8 @@ public abstract class AbstractTask {
     public abstract void tick() throws CancellationException;
 
     public abstract void run() throws CancellationException;
+
+    public enum ExecuteStage {
+        BEGIN, END
+    }
 }

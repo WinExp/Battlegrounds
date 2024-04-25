@@ -2,24 +2,18 @@ package com.github.winexp.battlegrounds.item.weapon;
 
 import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
 import com.github.winexp.battlegrounds.item.EnchantRestrict;
-import com.github.winexp.battlegrounds.item.recipe.ItemNbtRecipe;
-import com.github.winexp.battlegrounds.item.recipe.NbtRecipe;
-import com.github.winexp.battlegrounds.item.tool.TooltipProvider;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.item.v1.CustomDamageHandler;
 import net.fabricmc.fabric.api.item.v1.EquipmentSlotProvider;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentTarget;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.*;
-import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.resource.featuretoggle.FeatureFlag;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Rarity;
@@ -29,40 +23,32 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
-public class LegendarySwordItem extends SwordItem implements ItemNbtRecipe, EnchantRestrict {
+public class LegendarySwordItem extends SwordItem implements EnchantRestrict {
     private final List<StatusEffectInstance> enrichEffects;
     private final List<StatusEffectInstance> attackEffects;
     private final int attackEffectBound;
-    private final Supplier<ItemStack> defaultStackProvider;
-    private final Supplier<NbtRecipe> recipeProvider;
     private final boolean enchantable;
     private final boolean grindable;
     private final boolean hasGlint;
-    private final List<TooltipProvider> tooltipProviders;
 
     public LegendarySwordItem(ToolMaterial toolMaterial, int attackDamage, float attackSpeed, Settings settings) {
         super(toolMaterial, attackDamage, attackSpeed, settings);
         this.enrichEffects = settings.enrichEffects;
         this.attackEffects = settings.attackEffects;
         this.attackEffectBound = settings.attackEffectBound;
-        this.defaultStackProvider = settings.defaultStackProvider;
-        this.recipeProvider = settings.recipeProvider;
         this.enchantable = settings.enchantable;
         this.grindable = settings.grindable;
         this.hasGlint = settings.hasGlint;
-        this.tooltipProviders = settings.tooltipProviders;
-        ServerTickEvents.END_SERVER_TICK.register(this::tick);
     }
 
-    private void tick(MinecraftServer server) {
-        for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-            if (player.getEquippedStack(EquipmentSlot.MAINHAND).isOf(this)
-            || player.getEquippedStack(EquipmentSlot.OFFHAND).isOf(this)) {
-                for (StatusEffectInstance statusEffectInstance : this.enrichEffects) {
-                    player.addStatusEffect(new StatusEffectInstance(statusEffectInstance), player);
-                }
+    @Override
+    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
+        if (!world.isClient && entity instanceof LivingEntity livingEntity
+                && selected && (livingEntity.getEquippedStack(EquipmentSlot.MAINHAND).isOf(this)
+                || livingEntity.getEquippedStack(EquipmentSlot.OFFHAND).isOf(this))) {
+            for (StatusEffectInstance statusEffectInstance : this.enrichEffects) {
+                livingEntity.addStatusEffect(new StatusEffectInstance(statusEffectInstance), livingEntity);
             }
         }
     }
@@ -78,29 +64,16 @@ public class LegendarySwordItem extends SwordItem implements ItemNbtRecipe, Ench
     }
 
     @Override
-    public ItemStack getDefaultStack() {
-        ItemStack stack = this.defaultStackProvider.get();
-        return stack == ItemStack.EMPTY ? super.getDefaultStack() : stack;
-    }
-
-    @Override
-    public CraftingRecipe getRecipe() {
-        return this.recipeProvider.get().getRecipe();
-    }
-
-    @Override
     public boolean hasGlint(ItemStack stack) {
         return this.hasGlint;
     }
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        super.appendTooltip(stack, world, tooltip, context);
         tooltip.add(Text.translatable("item.battlegrounds.legendary")
                 .formatted(Formatting.GOLD)
                 .styled(style -> style.withBold(true)));
-        for (TooltipProvider tooltipProvider : this.tooltipProviders) {
-            tooltip.add(tooltipProvider.getTooltip(stack, world, context));
-        }
     }
 
     @Override
@@ -116,31 +89,19 @@ public class LegendarySwordItem extends SwordItem implements ItemNbtRecipe, Ench
     }
 
     public static class Settings extends FabricItemSettings {
-        private final List<StatusEffectInstance> enrichEffects;
-        private final List<StatusEffectInstance> attackEffects;
-        private int attackEffectBound;
-        private Supplier<ItemStack> defaultStackProvider;
-        private Supplier<NbtRecipe> recipeProvider;
-        private boolean enchantable;
-        private boolean grindable;
-        private boolean hasGlint;
-        private final List<TooltipProvider> tooltipProviders;
+        private final List<StatusEffectInstance> enrichEffects = new ArrayList<>(List.of(
+                new StatusEffectInstance(StatusEffects.RESISTANCE, 2 * 20, 0)
+        ));
+        private final List<StatusEffectInstance> attackEffects = new ArrayList<>(List.of(
+                new StatusEffectInstance(StatusEffects.APPROACHING_EXTINCTION, 15 * 20, 0)
+        ));
+        private int attackEffectBound = 100;
+        private boolean enchantable = false;
+        private boolean grindable = false;
+        private boolean hasGlint = false;
 
         public Settings() {
             super();
-            this.enrichEffects = new ArrayList<>(List.of(
-                    new StatusEffectInstance(StatusEffects.RESISTANCE, 0, 2 * 20)
-            ));
-            this.attackEffects = new ArrayList<>(List.of(
-                    new StatusEffectInstance(StatusEffects.APPROACHING_EXTINCTION, 0, 15 * 20)
-            ));
-            this.attackEffectBound = 100;
-            this.defaultStackProvider = () -> ItemStack.EMPTY;
-            this.recipeProvider = () -> NbtRecipe.EMPTY;
-            this.enchantable = false;
-            this.grindable = false;
-            this.hasGlint = false;
-            this.tooltipProviders = new ArrayList<>();
         }
 
         @Override
@@ -228,17 +189,6 @@ public class LegendarySwordItem extends SwordItem implements ItemNbtRecipe, Ench
             return this;
         }
 
-        public Settings defaultStack(Supplier<ItemStack> itemStackProvider) {
-            this.defaultStackProvider = itemStackProvider;
-            return this;
-        }
-
-        public Settings recipe(Supplier<NbtRecipe> recipeProvider) {
-            this.recipeProvider = recipeProvider;
-            this.defaultStackProvider = () -> recipeProvider.get().getDefaultStack();
-            return this;
-        }
-
         public Settings enchantable() {
             this.enchantable = true;
             return this;
@@ -252,15 +202,6 @@ public class LegendarySwordItem extends SwordItem implements ItemNbtRecipe, Ench
         public Settings glint() {
             this.hasGlint = true;
             return this;
-        }
-
-        public Settings tooltip(TooltipProvider tooltipProvider) {
-            this.tooltipProviders.add(tooltipProvider);
-            return this;
-        }
-
-        public Settings tooltip(Text text) {
-            return this.tooltip((stack, world, context) -> text);
         }
     }
 }

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "D": {
+      "tag": "c:diamonds"
+    },
+    "Q": {
+      "tag": "c:quartz"
+    }
+  },
+  "pattern": [
+    " QQ",
+    " DQ",
+    "D  "
+  ],
+  "result": {
+    "item": "minecraft:trident"
+  }
+}

@@ -2,6 +2,7 @@ package com.github.winexp.battlegrounds.datagen;
 
 import com.github.winexp.battlegrounds.datagen.provider.GamePropertiesProvider;
 import com.github.winexp.battlegrounds.game.GameProperties;
+import com.github.winexp.battlegrounds.util.data.ModGameConfig;
 import com.github.winexp.battlegrounds.util.time.Duration;
 import com.google.common.collect.ImmutableList;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
@@ -26,6 +27,7 @@ public class ModGamePropertiesGenerator extends GamePropertiesProvider {
                                         Duration.withMinutes(4),
                                         Duration.withMinutes(3)
                                 ),
+                                new ModGameConfig(true),
                                 true
                         ),
                         new GameProperties.StageInfo(
@@ -35,6 +37,7 @@ public class ModGamePropertiesGenerator extends GamePropertiesProvider {
                                         Duration.withMinutes(3),
                                         Duration.withMinutes(2)
                                 ),
+                                new ModGameConfig(true),
                                 true
                         ),
                         new GameProperties.StageInfo(
@@ -44,6 +47,7 @@ public class ModGamePropertiesGenerator extends GamePropertiesProvider {
                                         Duration.withMinutes(3),
                                         Duration.withMinutes(2)
                                 ),
+                                new ModGameConfig(false),
                                 false
                         )
                 ),

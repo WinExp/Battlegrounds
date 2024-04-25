@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "battlegrounds:pvp_pro_sword",
+    "battlegrounds:seven_eleven_sword",
+    "battlegrounds:steves_pain_sword",
+    "battlegrounds:my_holy_sword",
+    "battlegrounds:leaching_sword"
+  ]
+}

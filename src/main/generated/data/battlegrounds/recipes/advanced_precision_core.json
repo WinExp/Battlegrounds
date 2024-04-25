@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "minecraft:blaze_rod"
+    },
+    "D": {
+      "tag": "c:diamonds"
+    },
+    "E": {
+      "tag": "c:emeralds"
+    },
+    "N": {
+      "tag": "c:netherite_ingots"
+    },
+    "P": {
+      "item": "battlegrounds:precision_core"
+    }
+  },
+  "pattern": [
+    "DBD",
+    "EPE",
+    "DND"
+  ],
+  "result": {
+    "item": "battlegrounds:advanced_precision_core"
+  }
+}

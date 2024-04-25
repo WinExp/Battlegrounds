@@ -1,8 +1,8 @@
 package com.github.winexp.battlegrounds.item.recipe;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.RawShapedRecipe;
+import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.util.Identifier;
@@ -32,7 +32,7 @@ public class ShapedNbtRecipe implements NbtRecipe {
     }
 
     @Override
-    public CraftingRecipe getRecipe() {
+    public Recipe<?> getRecipe() {
         return this.recipe;
     }
 }

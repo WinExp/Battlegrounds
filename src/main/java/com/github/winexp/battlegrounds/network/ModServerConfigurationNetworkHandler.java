@@ -8,7 +8,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerConfigurationNetworkHandler;
 
-public class ModServerConfigurationNetworkHandler {
+public final class ModServerConfigurationNetworkHandler {
     public static void register() {
         ServerConfigurationNetworking.registerGlobalReceiver(ModInfoC2SPacket.TYPE, ModServerConfigurationNetworkHandler::onModInfoReceived);
         ServerConfigurationConnectionEvents.DISCONNECT.register(ModServerConfigurationNetworkHandler::onConfigureDisconnect);
@@ -19,6 +19,6 @@ public class ModServerConfigurationNetworkHandler {
     }
 
     private static void onConfigureDisconnect(ServerConfigurationNetworkHandler handler, MinecraftServer server) {
-        PlayerUtil.setPlayerModVersion(handler.getDebugProfile().getId(), null);
+        PlayerUtil.setPlayerModVersion(handler.getProfile().getId(), null);
     }
 }

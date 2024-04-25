@@ -69,6 +69,7 @@
   "gui.battlegrounds.vote.time_left": "剩余 %d 秒关闭投票",
   "gui.battlegrounds.vote.title": "投票界面",
 
+  "item.battlegrounds.advanced_precision_core": "高级精密核心",
   "item.battlegrounds.beef_noodle_soup": "铁牛牛肉面",
   "item.battlegrounds.butchers_axe": "屠夫的斧头",
   "item.battlegrounds.channeling_bow": "引雷弓",
@@ -78,7 +79,9 @@
   "item.battlegrounds.leaching_sword": "浸毒剑",
   "item.battlegrounds.miners_pickaxe": "采矿者之镐",
   "item.battlegrounds.molotov": "燃烧瓶",
+  "item.battlegrounds.my_holy_sword": "我滴圣剑",
   "item.battlegrounds.netherite_chestplate_special": "下界合金胸甲特供版",
+  "item.battlegrounds.precision_core": "精密核心",
   "item.battlegrounds.pvp_pro_sword": "PVP 大佬",
   "item.battlegrounds.pvp_pro_sword.tooltip.1": "「那是一个传奇的故事，",
   "item.battlegrounds.pvp_pro_sword.tooltip.2": "伟大的 GRW 团队召唤了 PVP 大佬...",
@@ -89,6 +92,8 @@
   "item.battlegrounds.seven_eleven_sword.tooltip.1": "「在一个阳光明媚的下午，",
   "item.battlegrounds.seven_eleven_sword.tooltip.2": "有 3 人踏上了寻找 7-11 的传奇之旅...」",
   "item.battlegrounds.steves_pain_sword": "史蒂夫の痛",
+  "item.battlegrounds.six_flavoured_dihuang_pill": "六味地黄丸",
+  "item.battlegrounds.six_flavoured_dihuang_pill.tooltip": "六味地黄丸，8 秒真男人，极致的速度与硬度",
 
   "itemGroup.battlegrounds.root": "Battlegrounds",
 

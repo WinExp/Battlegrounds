@@ -36,6 +36,8 @@ public class ModChestLootTableGenerator extends SimpleFabricLootTableProvider {
                                         .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(6.0F, 35.0F))))
                                 .with(ItemEntry.builder(Items.GOLD_NUGGET).weight(1)
                                         .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(8.0F, 40.0F))))
+                                .with(ItemEntry.builder(Items.GUNPOWDER).weight(1)
+                                        .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(1.0F, 3.0F))))
                         )
                         .pool(LootPool.builder().rolls(UniformLootNumberProvider.create(2.0F, 3.0F))
                                 .with(ItemEntry.builder(Items.IRON_INGOT).weight(1)
