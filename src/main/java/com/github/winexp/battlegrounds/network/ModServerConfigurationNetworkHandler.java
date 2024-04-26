@@ -1,6 +1,6 @@
 package com.github.winexp.battlegrounds.network;
 
-import com.github.winexp.battlegrounds.network.packet.c2s.config.ModInfoC2SPacket;
+import com.github.winexp.battlegrounds.network.packet.c2s.config.ModInfoPayloadC2S;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
@@ -9,11 +9,11 @@ import net.minecraft.server.network.ServerConfigurationNetworkHandler;
 
 public final class ModServerConfigurationNetworkHandler {
     public static void register() {
-        ServerConfigurationNetworking.registerGlobalReceiver(ModInfoC2SPacket.ID, ModServerConfigurationNetworkHandler::onModInfoReceived);
+        ServerConfigurationNetworking.registerGlobalReceiver(ModInfoPayloadC2S.ID, ModServerConfigurationNetworkHandler::onModInfoReceived);
         ServerConfigurationConnectionEvents.DISCONNECT.register(ModServerConfigurationNetworkHandler::onConfigureDisconnect);
     }
 
-    private static void onModInfoReceived(ModInfoC2SPacket packet, ServerConfigurationNetworking.Context context) {
+    private static void onModInfoReceived(ModInfoPayloadC2S packet, ServerConfigurationNetworking.Context context) {
         PlayerUtil.setPlayerModVersion(context.networkHandler().getProfile().getId(), packet.modVersion());
     }
 

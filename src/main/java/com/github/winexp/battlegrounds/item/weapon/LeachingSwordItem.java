@@ -13,22 +13,4 @@ public class LeachingSwordItem extends SwordItem {
     public boolean hasGlint(ItemStack stack) {
         return true;
     }
-
-    /*
-    return new ShapedItemNbtRecipe(
-                RawShapedRecipe.create(Map.of(
-                                'a', Ingredient.ofItems(Items.DIAMOND),
-                                'b', Ingredient.ofItems(Items.COBWEB),
-                                'c', Ingredient.ofItems(Items.SPIDER_EYE),
-                                'd', Ingredient.ofItems(Items.DIAMOND_SWORD),
-                                'e', Ingredient.ofItems(Items.DIAMOND_BLOCK)
-                        ),
-                        "abe",
-                        "cdc",
-                        "aba"
-                ),
-                CraftingRecipeCategory.EQUIPMENT,
-                this.getDefaultStack()
-        ).getRecipe();
-    */
 }

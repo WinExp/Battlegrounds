@@ -2,19 +2,23 @@ package com.github.winexp.battlegrounds.item.thrown;
 
 import com.github.winexp.battlegrounds.entity.projectile.thrown.MolotovEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ProjectileItem;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Position;
 import net.minecraft.world.World;
 
-public class MolotovItem extends Item {
+public class MolotovItem extends Item implements ProjectileItem {
     public static final int FUSE = 40;
     private static final int COOLDOWN = 2 * 20;
 
-    public MolotovItem(Settings settings) {
+    public MolotovItem(Item.Settings settings) {
         super(settings);
     }
 
@@ -34,5 +38,13 @@ public class MolotovItem extends Item {
             stack.decrement(1);
         }
         return TypedActionResult.success(stack, world.isClient);
+    }
+
+    @Override
+    public ProjectileEntity createEntity(World world, Position pos, ItemStack stack, Direction direction) {
+        MolotovEntity entity = new MolotovEntity(world, pos.getX(), pos.getY(), pos.getZ());
+        entity.setItem(stack.copyWithCount(1));
+        entity.setFuse(FUSE);
+        return entity;
     }
 }

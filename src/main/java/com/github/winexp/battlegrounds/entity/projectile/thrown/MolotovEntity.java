@@ -30,6 +30,10 @@ public class MolotovEntity extends ThrownItemEntity {
         super(entityType, world);
     }
 
+    public MolotovEntity(World world, double d, double e, double f) {
+        super(EntityTypes.MOLOTOV, d, e, f, world);
+    }
+
     public MolotovEntity(LivingEntity livingEntity, World world) {
         super(EntityTypes.MOLOTOV, livingEntity, world);
     }

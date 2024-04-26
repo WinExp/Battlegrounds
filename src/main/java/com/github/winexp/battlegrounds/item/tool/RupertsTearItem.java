@@ -1,7 +1,7 @@
 package com.github.winexp.battlegrounds.item.tool;
 
 import com.github.winexp.battlegrounds.item.EnchantRestrict;
-import com.github.winexp.battlegrounds.network.packet.c2s.play.RupertsTearTeleportC2SPacket;
+import com.github.winexp.battlegrounds.network.packet.c2s.play.RupertsTearTeleportPayloadC2S;
 import com.github.winexp.battlegrounds.registry.tag.ModFluidTags;
 import com.github.winexp.battlegrounds.util.MathUtil;
 import com.github.winexp.battlegrounds.util.BlockUtil;
@@ -81,7 +81,7 @@ public class RupertsTearItem extends ToolItem implements EnchantRestrict {
             double y = BlockUtil.getBlockMaxY(world, pos);
             Box boundingBox = BlockUtil.getCollisionShape(world, pos).getBoundingBox();
             Vec3d tpPos = boundingBox.getCenter().add(Vec3d.of(pos)).withAxis(Direction.Axis.Y, y);
-            RupertsTearTeleportC2SPacket packet = new RupertsTearTeleportC2SPacket(stack, tpPos);
+            RupertsTearTeleportPayloadC2S packet = new RupertsTearTeleportPayloadC2S(stack, tpPos);
             ClientPlayNetworking.send(packet);
         }
         return TypedActionResult.success(stack, world.isClient);

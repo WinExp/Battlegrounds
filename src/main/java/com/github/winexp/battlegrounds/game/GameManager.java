@@ -3,7 +3,7 @@ package com.github.winexp.battlegrounds.game;
 import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
 import com.github.winexp.battlegrounds.event.ModServerPlayerEvents;
 import com.github.winexp.battlegrounds.helper.WorldHelper;
-import com.github.winexp.battlegrounds.network.packet.s2c.play.config.ModGameConfigS2CPacket;
+import com.github.winexp.battlegrounds.network.packet.s2c.play.config.ModGameConfigPayloadS2C;
 import com.github.winexp.battlegrounds.sound.SoundEvents;
 import com.github.winexp.battlegrounds.task.LimitRepeatTask;
 import com.github.winexp.battlegrounds.task.RepeatTask;
@@ -534,7 +534,7 @@ public class GameManager extends PersistentState implements GameListener {
     }
 
     private void syncData() {
-        PlayerUtil.broadcastPacket(this.server, new ModGameConfigS2CPacket(this.currentStage != null
+        PlayerUtil.broadcastPacket(this.server, new ModGameConfigPayloadS2C(this.currentStage != null
                 ? this.currentStage.gameConfig() : Constants.DEFAULT_MOD_GAME_CONFIG));
     }
 

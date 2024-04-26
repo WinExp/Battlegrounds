@@ -43,6 +43,12 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
     }
 
     @Override
+    protected void initDataTracker(DataTracker.Builder builder) {
+        super.initDataTracker(builder);
+        builder.add(CHANNELING, false);
+    }
+
+    @Override
     public void tick() {
         super.tick();
         if (this.getWorld().isClient) {

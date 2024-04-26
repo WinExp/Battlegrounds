@@ -2,6 +2,7 @@ package com.github.winexp.battlegrounds.datagen;
 
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.registry.RegistryKeys;
+import com.github.winexp.battlegrounds.world.gen.structure.StructureKeys;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricAdvancementProvider;
 import net.minecraft.advancement.Advancement;
@@ -43,7 +44,7 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
                 .criterion("tick", TickCriterion.Conditions.createTick())
                 .build(exporter, "battlegrounds:story/root");
         this.generateItemAdvancements(wrapperLookup ,rootAdvancement, exporter);
-        this.generateStructureAdvancements(wrapperLookup, rootAdvancement, exporter);
+        //this.generateStructureAdvancements(wrapperLookup, rootAdvancement, exporter);
     }
 
     @SafeVarargs
@@ -54,10 +55,8 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
     private Advancement.Builder requiredAllStructuresArrived(RegistryWrapper.WrapperLookup wrapperLookup, Advancement.Builder builder, Collection<RegistryKey<Structure>> structures) {
         for (RegistryKey<Structure> structure : structures) {
             builder.criterion(structure.getValue().getPath(), TickCriterion.Conditions.createLocation(
-                    LocationPredicate.Builder.createStructure(wrapperLookup.createRegistryLookup().getOptionalEntry(
-                            RegistryKeys.STRUCTURE,
-                            structure
-                    ).orElseThrow())
+                    LocationPredicate.Builder.createStructure(wrapperLookup.getWrapperOrThrow(RegistryKeys.STRUCTURE)
+                            .getOrThrow(structure))
             ));
         }
         return builder;
@@ -67,10 +66,7 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
         AdvancementEntry medievalFortressAdvancement = this.requiredAllStructuresArrived(
                         wrapperLookup,
                         Advancement.Builder.create(),
-                        RegistryKey.of(
-                                RegistryKeys.STRUCTURE,
-                                new Identifier("battlegrounds", "medieval_fortress")
-                        )
+                        StructureKeys.MEDIEVAL_FORTRESS
                 )
                 .parent(rootAdvancement)
                 .display(
@@ -86,10 +82,7 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
         AdvancementEntry relicOfFantasyAdvancement = this.requiredAllStructuresArrived(
                         wrapperLookup,
                         Advancement.Builder.create(),
-                        RegistryKey.of(
-                                RegistryKeys.STRUCTURE,
-                                new Identifier("battlegrounds", "relic_of_fantasy")
-                        )
+                        StructureKeys.RELIC_OF_FANTASY
                 )
                 .parent(rootAdvancement)
                 .display(
@@ -105,10 +98,7 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
         AdvancementEntry wineShopAdvancement = this.requiredAllStructuresArrived(
                         wrapperLookup,
                         Advancement.Builder.create(),
-                        RegistryKey.of(
-                                RegistryKeys.STRUCTURE,
-                                new Identifier("battlegrounds", "wine_shop")
-                        )
+                        StructureKeys.WINE_SHOP
                 )
                 .parent(rootAdvancement)
                 .display(
@@ -124,10 +114,7 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
         AdvancementEntry libraryAdvancement = this.requiredAllStructuresArrived(
                         wrapperLookup,
                         Advancement.Builder.create(),
-                        RegistryKey.of(
-                                RegistryKeys.STRUCTURE,
-                                new Identifier("battlegrounds", "library")
-                        )
+                        StructureKeys.LIBRARY
                 )
                 .parent(rootAdvancement)
                 .display(
@@ -143,42 +130,15 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
         AdvancementEntry allStructuresAdvancement = this.requiredAllStructuresArrived(
                         wrapperLookup,
                         Advancement.Builder.create(),
-                        RegistryKey.of(
-                                RegistryKeys.STRUCTURE,
-                                new Identifier("battlegrounds", "canopies")
-                        ),
-                        RegistryKey.of(
-                                RegistryKeys.STRUCTURE,
-                                new Identifier("battlegrounds", "desert_hut")
-                        ),
-                        RegistryKey.of(
-                                RegistryKeys.STRUCTURE,
-                                new Identifier("battlegrounds", "kiosk")
-                        ),
-                        RegistryKey.of(
-                                RegistryKeys.STRUCTURE,
-                                new Identifier("battlegrounds", "library")
-                        ),
-                        RegistryKey.of(
-                                RegistryKeys.STRUCTURE,
-                                new Identifier("battlegrounds", "medieval_library")
-                        ),
-                        RegistryKey.of(
-                                RegistryKeys.STRUCTURE,
-                                new Identifier("battlegrounds", "medieval_fortress")
-                        ),
-                        RegistryKey.of(
-                                RegistryKeys.STRUCTURE,
-                                new Identifier("battlegrounds", "relic_of_fantasy")
-                        ),
-                        RegistryKey.of(
-                                RegistryKeys.STRUCTURE,
-                                new Identifier("battlegrounds", "wine_shop")
-                        ),
-                        RegistryKey.of(
-                                RegistryKeys.STRUCTURE,
-                                new Identifier("battlegrounds", "ancient_ruins")
-                        )
+                        StructureKeys.ANCIENT_RUINS,
+                        StructureKeys.CANOPIES,
+                        StructureKeys.DESERT_HUT,
+                        StructureKeys.IZAKAYA,
+                        StructureKeys.KIOSK,
+                        StructureKeys.LIBRARY,
+                        StructureKeys.MEDIEVAL_FORTRESS,
+                        StructureKeys.MEDIEVAL_LIBRARY,
+                        StructureKeys.WINE_SHOP
                 )
                 .parent(rootAdvancement)
                 .display(

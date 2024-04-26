@@ -2,10 +2,10 @@ package com.github.winexp.battlegrounds.client.gui.screen.vote;
 
 import com.github.winexp.battlegrounds.client.KeyBindings;
 import com.github.winexp.battlegrounds.discussion.vote.VoteInfo;
-import com.github.winexp.battlegrounds.network.packet.c2s.play.vote.VoteC2SPacket;
-import com.github.winexp.battlegrounds.network.packet.c2s.play.vote.SyncVoteInfosC2SPacket;
-import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.UpdateVoteInfoS2CPacket;
-import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.SyncVoteInfosS2CPacket;
+import com.github.winexp.battlegrounds.network.packet.c2s.play.vote.VotePayloadC2S;
+import com.github.winexp.battlegrounds.network.packet.c2s.play.vote.SyncVoteInfosPayloadC2S;
+import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.UpdateVoteInfoPayloadS2C;
+import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.SyncVoteInfosPayloadS2C;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -55,7 +55,7 @@ public class VoteScreen extends Screen {
     }
 
     public static void syncVoteInfos() {
-        ClientPlayNetworking.send(new SyncVoteInfosC2SPacket());
+        ClientPlayNetworking.send(new SyncVoteInfosPayloadC2S());
     }
 
     public static void onVoteOpened(MinecraftClient client, VoteInfo voteInfo) {
@@ -72,7 +72,7 @@ public class VoteScreen extends Screen {
         }
     }
 
-    public static void onSyncVoteInfos(MinecraftClient client, SyncVoteInfosS2CPacket packet) {
+    public static void onSyncVoteInfos(MinecraftClient client, SyncVoteInfosPayloadS2C packet) {
         voteInfosCache.clear();
         voteInfosCache.addAll(packet.voteInfos());
         if (client.currentScreen instanceof VoteScreen voteScreen) {
@@ -80,7 +80,7 @@ public class VoteScreen extends Screen {
         }
     }
 
-    public static void onUpdateVoteInfo(MinecraftClient client, UpdateVoteInfoS2CPacket packet) {
+    public static void onUpdateVoteInfo(MinecraftClient client, UpdateVoteInfoPayloadS2C packet) {
         if (packet.voteInfo().isEmpty()) return;
         VoteInfo voteInfo = packet.voteInfo().get();
         voteInfosCache.remove(voteInfo);
@@ -100,7 +100,7 @@ public class VoteScreen extends Screen {
         VoteListWidget.Entry entry = this.voteList.getSelectedOrNull();
         if (entry instanceof VoteListWidget.VoteEntry voteEntry) {
             Identifier identifier = voteEntry.voteInfo.identifier;
-            ClientPlayNetworking.send(new VoteC2SPacket(identifier, result));
+            ClientPlayNetworking.send(new VotePayloadC2S(identifier, result));
             voteEntry.setSelectable(false);
         }
         this.voteList.setSelected(null);

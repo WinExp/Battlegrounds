@@ -2,7 +2,7 @@ package com.github.winexp.battlegrounds.entity.projectile.thrown;
 
 import com.github.winexp.battlegrounds.entity.EntityTypes;
 import com.github.winexp.battlegrounds.item.Items;
-import com.github.winexp.battlegrounds.network.packet.s2c.play.FlashS2CPacket;
+import com.github.winexp.battlegrounds.network.packet.s2c.play.FlashPayloadS2C;
 import com.github.winexp.battlegrounds.sound.SoundEvents;
 import com.github.winexp.battlegrounds.util.MathUtil;
 import com.github.winexp.battlegrounds.util.ParticleUtil;
@@ -48,7 +48,7 @@ public class FlashBangEntity extends AbstractThrownPropEntity {
                 float distance = MathUtil.distanceTo(pos, player.getEyePos());
                 if (distance <= MAX_DISTANCE + DISTANCE_INCREMENT) {
                     float distanceStrength = (MAX_DISTANCE - distance + DISTANCE_INCREMENT) / MAX_DISTANCE;
-                    FlashS2CPacket packet = new FlashS2CPacket(pos, distanceStrength);
+                    FlashPayloadS2C packet = new FlashPayloadS2C(pos, distanceStrength);
                     ServerPlayNetworking.send(player, packet);
                 }
             }

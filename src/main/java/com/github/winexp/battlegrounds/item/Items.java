@@ -5,6 +5,7 @@ import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
 import com.github.winexp.battlegrounds.item.food.*;
 import com.github.winexp.battlegrounds.item.ingredient.*;
 import com.github.winexp.battlegrounds.item.recipe.*;
+import com.github.winexp.battlegrounds.item.tool.ToolMaterials;
 import com.github.winexp.battlegrounds.item.weapon.*;
 import com.github.winexp.battlegrounds.item.mining.*;
 import com.github.winexp.battlegrounds.item.thrown.*;
@@ -21,9 +22,7 @@ import net.minecraft.component.type.FoodComponent;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.EnchantmentLevelEntry;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.item.EnchantedBookItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RawShapedRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
@@ -107,6 +106,7 @@ public class Items extends net.minecraft.item.Items {
     ));
     public static final MinersPickaxeItem MINERS_PICKAXE = registerItem("miners_pickaxe", new MinersPickaxeItem(ToolMaterials.MINERS_PICKAXE, new Item.Settings()
             .rarity(Rarity.UNCOMMON)
+            .attributeModifiers(PickaxeItem.createAttributeModifiers(ToolMaterials.MINERS_PICKAXE, 1, -2.8F))
             .component(DataComponentTypes.ENCHANTMENTS, Util.make(new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT), component -> {
                 component.add(Enchantments.FORTUNE, 3);
                 component.add(Enchantments.EFFICIENCY, 5);
@@ -120,11 +120,12 @@ public class Items extends net.minecraft.item.Items {
     public static final ButchersAxeItem BUTCHERS_AXE = registerItem("butchers_axe", new ButchersAxeItem(ToolMaterials.BUTCHERS_AXE, new Item.Settings()
             .rarity(Rarity.EPIC)
             .fireproof()
+            .attributeModifiers(AxeItem.createAttributeModifiers(ToolMaterials.BUTCHERS_AXE, 5, -3.3F))
     ));
-    public static final ChannelingBowItem CHANNELING_BOW = registerItem("channeling_bow", new ChannelingBowItem(new Item.Settings()
+    public static final BowItem CHANNELING_BOW = registerItem("channeling_bow", new BowItem(new Item.Settings()
             .rarity(Rarity.RARE)
             .fireproof()
-            .maxDamage(ChannelingBowItem.DURABILITY)
+            .maxDamage(500)
             .component(DataComponentTypes.ENCHANTMENTS, Util.make(new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT), component -> {
                 component.add(Enchantments.CHANNELING_PRO, 1);
                 component.add(Enchantments.POWER, 5);
@@ -151,6 +152,10 @@ public class Items extends net.minecraft.item.Items {
     public static final KnockbackStickItem KNOCKBACK_STICK = registerItem("knockback_stick", new KnockbackStickItem(ToolMaterials.KNOCKBACK_STICK, new Item.Settings()
             .maxCount(1)
             .rarity(Rarity.RARE)
+            .component(DataComponentTypes.ENCHANTMENTS, Util.make(new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT), component -> {
+                component.add(Enchantments.KNOCKBACK, 7);
+                component.add(Enchantments.SHARPNESS, 1);
+            }).build())
     ));
 
     public static final Item PRECISION_CORE = registerItem("precision_core", new Item(new Item.Settings()

@@ -6,6 +6,7 @@ import net.minecraft.enchantment.EnchantmentLevelEntry;
 import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -14,7 +15,7 @@ import net.minecraft.util.Identifier;
 
 public class ItemGroups extends net.minecraft.item.ItemGroups {
     public static final ItemGroup ROOT_ITEM_GROUP = register("root_item_group", FabricItemGroup.builder()
-            .icon(Items.PVP_PRO_SWORD::getDefaultStack)
+            .icon(() -> new ItemStack(Items.PVP_PRO_SWORD))
             .displayName(Text.translatable("itemGroup.battlegrounds.root"))
             .entries((context, entries) -> {
                 addEntry(entries, Items.PVP_PRO_SWORD);

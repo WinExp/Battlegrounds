@@ -3,7 +3,7 @@ package com.github.winexp.battlegrounds.datagen;
 import com.github.winexp.battlegrounds.item.Items;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
-import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
 
@@ -28,7 +28,12 @@ public class ModItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         this.getOrCreateTagBuilder(ItemTags.AXES)
                 .add(Items.BUTCHERS_AXE);
         // conventional
-        this.getOrCreateTagBuilder(ConventionalItemTags.BOWS)
+        this.getOrCreateTagBuilder(ConventionalItemTags.TOOLS)
+                .add(Items.KNOCKBACK_STICK)
+                .add(Items.RUPERTS_TEAR);
+        this.getOrCreateTagBuilder(ConventionalItemTags.BOWS_TOOLS)
+                .add(Items.CHANNELING_BOW);
+        this.getOrCreateTagBuilder(ConventionalItemTags.RANGED_WEAPONS_TOOLS)
                 .add(Items.CHANNELING_BOW);
         this.getOrCreateTagBuilder(ConventionalItemTags.FOODS)
                 .add(Items.BEEF_NOODLE_SOUP)

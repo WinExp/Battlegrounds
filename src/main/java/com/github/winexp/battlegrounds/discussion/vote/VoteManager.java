@@ -2,10 +2,10 @@ package com.github.winexp.battlegrounds.discussion.vote;
 
 import com.github.winexp.battlegrounds.event.ModServerPlayerEvents;
 import com.github.winexp.battlegrounds.event.ServerVoteEvents;
-import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.PlayerVotedS2CPacket;
-import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.SyncVoteInfosS2CPacket;
-import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.VoteClosedS2CPacket;
-import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.VoteOpenedS2CPacket;
+import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.PlayerVotedPayloadS2C;
+import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.SyncVoteInfosPayloadS2C;
+import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.VoteClosedPayloadS2C;
+import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.VoteOpenedPayloadS2C;
 import com.github.winexp.battlegrounds.util.Variables;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.ClientConnection;
@@ -30,7 +30,7 @@ public class VoteManager {
     }
 
     private void onVoteOpened(VoteInstance voteInstance) {
-        VoteOpenedS2CPacket packet = new VoteOpenedS2CPacket(voteInstance.getVoteInfo());
+        VoteOpenedPayloadS2C packet = new VoteOpenedPayloadS2C(voteInstance.getVoteInfo());
         for (UUID uuid : voteInstance.getParticipants()) {
             ServerPlayerEntity player = Variables.server.getPlayerManager().getPlayer(uuid);
             if (player != null) {
@@ -42,7 +42,7 @@ public class VoteManager {
     private void onVoteClosed(VoteInstance voteInstance, VoteSettings.CloseReason reason) {
         Identifier identifier = voteInstance.getIdentifier();
         this.voteMap.remove(identifier);
-        VoteClosedS2CPacket packet = new VoteClosedS2CPacket(voteInstance.getVoteInfo(), reason);
+        VoteClosedPayloadS2C packet = new VoteClosedPayloadS2C(voteInstance.getVoteInfo(), reason);
         for (UUID uuid : voteInstance.getParticipants()) {
             ServerPlayerEntity player = Variables.server.getPlayerManager().getPlayer(uuid);
             if (player != null) {
@@ -52,7 +52,7 @@ public class VoteManager {
     }
 
     private void onPlayerVoted(ServerPlayerEntity player, VoteInstance voteInstance, boolean result) {
-        PlayerVotedS2CPacket packet = new PlayerVotedS2CPacket(player.getDisplayName(), voteInstance.getVoteInfo(player), result);
+        PlayerVotedPayloadS2C packet = new PlayerVotedPayloadS2C(player.getDisplayName(), voteInstance.getVoteInfo(player), result);
         for (UUID uuid : voteInstance.getParticipants()) {
             ServerPlayerEntity player1 = Variables.server.getPlayerManager().getPlayer(uuid);
             if (player1 != null) {
@@ -74,7 +74,7 @@ public class VoteManager {
                 voteInfos.add(voteInfo);
             }
         }
-        SyncVoteInfosS2CPacket packet = new SyncVoteInfosS2CPacket(voteInfos);
+        SyncVoteInfosPayloadS2C packet = new SyncVoteInfosPayloadS2C(voteInfos);
         ServerPlayNetworking.send(player, packet);
     }
 

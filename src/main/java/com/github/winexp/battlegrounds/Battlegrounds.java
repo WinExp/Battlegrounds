@@ -18,6 +18,14 @@ import com.github.winexp.battlegrounds.loot.function.LootFunctionTypes;
 import com.github.winexp.battlegrounds.mixin.ArgumentTypesInvoker;
 import com.github.winexp.battlegrounds.network.ModServerConfigurationNetworkHandler;
 import com.github.winexp.battlegrounds.network.ModServerPlayNetworkHandler;
+import com.github.winexp.battlegrounds.network.packet.c2s.config.ModInfoPayloadC2S;
+import com.github.winexp.battlegrounds.network.packet.c2s.play.RupertsTearTeleportPayloadC2S;
+import com.github.winexp.battlegrounds.network.packet.c2s.play.vote.GetVoteInfoPayloadC2S;
+import com.github.winexp.battlegrounds.network.packet.c2s.play.vote.SyncVoteInfosPayloadC2S;
+import com.github.winexp.battlegrounds.network.packet.c2s.play.vote.VotePayloadC2S;
+import com.github.winexp.battlegrounds.network.packet.s2c.play.FlashPayloadS2C;
+import com.github.winexp.battlegrounds.network.packet.s2c.play.config.ModGameConfigPayloadS2C;
+import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.*;
 import com.github.winexp.battlegrounds.resource.listener.DataPackResourceReloadListener;
 import com.github.winexp.battlegrounds.sound.SoundEvents;
 import com.github.winexp.battlegrounds.task.ServerTaskScheduler;
@@ -29,6 +37,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.serialize.ConstantArgumentSerializer;
@@ -93,6 +102,22 @@ public class Battlegrounds implements ModInitializer {
         );
     }
 
+    private void registerCustomPayloads() {
+        PayloadTypeRegistry.playS2C().register(ModGameConfigPayloadS2C.ID, ModGameConfigPayloadS2C.PACKET_CODEC);
+        PayloadTypeRegistry.playS2C().register(SyncVoteInfosPayloadS2C.ID, SyncVoteInfosPayloadS2C.PACKET_CODEC);
+        PayloadTypeRegistry.playS2C().register(UpdateVoteInfoPayloadS2C.ID, UpdateVoteInfoPayloadS2C.PACKET_CODEC);
+        PayloadTypeRegistry.playS2C().register(VoteOpenedPayloadS2C.ID, VoteOpenedPayloadS2C.PACKET_CODEC);
+        PayloadTypeRegistry.playS2C().register(VoteClosedPayloadS2C.ID, VoteClosedPayloadS2C.PACKET_CODEC);
+        PayloadTypeRegistry.playS2C().register(PlayerVotedPayloadS2C.ID, PlayerVotedPayloadS2C.PACKET_CODEC);
+        PayloadTypeRegistry.playS2C().register(FlashPayloadS2C.ID, FlashPayloadS2C.PACKET_CODEC);
+
+        PayloadTypeRegistry.configurationC2S().register(ModInfoPayloadC2S.ID, ModInfoPayloadC2S.PACKET_CODEC);
+        PayloadTypeRegistry.playC2S().register(SyncVoteInfosPayloadC2S.ID, SyncVoteInfosPayloadC2S.PACKET_CODEC);
+        PayloadTypeRegistry.playC2S().register(GetVoteInfoPayloadC2S.ID, GetVoteInfoPayloadC2S.PACKET_CODEC);
+        PayloadTypeRegistry.playC2S().register(VotePayloadC2S.ID, VotePayloadC2S.PACKET_CODEC);
+        PayloadTypeRegistry.playC2S().register(RupertsTearTeleportPayloadC2S.ID, RupertsTearTeleportPayloadC2S.PACKET_CODEC);
+    }
+
     @Override
     public void onInitialize() {
         INSTANCE = this;
@@ -109,6 +134,7 @@ public class Battlegrounds implements ModInitializer {
         ServerLifecycleEvents.AFTER_SAVE.register(this::onSaving);
         LootTableEvents.MODIFY.register(new LootTableModifier());
         // 注册网络包相关
+        this.registerCustomPayloads();
         ModServerConfigurationNetworkHandler.register();
         ModServerPlayNetworkHandler.register();
         // 注册数据包

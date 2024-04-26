@@ -7,15 +7,12 @@ import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.item.tool.RupertsTearItem;
 import com.github.winexp.battlegrounds.network.packet.c2s.play.*;
 import com.github.winexp.battlegrounds.network.packet.c2s.play.vote.*;
-import com.github.winexp.battlegrounds.network.packet.s2c.play.FlashS2CPacket;
 import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.*;
 import com.github.winexp.battlegrounds.sound.SoundEvents;
-import com.github.winexp.battlegrounds.util.Constants;
 import com.github.winexp.battlegrounds.util.ParticleUtil;
 import com.github.winexp.battlegrounds.util.data.ModVersion;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.item.ItemStack;
@@ -26,7 +23,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 
@@ -37,21 +33,16 @@ public final class ModServerPlayNetworkHandler {
     public static void register() {
         ServerPlayConnectionEvents.INIT.register(ModServerPlayNetworkHandler::onPlayInit);
         ServerPlayConnectionEvents.DISCONNECT.register(ModServerPlayNetworkHandler::onPlayDisconnect);
-        PayloadTypeRegistry.playS2C().register(PlayerVotedS2CPacket.ID, PlayerVotedS2CPacket.PACKET_CODEC);
-        PayloadTypeRegistry.playS2C().register(SyncVoteInfosS2CPacket.ID, SyncVoteInfosS2CPacket.PACKET_CODEC);
-        PayloadTypeRegistry.playS2C().register(UpdateVoteInfoS2CPacket.ID, UpdateVoteInfoS2CPacket.PACKET_CODEC);
-        PayloadTypeRegistry.playS2C().register(VoteClosedS2CPacket.ID, VoteClosedS2CPacket.PACKET_CODEC);
-        PayloadTypeRegistry.playS2C().register(VoteOpenedS2CPacket.ID, VoteOpenedS2CPacket.PACKET_CODEC);
-        PayloadTypeRegistry.playS2C().register(FlashS2CPacket.ID, FlashS2CPacket.PACKET_CODEC);
-        ServerPlayNetworking.registerGlobalReceiver(SyncVoteInfosC2SPacket.ID, ModServerPlayNetworkHandler::onSyncVoteInfos);
-        ServerPlayNetworking.registerGlobalReceiver(GetVoteInfoC2SPacket.ID, ModServerPlayNetworkHandler::onGetVoteInfo);
-        ServerPlayNetworking.registerGlobalReceiver(VoteC2SPacket.ID, ModServerPlayNetworkHandler::onVote);
-        ServerPlayNetworking.registerGlobalReceiver(RupertsTearTeleportC2SPacket.ID, ModServerPlayNetworkHandler::onRupertsTearTeleport);
+        ServerPlayNetworking.registerGlobalReceiver(SyncVoteInfosPayloadC2S.ID, ModServerPlayNetworkHandler::onSyncVoteInfos);
+        ServerPlayNetworking.registerGlobalReceiver(GetVoteInfoPayloadC2S.ID, ModServerPlayNetworkHandler::onGetVoteInfo);
+        ServerPlayNetworking.registerGlobalReceiver(VotePayloadC2S.ID, ModServerPlayNetworkHandler::onVote);
+        ServerPlayNetworking.registerGlobalReceiver(RupertsTearTeleportPayloadC2S.ID, ModServerPlayNetworkHandler::onRupertsTearTeleport);
     }
 
     private static void onPlayInit(ServerPlayNetworkHandler handler, MinecraftServer server) {
         UUID uuid = handler.getDebugProfile().getId();
         ModVersion playerModVersion = PlayerUtil.getPlayerModVersion(uuid);
+        /*
         if (playerModVersion == null) {
             handler.disconnect(Text.translatable(
                     "disconnect.battlegrounds.config.mod_info.not_found",
@@ -69,31 +60,32 @@ public final class ModServerPlayNetworkHandler {
                     .formatted(Formatting.RED)
                     .styled(style -> style.withBold(true)));
         }
+         */
     }
 
     private static void onPlayDisconnect(ServerPlayNetworkHandler handler, MinecraftServer server) {
         PlayerUtil.setPlayerModVersion(handler.getDebugProfile().getId(), null);
     }
 
-    private static void onSyncVoteInfos(SyncVoteInfosC2SPacket packet, ServerPlayNetworking.Context context) {
+    private static void onSyncVoteInfos(SyncVoteInfosPayloadC2S packet, ServerPlayNetworking.Context context) {
         ServerPlayerEntity player = context.player();
         player.server.execute(() -> VoteManager.INSTANCE.syncVoteInfos(player));
     }
 
-    private static void onGetVoteInfo(GetVoteInfoC2SPacket packet, ServerPlayNetworking.Context context) {
+    private static void onGetVoteInfo(GetVoteInfoPayloadC2S packet, ServerPlayNetworking.Context context) {
         ServerPlayerEntity player = context.player();
         PacketSender sender = context.responseSender();
         VoteManager.INSTANCE.getVoteInstance(packet.voteId()).ifPresentOrElse(voteInstance -> {
             VoteInfo voteInfo = voteInstance.getVoteInfo(player);
-            UpdateVoteInfoS2CPacket responsePacket = new UpdateVoteInfoS2CPacket(Optional.of(voteInfo));
+            UpdateVoteInfoPayloadS2C responsePacket = new UpdateVoteInfoPayloadS2C(Optional.of(voteInfo));
             sender.sendPacket(responsePacket);
         }, () -> {
-            UpdateVoteInfoS2CPacket responsePacket = new UpdateVoteInfoS2CPacket(Optional.empty());
+            UpdateVoteInfoPayloadS2C responsePacket = new UpdateVoteInfoPayloadS2C(Optional.empty());
             sender.sendPacket(responsePacket);
         });
     }
 
-    private static void onVote(VoteC2SPacket packet, ServerPlayNetworking.Context context) {
+    private static void onVote(VotePayloadC2S packet, ServerPlayNetworking.Context context) {
         ServerPlayerEntity player = context.player();
         PacketSender sender = context.responseSender();
         Identifier identifier = packet.identifier();
@@ -108,13 +100,13 @@ public final class ModServerPlayNetworkHandler {
             }
             if (voteInstance.isVoting()) {
                 VoteInfo voteInfo = voteInstance.getVoteInfo(player);
-                UpdateVoteInfoS2CPacket responsePacket = new UpdateVoteInfoS2CPacket(Optional.of(voteInfo));
+                UpdateVoteInfoPayloadS2C responsePacket = new UpdateVoteInfoPayloadS2C(Optional.of(voteInfo));
                 sender.sendPacket(responsePacket);
             }
         }
     }
 
-    private static void onRupertsTearTeleport(RupertsTearTeleportC2SPacket packet, ServerPlayNetworking.Context context) {
+    private static void onRupertsTearTeleport(RupertsTearTeleportPayloadC2S packet, ServerPlayNetworking.Context context) {
         ServerPlayerEntity player = context.player();
         ItemStack stack = packet.itemStack();
         Vec3d pos = player.getPos();
