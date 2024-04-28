@@ -60,7 +60,6 @@ public class Battlegrounds implements ModInitializer {
 
     public void reload() {
         this.loadConfigs();
-
         Items.addRecipes();
     }
 

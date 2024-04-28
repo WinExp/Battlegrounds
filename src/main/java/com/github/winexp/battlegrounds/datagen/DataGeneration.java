@@ -1,7 +1,12 @@
 package com.github.winexp.battlegrounds.datagen;
 
+import com.github.winexp.battlegrounds.structure.StructurePools;
+import com.github.winexp.battlegrounds.structure.StructureSets;
+import com.github.winexp.battlegrounds.structure.Structures;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+import net.minecraft.registry.RegistryBuilder;
+import net.minecraft.registry.RegistryKeys;
 
 public class DataGeneration implements DataGeneratorEntrypoint {
     @Override
@@ -15,5 +20,12 @@ public class DataGeneration implements DataGeneratorEntrypoint {
         pack.addProvider(ModItemModelGenerator::new);
         pack.addProvider(ModRecipeGenerator::new);
         pack.addProvider(ModGamePropertiesGenerator::new);
+    }
+
+    @Override
+    public void buildRegistry(RegistryBuilder registryBuilder) {
+        registryBuilder.addRegistry(RegistryKeys.TEMPLATE_POOL, StructurePools::bootstrap)
+                .addRegistry(RegistryKeys.STRUCTURE, Structures::bootstrap)
+                .addRegistry(RegistryKeys.STRUCTURE_SET, StructureSets::bootstrap);
     }
 }

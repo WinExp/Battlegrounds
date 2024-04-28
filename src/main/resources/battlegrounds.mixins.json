@@ -14,10 +14,7 @@
     "events_PlayerManagerMixin",
     "ShapedRecipeAccessor",
     "shapeType_RaycastContextMixin",
-    "shield_LivingEntityMixin",
-    "structure.structures_StructurePoolsMixin",
-    "structure.structures_StructureSetsMixin",
-    "structure.structures_StructuresMixin"
+    "shield_LivingEntityMixin"
   ],
   "client": [
     "client.flashSound_AbstractSoundInstanceMixin",

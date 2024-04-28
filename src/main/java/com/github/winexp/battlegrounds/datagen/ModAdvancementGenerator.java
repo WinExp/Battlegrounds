@@ -1,8 +1,7 @@
 package com.github.winexp.battlegrounds.datagen;
 
 import com.github.winexp.battlegrounds.item.Items;
-import com.github.winexp.battlegrounds.registry.RegistryKeys;
-import com.github.winexp.battlegrounds.structure.StructureKeys;
+import com.github.winexp.battlegrounds.structure.Structures;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricAdvancementProvider;
 import net.minecraft.advancement.Advancement;
@@ -15,6 +14,7 @@ import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.potion.Potions;
 import net.minecraft.predicate.entity.LocationPredicate;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -66,7 +66,7 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
         AdvancementEntry medievalFortressAdvancement = this.requiredAllStructuresArrived(
                         wrapperLookup,
                         Advancement.Builder.create(),
-                        StructureKeys.MEDIEVAL_FORTRESS
+                        Structures.MEDIEVAL_FORTRESS
                 )
                 .parent(rootAdvancement)
                 .display(
@@ -82,7 +82,7 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
         AdvancementEntry relicOfFantasyAdvancement = this.requiredAllStructuresArrived(
                         wrapperLookup,
                         Advancement.Builder.create(),
-                        StructureKeys.RELIC_OF_FANTASY
+                        Structures.RELIC_OF_FANTASY
                 )
                 .parent(rootAdvancement)
                 .display(
@@ -98,7 +98,7 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
         AdvancementEntry wineShopAdvancement = this.requiredAllStructuresArrived(
                         wrapperLookup,
                         Advancement.Builder.create(),
-                        StructureKeys.WINE_SHOP
+                        Structures.WINE_SHOP
                 )
                 .parent(rootAdvancement)
                 .display(
@@ -114,7 +114,7 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
         AdvancementEntry libraryAdvancement = this.requiredAllStructuresArrived(
                         wrapperLookup,
                         Advancement.Builder.create(),
-                        StructureKeys.LIBRARY
+                        Structures.LIBRARY
                 )
                 .parent(rootAdvancement)
                 .display(
@@ -130,15 +130,15 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
         AdvancementEntry allStructuresAdvancement = this.requiredAllStructuresArrived(
                         wrapperLookup,
                         Advancement.Builder.create(),
-                        StructureKeys.ANCIENT_RUINS,
-                        StructureKeys.CANOPIES,
-                        StructureKeys.DESERT_HUT,
-                        StructureKeys.IZAKAYA,
-                        StructureKeys.KIOSK,
-                        StructureKeys.LIBRARY,
-                        StructureKeys.MEDIEVAL_FORTRESS,
-                        StructureKeys.MEDIEVAL_LIBRARY,
-                        StructureKeys.WINE_SHOP
+                        Structures.ANCIENT_RUINS,
+                        Structures.CANOPIES,
+                        Structures.DESERT_HUT,
+                        Structures.IZAKAYA,
+                        Structures.KIOSK,
+                        Structures.LIBRARY,
+                        Structures.MEDIEVAL_FORTRESS,
+                        Structures.MEDIEVAL_LIBRARY,
+                        Structures.WINE_SHOP
                 )
                 .parent(rootAdvancement)
                 .display(
