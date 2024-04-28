@@ -19,15 +19,4 @@ public class MinersPickaxeItem extends PickaxeItem implements EnchantRestrict {
     public boolean isEnchantable(ItemStack stack) {
         return false;
     }
-
-    /*
-    RawShapedRecipe rawShaped = RawShapedRecipe.create(Map.of(
-                        'a', Ingredient.ofItems(Items.RAW_IRON),
-                        'b', Ingredient.fromTag(ItemTags.COALS),
-                        'c', Ingredient.ofItems(Items.STICK)
-                ),
-                "aaa",
-                "bcb",
-                " c ");
-    */
 }

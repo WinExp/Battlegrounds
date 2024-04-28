@@ -2,10 +2,10 @@ package com.github.winexp.battlegrounds.discussion.vote;
 
 import com.github.winexp.battlegrounds.event.ModServerPlayerEvents;
 import com.github.winexp.battlegrounds.event.ServerVoteEvents;
-import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.PlayerVotedPayloadS2C;
-import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.SyncVoteInfosPayloadS2C;
-import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.VoteClosedPayloadS2C;
-import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.VoteOpenedPayloadS2C;
+import com.github.winexp.battlegrounds.network.payload.s2c.play.vote.PlayerVotedPayloadS2C;
+import com.github.winexp.battlegrounds.network.payload.s2c.play.vote.SyncVoteInfosPayloadS2C;
+import com.github.winexp.battlegrounds.network.payload.s2c.play.vote.VoteClosedPayloadS2C;
+import com.github.winexp.battlegrounds.network.payload.s2c.play.vote.VoteOpenedPayloadS2C;
 import com.github.winexp.battlegrounds.util.Variables;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.ClientConnection;

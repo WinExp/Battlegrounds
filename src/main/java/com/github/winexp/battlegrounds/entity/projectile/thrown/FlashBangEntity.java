@@ -2,7 +2,7 @@ package com.github.winexp.battlegrounds.entity.projectile.thrown;
 
 import com.github.winexp.battlegrounds.entity.EntityTypes;
 import com.github.winexp.battlegrounds.item.Items;
-import com.github.winexp.battlegrounds.network.packet.s2c.play.FlashPayloadS2C;
+import com.github.winexp.battlegrounds.network.payload.s2c.play.FlashPayloadS2C;
 import com.github.winexp.battlegrounds.sound.SoundEvents;
 import com.github.winexp.battlegrounds.util.MathUtil;
 import com.github.winexp.battlegrounds.util.ParticleUtil;

@@ -12,8 +12,12 @@
     "enchantRestrict_GrindstoneScreenHandlerMixin",
     "events_PlayerEntityMixin",
     "events_PlayerManagerMixin",
+    "ShapedRecipeAccessor",
     "shapeType_RaycastContextMixin",
-    "shield_LivingEntityMixin"
+    "shield_LivingEntityMixin",
+    "structure.structures_StructurePoolsMixin",
+    "structure.structures_StructureSetsMixin",
+    "structure.structures_StructuresMixin"
   ],
   "client": [
     "client.flashSound_AbstractSoundInstanceMixin",

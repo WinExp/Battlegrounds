@@ -1,7 +1,7 @@
 package com.github.winexp.battlegrounds.item.tool;
 
 import com.github.winexp.battlegrounds.item.EnchantRestrict;
-import com.github.winexp.battlegrounds.network.packet.c2s.play.RupertsTearTeleportPayloadC2S;
+import com.github.winexp.battlegrounds.network.payload.c2s.play.RupertsTearTeleportPayloadC2S;
 import com.github.winexp.battlegrounds.registry.tag.ModFluidTags;
 import com.github.winexp.battlegrounds.util.MathUtil;
 import com.github.winexp.battlegrounds.util.BlockUtil;

@@ -6,6 +6,8 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 
 public record ModGameConfig(boolean displayPlayerNameLabel) {
+    public static final ModGameConfig DEFAULT = new ModGameConfig(true);
+
     public static final Codec<ModGameConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.BOOL.fieldOf("display_player_name_label").forGetter(ModGameConfig::displayPlayerNameLabel)
     ).apply(instance, ModGameConfig::new));

@@ -1,6 +1,6 @@
 package com.github.winexp.battlegrounds;
 
-import com.github.winexp.battlegrounds.block.BlockSmeltableRegistry;
+import com.github.winexp.battlegrounds.block.SmeltableBlockRegistry;
 import com.github.winexp.battlegrounds.command.BattlegroundsCommand;
 import com.github.winexp.battlegrounds.command.RandomTpCommand;
 import com.github.winexp.battlegrounds.command.argument.PVPModeArgumentType;
@@ -18,17 +18,18 @@ import com.github.winexp.battlegrounds.loot.function.LootFunctionTypes;
 import com.github.winexp.battlegrounds.mixin.ArgumentTypesInvoker;
 import com.github.winexp.battlegrounds.network.ModServerConfigurationNetworkHandler;
 import com.github.winexp.battlegrounds.network.ModServerPlayNetworkHandler;
-import com.github.winexp.battlegrounds.network.packet.c2s.config.ModInfoPayloadC2S;
-import com.github.winexp.battlegrounds.network.packet.c2s.play.RupertsTearTeleportPayloadC2S;
-import com.github.winexp.battlegrounds.network.packet.c2s.play.vote.GetVoteInfoPayloadC2S;
-import com.github.winexp.battlegrounds.network.packet.c2s.play.vote.SyncVoteInfosPayloadC2S;
-import com.github.winexp.battlegrounds.network.packet.c2s.play.vote.VotePayloadC2S;
-import com.github.winexp.battlegrounds.network.packet.s2c.play.FlashPayloadS2C;
-import com.github.winexp.battlegrounds.network.packet.s2c.play.config.ModGameConfigPayloadS2C;
-import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.*;
+import com.github.winexp.battlegrounds.network.payload.c2s.config.ModInfoPayloadC2S;
+import com.github.winexp.battlegrounds.network.payload.c2s.play.RupertsTearTeleportPayloadC2S;
+import com.github.winexp.battlegrounds.network.payload.c2s.play.vote.GetVoteInfoPayloadC2S;
+import com.github.winexp.battlegrounds.network.payload.c2s.play.vote.SyncVoteInfosPayloadC2S;
+import com.github.winexp.battlegrounds.network.payload.c2s.play.vote.VotePayloadC2S;
+import com.github.winexp.battlegrounds.network.payload.s2c.config.ModInfoPayloadS2C;
+import com.github.winexp.battlegrounds.network.payload.s2c.play.FlashPayloadS2C;
+import com.github.winexp.battlegrounds.network.payload.s2c.play.config.ModGameConfigPayloadS2C;
+import com.github.winexp.battlegrounds.network.payload.s2c.play.vote.*;
 import com.github.winexp.battlegrounds.resource.listener.DataPackResourceReloadListener;
 import com.github.winexp.battlegrounds.sound.SoundEvents;
-import com.github.winexp.battlegrounds.task.ServerTaskScheduler;
+import com.github.winexp.battlegrounds.util.task.TaskScheduler;
 import com.github.winexp.battlegrounds.util.Constants;
 import com.github.winexp.battlegrounds.util.FileUtil;
 import com.github.winexp.battlegrounds.util.Variables;
@@ -78,7 +79,7 @@ public class Battlegrounds implements ModInitializer {
     }
 
     private void onServerStopping(MinecraftServer server) {
-        ServerTaskScheduler.INSTANCE.cancelAllTasks();
+        TaskScheduler.INSTANCE.cancelAllTasks();
     }
 
     private void onSaving(MinecraftServer server, boolean flush, boolean force) {
@@ -103,6 +104,7 @@ public class Battlegrounds implements ModInitializer {
     }
 
     private void registerCustomPayloads() {
+        PayloadTypeRegistry.configurationS2C().register(ModInfoPayloadS2C.ID, ModInfoPayloadS2C.PACKET_CODEC);
         PayloadTypeRegistry.playS2C().register(ModGameConfigPayloadS2C.ID, ModGameConfigPayloadS2C.PACKET_CODEC);
         PayloadTypeRegistry.playS2C().register(SyncVoteInfosPayloadS2C.ID, SyncVoteInfosPayloadS2C.PACKET_CODEC);
         PayloadTypeRegistry.playS2C().register(UpdateVoteInfoPayloadS2C.ID, UpdateVoteInfoPayloadS2C.PACKET_CODEC);
@@ -153,7 +155,7 @@ public class Battlegrounds implements ModInitializer {
         // 注册附魔
         Enchantments.registerEnchantments();
         // 自动冶炼
-        BlockSmeltableRegistry.registerDefaults();
+        SmeltableBlockRegistry.registerDefaults();
         // 注册声音事件
         SoundEvents.registerSoundEvents();
         // 注册指令参数类型

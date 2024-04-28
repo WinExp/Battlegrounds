@@ -2,6 +2,7 @@ package com.github.winexp.battlegrounds.item.tool;
 
 import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
 import com.github.winexp.battlegrounds.item.EnchantRestrict;
+import com.google.common.collect.ImmutableList;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -12,7 +13,7 @@ import net.minecraft.item.ToolMaterial;
 import java.util.List;
 
 public class KnockbackStickItem extends ToolItem implements EnchantRestrict {
-    private static final List<StatusEffectInstance> ATTACK_EFFECTS = List.of(
+    private static final List<StatusEffectInstance> ATTACK_EFFECTS = ImmutableList.of(
             new StatusEffectInstance(StatusEffects.SLOWNESS, 5 * 20, 2),
             new StatusEffectInstance(StatusEffects.NAUSEA, 5 * 20, 0)
     );

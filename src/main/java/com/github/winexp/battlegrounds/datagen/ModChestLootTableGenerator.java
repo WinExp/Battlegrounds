@@ -233,8 +233,8 @@ public class ModChestLootTableGenerator extends SimpleFabricLootTableProvider {
                                 .with(ItemEntry.builder(Items.IRON_INGOT).weight(2)
                                         .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(3.0F, 5.0F))))
                                 .with(ItemEntry.builder(Items.GOLD_INGOT).weight(3)
-                                        .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(3.0F, 8.0F))))
-                                .with(ItemEntry.builder(Items.DIAMOND).weight(3)
+                                        .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(4.0F, 9.0F))))
+                                .with(ItemEntry.builder(Items.DIAMOND).weight(2)
                                         .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(2.0F, 5.0F))))
                         )
         );

@@ -7,7 +7,8 @@ import com.github.winexp.battlegrounds.discussion.vote.VotePreset;
 import com.github.winexp.battlegrounds.entity.projectile.thrown.FlashBangEntity;
 import com.github.winexp.battlegrounds.game.GameProperties;
 import com.github.winexp.battlegrounds.game.PVPMode;
-import com.github.winexp.battlegrounds.task.ServerTaskScheduler;
+import com.github.winexp.battlegrounds.resource.listener.DataPackResourceReloadListener;
+import com.github.winexp.battlegrounds.util.task.TaskScheduler;
 import com.github.winexp.battlegrounds.util.*;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.ArgumentBuilder;
@@ -67,7 +68,7 @@ public class BattlegroundsCommand {
         var cStart = literal("start");
         var aProp = argument("gameProperties", IdentifierArgumentType.identifier())
                 .suggests(((context, builder) ->
-                        CommandSource.suggestMatching(Constants.GAME_PROPERTIES.keySet().stream().map(Identifier::toString), builder)))
+                        CommandSource.suggestMatching(DataPackResourceReloadListener.GAME_PROPERTIES.keySet().stream().map(Identifier::toString), builder)))
                 .executes(BattlegroundsCommand::executeStart);
         return cStart.then(aProp);
     }
@@ -125,10 +126,10 @@ public class BattlegroundsCommand {
     private static int executeStart(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerCommandSource source = context.getSource();
         Identifier id = IdentifierArgumentType.getIdentifier(context, "gameProperties");
-        if (!Constants.GAME_PROPERTIES.containsKey(id)) {
+        if (!DataPackResourceReloadListener.GAME_PROPERTIES.containsKey(id)) {
             throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument().create();
         }
-        GameProperties gameProperties = Constants.GAME_PROPERTIES.get(id);
+        GameProperties gameProperties = DataPackResourceReloadListener.GAME_PROPERTIES.get(id);
         if (VoteManager.INSTANCE.containsVote(VotePreset.START_GAME.identifier())) {
             source.sendFeedback(() -> Text.translatable("vote.battlegrounds.already_voting.feedback")
                     .formatted(Formatting.RED), false);
@@ -142,7 +143,7 @@ public class BattlegroundsCommand {
 
     private static int executeStop(CommandContext<ServerCommandSource> context) {
         VoteManager.INSTANCE.closeAllVotes();
-        ServerTaskScheduler.INSTANCE.cancelAllTasks();
+        TaskScheduler.INSTANCE.cancelAllTasks();
         Variables.gameManager.stopGame();
         context.getSource().sendFeedback(() -> Text.translatable("commands.battlegrounds.stop.feedback")
                 .formatted(Formatting.GREEN), true);

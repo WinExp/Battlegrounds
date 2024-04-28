@@ -4,6 +4,7 @@ import com.github.winexp.battlegrounds.entity.EntityTypes;
 import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.util.ParticleUtil;
+import com.google.common.collect.ImmutableList;
 import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
@@ -22,7 +23,7 @@ import net.minecraft.world.World;
 import java.util.*;
 
 public class ChannelingArrowEntity extends PersistentProjectileEntity {
-    private static final List<StatusEffectInstance> STATUS_EFFECTS = List.of(
+    private static final List<StatusEffectInstance> STATUS_EFFECTS = ImmutableList.of(
             new StatusEffectInstance(StatusEffects.SLOWNESS, 5 * 20, 1),
             new StatusEffectInstance(StatusEffects.WEAKNESS, 5 * 20, 0),
             new StatusEffectInstance(StatusEffects.POISON, 5 * 20, 1),

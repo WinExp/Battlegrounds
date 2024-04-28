@@ -2,6 +2,7 @@ package com.github.winexp.battlegrounds.item.weapon;
 
 import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
 import com.github.winexp.battlegrounds.item.EnchantRestrict;
+import com.google.common.collect.ImmutableList;
 import net.fabricmc.fabric.api.item.v1.CustomDamageHandler;
 import net.fabricmc.fabric.api.item.v1.EquipmentSlotProvider;
 import net.minecraft.client.item.TooltipType;
@@ -89,10 +90,10 @@ public class LegendarySwordItem extends SwordItem implements EnchantRestrict {
     }
 
     public static class Settings extends Item.Settings {
-        private final List<StatusEffectInstance> enrichEffects = new ArrayList<>(List.of(
+        private final List<StatusEffectInstance> enrichEffects = new ArrayList<>(ImmutableList.of(
                 new StatusEffectInstance(StatusEffects.RESISTANCE, 2 * 20, 0)
         ));
-        private final List<StatusEffectInstance> attackEffects = new ArrayList<>(List.of(
+        private final List<StatusEffectInstance> attackEffects = new ArrayList<>(ImmutableList.of(
                 new StatusEffectInstance(StatusEffects.APPROACHING_EXTINCTION, 15 * 20, 0)
         ));
         private int attackEffectBound = 100;

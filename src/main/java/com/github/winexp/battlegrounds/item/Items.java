@@ -11,6 +11,7 @@ import com.github.winexp.battlegrounds.item.mining.*;
 import com.github.winexp.battlegrounds.item.thrown.*;
 import com.github.winexp.battlegrounds.item.tool.*;
 import com.github.winexp.battlegrounds.util.RecipeUtil;
+import com.google.common.collect.ImmutableList;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.DispenserBlock;
@@ -108,13 +109,11 @@ public class Items extends net.minecraft.item.Items {
             .rarity(Rarity.UNCOMMON)
             .attributeModifiers(PickaxeItem.createAttributeModifiers(ToolMaterials.MINERS_PICKAXE, 1, -2.8F))
             .component(DataComponentTypes.ENCHANTMENTS, Util.make(new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT), component -> {
-                component.add(Enchantments.FORTUNE, 3);
-                component.add(Enchantments.EFFICIENCY, 5);
+                component.add(Enchantments.FORTUNE, 1);
+                component.add(Enchantments.EFFICIENCY, 3);
                 component.add(Enchantments.SMELTING, 1);
                 component.add(Enchantments.MENDING, 1);
                 component.add(Enchantments.UNBREAKING, 3);
-                component.add(Enchantments.FIRE_ASPECT, 2);
-                component.add(Enchantments.KNOCKBACK, 2);
             }).build())
     ));
     public static final ButchersAxeItem BUTCHERS_AXE = registerItem("butchers_axe", new ButchersAxeItem(ToolMaterials.BUTCHERS_AXE, new Item.Settings()
@@ -162,8 +161,12 @@ public class Items extends net.minecraft.item.Items {
             .rarity(Rarity.COMMON)
             .maxCount(16)
     ));
-    public static final Item ADVANCED_PRECISION_CORE = registerItem("advanced_precision_core", new AdvancedPrecisionCoreItem(new Item.Settings()
+    public static final AdvancedPrecisionCoreItem ADVANCED_PRECISION_CORE = registerItem("advanced_precision_core", new AdvancedPrecisionCoreItem(new Item.Settings()
             .rarity(Rarity.UNCOMMON)
+            .maxCount(8)
+    ));
+    public static final AdvancedPrecisionCoreItem SEVEN_ELEVEN_PRECISION_CORE = registerItem("seven_eleven_precision_core", new AdvancedPrecisionCoreItem(new Item.Settings()
+            .rarity(Rarity.EPIC)
             .maxCount(8)
     ));
 
@@ -213,7 +216,7 @@ public class Items extends net.minecraft.item.Items {
     }
 
     private static void addCustomRecipes() {
-        List<ShapedNbtRecipe> shapedRecipes = List.of(
+        List<ShapedNbtRecipe> shapedRecipes = ImmutableList.of(
                 // 自动冶炼
                 new ShapedNbtRecipe(
                         new Identifier("battlegrounds", "enchanted_book_smelting"),
@@ -252,7 +255,7 @@ public class Items extends net.minecraft.item.Items {
                         })
                 )
         );
-        List<ShapelessNbtRecipe> shapelessRecipes = List.of(
+        List<ShapelessNbtRecipe> shapelessRecipes = ImmutableList.of(
                 // 锋利 1 附魔书
                 new ShapelessNbtRecipe(
                         new Identifier("battlegrounds", "enchanted_book_sharpness_1"),
@@ -260,7 +263,7 @@ public class Items extends net.minecraft.item.Items {
                         EnchantedBookItem.forEnchantment(new EnchantmentLevelEntry(
                                 Enchantments.SHARPNESS, 1
                         )),
-                        List.of(
+                        ImmutableList.of(
                                 Ingredient.ofItems(IRON_SWORD),
                                 Ingredient.ofItems(BOOK)
                         )
@@ -272,7 +275,7 @@ public class Items extends net.minecraft.item.Items {
                         EnchantedBookItem.forEnchantment(new EnchantmentLevelEntry(
                                 Enchantments.PROTECTION, 1
                         )),
-                        List.of(
+                        ImmutableList.of(
                                 Ingredient.ofItems(IRON_CHESTPLATE),
                                 Ingredient.ofItems(BOOK)
                         )
@@ -284,7 +287,7 @@ public class Items extends net.minecraft.item.Items {
                         EnchantedBookItem.forEnchantment(new EnchantmentLevelEntry(
                                 Enchantments.POWER, 1
                         )),
-                        List.of(
+                        ImmutableList.of(
                                 Ingredient.ofItems(BOW),
                                 Ingredient.ofItems(BOOK)
                         )

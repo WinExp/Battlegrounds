@@ -109,7 +109,7 @@ public class MolotovEntity extends ThrownItemEntity {
             areaEffectCloud.setDuration(12 * 20);
             areaEffectCloud.setWaitTime(20);
             areaEffectCloud.setRadius(5.0F);
-            areaEffectCloud.setRadiusGrowth((areaEffectCloud.getRadius() * 0.4F) / areaEffectCloud.getDuration());
+            areaEffectCloud.setRadiusGrowth(-(7 - areaEffectCloud.getRadius()) / areaEffectCloud.getDuration());
             areaEffectCloud.setOwner(this.getOwner() == null ? null : (LivingEntity) this.getOwner());
             world.spawnEntity(areaEffectCloud);
             this.discard();

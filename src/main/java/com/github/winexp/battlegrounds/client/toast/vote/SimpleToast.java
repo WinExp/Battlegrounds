@@ -1,6 +1,7 @@
 package com.github.winexp.battlegrounds.client.toast.vote;
 
 import com.github.winexp.battlegrounds.util.time.Duration;
+import com.google.common.collect.ImmutableList;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.toast.ToastManager;
@@ -9,7 +10,6 @@ import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Supplier;
 
 public abstract class SimpleToast extends AutoWidthToast {
@@ -36,7 +36,7 @@ public abstract class SimpleToast extends AutoWidthToast {
 
     @Override
     public final Collection<Text> getLines() {
-        return List.of(title.get(), subtitle.get());
+        return ImmutableList.of(title.get(), subtitle.get());
     }
 
     @Override

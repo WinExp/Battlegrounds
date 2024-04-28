@@ -27,8 +27,8 @@
   "commands.battlegrounds.reload.feedback": "已重载配置文件",
   "commands.battlegrounds.stop.feedback": "已停止所有任务",
 
-  "disconnect.battlegrounds.config.mod_info.failed": "你的 Battlegrounds 版本与服务器不兼容！\n你的版本：%s-%d\n服务器版本：%s-%d",
-  "disconnect.battlegrounds.config.mod_info.not_found": "你的 Battlegrounds 版本过旧或你未安装 Battlegrounds\n服务器版本：%s-%d",
+  "disconnect.battlegrounds.config.mod_info.not_found": "你的 Battlegrounds 版本过旧或你未安装 Battlegrounds\n服务器版本：%s",
+  "disconnect.battlegrounds.config.mod_info.wrong": "你的 Battlegrounds 版本与服务器不兼容！\n你的版本：%s\n服务器版本：%s",
 
   "effect.battlegrounds.adrenaline": "肾上腺素",
   "effect.battlegrounds.approaching_extinction": "濒死",

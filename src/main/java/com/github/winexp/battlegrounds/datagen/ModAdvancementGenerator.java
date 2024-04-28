@@ -2,7 +2,7 @@ package com.github.winexp.battlegrounds.datagen;
 
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.registry.RegistryKeys;
-import com.github.winexp.battlegrounds.world.gen.structure.StructureKeys;
+import com.github.winexp.battlegrounds.structure.StructureKeys;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricAdvancementProvider;
 import net.minecraft.advancement.Advancement;
@@ -44,7 +44,7 @@ public class ModAdvancementGenerator extends FabricAdvancementProvider {
                 .criterion("tick", TickCriterion.Conditions.createTick())
                 .build(exporter, "battlegrounds:story/root");
         this.generateItemAdvancements(wrapperLookup ,rootAdvancement, exporter);
-        //this.generateStructureAdvancements(wrapperLookup, rootAdvancement, exporter);
+        this.generateStructureAdvancements(wrapperLookup, rootAdvancement, exporter);
     }
 
     @SafeVarargs

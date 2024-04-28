@@ -1,5 +1,6 @@
 package com.github.winexp.battlegrounds.enchantment;
 
+import com.google.common.collect.ImmutableList;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -12,7 +13,7 @@ import java.util.List;
 
 public class StevesPainEnchantment extends Enchantment {
     private static final float EFFECT_CHANCE = 0.3F;
-    private static final List<StatusEffectInstance> ATTACK_EFFECTS = List.of(
+    private static final List<StatusEffectInstance> ATTACK_EFFECTS = ImmutableList.of(
             new StatusEffectInstance(StatusEffects.SLOWNESS, 5 * 20, 1),
             new StatusEffectInstance(StatusEffects.WITHER, 5 * 20, 2),
             new StatusEffectInstance(StatusEffects.POISON, 5 * 20, 0),

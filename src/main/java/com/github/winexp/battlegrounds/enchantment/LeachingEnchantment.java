@@ -1,6 +1,7 @@
 package com.github.winexp.battlegrounds.enchantment;
 
 import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
+import com.google.common.collect.ImmutableList;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -10,7 +11,7 @@ import net.minecraft.registry.tag.ItemTags;
 import java.util.List;
 
 public class LeachingEnchantment extends Enchantment {
-    private static final List<StatusEffectInstance> ATTACK_EFFECTS = List.of(
+    private static final List<StatusEffectInstance> ATTACK_EFFECTS = ImmutableList.of(
             new StatusEffectInstance(StatusEffects.POISON, 5 * 20, 3),
             new StatusEffectInstance(StatusEffects.SLOWNESS, 5 * 20, 0),
             new StatusEffectInstance(StatusEffects.HUNGER, 5 * 20, 2),

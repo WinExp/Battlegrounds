@@ -35,4 +35,9 @@ public record ModVersion(Version version, int protocolVersion) {
             buf.writeInt(value.protocolVersion);
         }
     };
+
+    @Override
+    public String toString() {
+        return this.version.getFriendlyString() + '-' + this.protocolVersion;
+    }
 }

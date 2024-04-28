@@ -2,10 +2,10 @@ package com.github.winexp.battlegrounds.client.gui.screen.vote;
 
 import com.github.winexp.battlegrounds.client.KeyBindings;
 import com.github.winexp.battlegrounds.discussion.vote.VoteInfo;
-import com.github.winexp.battlegrounds.network.packet.c2s.play.vote.VotePayloadC2S;
-import com.github.winexp.battlegrounds.network.packet.c2s.play.vote.SyncVoteInfosPayloadC2S;
-import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.UpdateVoteInfoPayloadS2C;
-import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.SyncVoteInfosPayloadS2C;
+import com.github.winexp.battlegrounds.network.payload.c2s.play.vote.VotePayloadC2S;
+import com.github.winexp.battlegrounds.network.payload.c2s.play.vote.SyncVoteInfosPayloadC2S;
+import com.github.winexp.battlegrounds.network.payload.s2c.play.vote.UpdateVoteInfoPayloadS2C;
+import com.github.winexp.battlegrounds.network.payload.s2c.play.vote.SyncVoteInfosPayloadS2C;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;

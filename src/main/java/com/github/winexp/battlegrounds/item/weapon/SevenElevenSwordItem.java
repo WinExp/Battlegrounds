@@ -23,25 +23,4 @@ public class SevenElevenSwordItem extends LegendarySwordItem {
                 .formatted(Formatting.GOLD)
                 .styled(style -> style.withBold(true)));
     }
-
-    /*
-    return new ShapedItemNbtRecipe(
-                RawShapedRecipe.create(
-                        Map.of(
-                                'a', Ingredient.ofItems(Items.DIAMOND),
-                                'b', Ingredient.ofItems(Items.AMETHYST_SHARD),
-                                'c', Ingredient.ofStacks(PotionContentsComponent.createStack(Items.SPLASH_POTION, Potions.TURTLE_MASTER)),
-                                'd', Ingredient.ofItems(Items.NETHERITE_SWORD),
-                                'e', Ingredient.ofStacks(PotionContentsComponent.createStack(Items.SPLASH_POTION, Potions.STRONG_SWIFTNESS)),
-                                'f', Ingredient.ofItems(Items.DIAMOND_BLOCK),
-                                'g', Ingredient.ofItems(Items.PRECISION_CORE)
-                        ),
-                        "aba",
-                        "cde",
-                        "fgf"
-                ),
-                CraftingRecipeCategory.EQUIPMENT,
-                this.getDefaultStack()
-        ).getRecipe();
-    */
 }

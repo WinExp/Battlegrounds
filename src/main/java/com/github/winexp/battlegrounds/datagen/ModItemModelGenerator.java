@@ -31,6 +31,7 @@ public class ModItemModelGenerator extends FabricModelProvider {
         itemModelGenerator.register(Items.KNOCKBACK_STICK, Models.GENERATED);
         itemModelGenerator.register(Items.PRECISION_CORE, Models.GENERATED);
         itemModelGenerator.register(Items.ADVANCED_PRECISION_CORE, Models.GENERATED);
+        itemModelGenerator.register(Items.SEVEN_ELEVEN_PRECISION_CORE, Models.GENERATED);
         itemModelGenerator.register(Items.BEEF_NOODLE_SOUP, Models.GENERATED);
         itemModelGenerator.register(Items.SIX_FLAVOURED_DIHUANG_PILL, Models.GENERATED);
     }

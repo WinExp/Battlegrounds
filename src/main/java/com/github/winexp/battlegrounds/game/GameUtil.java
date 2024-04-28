@@ -17,7 +17,7 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Collections;
 
 public class GameUtil {
     public static void createDeleteWorldTmpFile(Path savePath) {
@@ -56,7 +56,7 @@ public class GameUtil {
             FireworkExplosionComponent explosion = new FireworkExplosionComponent(shape, colors, fadeColors, hasTrail, hasTwinkle);
             ItemStack stack = new ItemStack(Items.FIREWORK_ROCKET);
             stack.applyChanges(ComponentChanges.builder()
-                    .add(DataComponentTypes.FIREWORKS, new FireworksComponent(flightTime, List.of(explosion)))
+                    .add(DataComponentTypes.FIREWORKS, new FireworksComponent(flightTime, Collections.singletonList(explosion)))
                     .build());
             FireworkRocketEntity firework = new FireworkRocketEntity(world, x, y, z, stack);
             firework.noClip = true;
