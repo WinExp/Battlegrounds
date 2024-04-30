@@ -53,12 +53,10 @@ public class ModRecipeGenerator extends FabricRecipeProvider {
 
         this.identifierNamespace = this.output.getModId();
         ModShapedRecipeJsonBuilder.create(RecipeCategory.MISC, Items.ADVANCED_PRECISION_CORE)
-                .pattern("DBD")
-                .pattern("EPE")
+                .pattern("D D")
+                .pattern(" P ")
                 .pattern("DND")
                 .input('D', ConventionalItemTags.DIAMONDS)
-                .input('B', Items.BLAZE_ROD)
-                .input('E', ConventionalItemTags.EMERALDS)
                 .input('P', Items.PRECISION_CORE)
                 .input('N', ConventionalItemTags.NETHERITE_INGOTS)
                 .offerTo(exporter);

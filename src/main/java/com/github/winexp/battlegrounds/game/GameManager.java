@@ -423,7 +423,6 @@ public class GameManager extends PersistentState implements GameListener {
 
     public void enableInfoBossBar() {
         this.ensureIsGaming();
-        this.ensureBorderResizeEnabled();
         BossBarManager manager = this.server.getBossBarManager();
         CommandBossBar bossBar = manager.get(RESIZE_BOSS_BAR_ID);
         if (bossBar == null) {
@@ -469,7 +468,7 @@ public class GameManager extends PersistentState implements GameListener {
                             .formatted(Formatting.RED));
             this.resizeBossBar.setMaxValue(timeoutTimeTicks);
             this.resizeBossBar.setValue(this.timeoutTask.getDelayTicks());
-        } else if (this.borderStage == GameBorderStage.WAITING) {
+        } else if (this.borderStage == GameBorderStage.WAITING && !this.resizeBorderTask.isCancelled()) {
             int delayTimeTicks = this.currentStage.resizeTimeInfo().delayTime().toTicks();
             this.resizeBossBar.setName(
                     Text.translatable(
@@ -479,7 +478,7 @@ public class GameManager extends PersistentState implements GameListener {
                     .formatted(Formatting.GREEN));
             this.resizeBossBar.setMaxValue(delayTimeTicks);
             this.resizeBossBar.setValue(this.resizeBorderTask.getDelayTicks());
-        } else if (this.borderStage == GameBorderStage.RESIZING) {
+        } else if (this.borderStage == GameBorderStage.RESIZING && !this.borderResizingTask.isCancelled()) {
             int spendTimeTicks = this.currentStage.resizeTimeInfo().spendTime().toTicks();
             this.resizeBossBar.setName(
                     Text.translatable(
@@ -489,6 +488,8 @@ public class GameManager extends PersistentState implements GameListener {
                             .formatted(Formatting.GOLD));
             this.resizeBossBar.setMaxValue(spendTimeTicks);
             this.resizeBossBar.setValue(this.borderResizingTask.getDelayTicks());
+        } else {
+            this.updateBossBarTask.cancel();
         }
     }
 
@@ -605,18 +606,10 @@ public class GameManager extends PersistentState implements GameListener {
     public void resumeGame(int resizeTimer, int resizingTimer, int timeoutTimer) {
         this.ensureIsGaming();
         this.ensureGamePropertiesNotNull();
-        if (resizeTimer > 0) {
-            this.enableBorderResizing(resizeTimer);
-        }
-        if (resizingTimer > 0) {
-            this.startBorderResizingTimer(resizingTimer);
-        }
-        if (timeoutTimer > 0) {
-            this.enableTimeoutTimer(timeoutTimer);
-        }
-        if (resizeTimer >= 0 || resizingTimer > 0 || timeoutTimer > 0) {
-            this.enableInfoBossBar();
-        }
+        this.enableBorderResizing(resizeTimer);
+        this.startBorderResizingTimer(resizingTimer);
+        this.enableTimeoutTimer(timeoutTimer);
+        this.enableInfoBossBar();
         this.syncData();
     }
 
