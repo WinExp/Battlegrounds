@@ -60,5 +60,5 @@ jobs:
       - name: Upload assets to GitHub Action
         uses: actions/upload-artifact@v3
         with:
-          name: "${{ steps.mod_info.outputs.mod_name }} ${{ steps.mod_info.outputs.mod_version }}.${{ steps.get_commit_count.outputs.commit_count }}+${{ steps.get_short_sha.outputs.short_sha }}"
+          name: "${{ steps.mod_info.outputs.mod_name }} ${{ steps.mod_info.outputs.mod_version }}+${{ steps.get_short_sha.outputs.short_sha }}"
           path: build/libs/*.jar

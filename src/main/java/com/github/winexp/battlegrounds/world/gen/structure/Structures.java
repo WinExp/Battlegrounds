@@ -1,4 +1,4 @@
-package com.github.winexp.battlegrounds.structure;
+package com.github.winexp.battlegrounds.world.gen.structure;
 
 import net.minecraft.registry.Registerable;
 import net.minecraft.registry.RegistryEntryLookup;
@@ -48,7 +48,7 @@ public class Structures extends net.minecraft.world.gen.structure.Structures {
                 ConstantHeightProvider.create(YOffset.fixed(yOffset)), false, Heightmap.Type.WORLD_SURFACE_WG));
     }
 
-    public static void bootstrap(Registerable<Structure> structureRegisterable) {
+    public static void register(Registerable<Structure> structureRegisterable) {
         registerDefault(structureRegisterable, Structures.ANCIENT_RUINS, StructurePools.ANCIENT_RUINS, 1);
         registerDefault(structureRegisterable, Structures.CANOPIES, StructurePools.CANOPIES, 1);
         registerDefault(structureRegisterable, Structures.DESERT_HUT, StructurePools.DESERT_HUT, 0);

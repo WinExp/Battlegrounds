@@ -1,4 +1,4 @@
-package com.github.winexp.battlegrounds.structure;
+package com.github.winexp.battlegrounds.world.gen.structure;
 
 import net.minecraft.registry.Registerable;
 import net.minecraft.registry.RegistryEntryLookup;
@@ -39,7 +39,7 @@ public class StructureSets implements net.minecraft.structure.StructureSets {
                 new RandomSpreadStructurePlacement(spacing, separation, SpreadType.LINEAR, getSalt(structureSetKey))));
     }
 
-    public static void bootstrap(Registerable<StructureSet> structureSetRegisterable) {
+    public static void register(Registerable<StructureSet> structureSetRegisterable) {
         registerDefault(structureSetRegisterable, StructureSets.ANCIENT_RUINS, Structures.ANCIENT_RUINS, 15, 4);
         registerDefault(structureSetRegisterable, StructureSets.CANOPIES, Structures.CANOPIES, 26, 7);
         registerDefault(structureSetRegisterable, StructureSets.DESERT_HUT, Structures.DESERT_HUT, 28, 7);

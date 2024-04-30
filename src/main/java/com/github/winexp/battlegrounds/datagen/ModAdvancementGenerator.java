@@ -1,7 +1,7 @@
 package com.github.winexp.battlegrounds.datagen;
 
 import com.github.winexp.battlegrounds.item.Items;
-import com.github.winexp.battlegrounds.structure.Structures;
+import com.github.winexp.battlegrounds.world.gen.structure.Structures;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricAdvancementProvider;
 import net.minecraft.advancement.Advancement;

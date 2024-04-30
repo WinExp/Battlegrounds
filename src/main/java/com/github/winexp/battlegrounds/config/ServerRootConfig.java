@@ -8,14 +8,14 @@ import net.minecraft.util.Identifier;
 
 import java.util.Map;
 
-public record RootConfig(RandomTpConfig randomTp, Map<Identifier, VoteConfig> votes, boolean debug) implements IConfig<RootConfig> {
-    public static final Codec<RootConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            RandomTpConfig.CODEC.fieldOf("random_tp").forGetter(RootConfig::randomTp),
-            Codec.unboundedMap(Identifier.CODEC, VoteConfig.CODEC).fieldOf("votes").forGetter(RootConfig::votes),
-            Codec.BOOL.fieldOf("debug").forGetter(RootConfig::debug)
-    ).apply(instance, RootConfig::new));
+public record ServerRootConfig(RandomTpConfig randomTp, Map<Identifier, VoteConfig> votes, boolean debug) implements IConfig<ServerRootConfig> {
+    public static final Codec<ServerRootConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            RandomTpConfig.CODEC.fieldOf("random_tp").forGetter(ServerRootConfig::randomTp),
+            Codec.unboundedMap(Identifier.CODEC, VoteConfig.CODEC).fieldOf("votes").forGetter(ServerRootConfig::votes),
+            Codec.BOOL.fieldOf("debug").forGetter(ServerRootConfig::debug)
+    ).apply(instance, ServerRootConfig::new));
 
-    public static final RootConfig DEFAULT_CONFIG = new RootConfig(
+    public static final ServerRootConfig DEFAULT_CONFIG = new ServerRootConfig(
             new RandomTpConfig(
                     Duration.withSeconds(30),
                     Duration.withSeconds(20),
@@ -34,7 +34,7 @@ public record RootConfig(RandomTpConfig randomTp, Map<Identifier, VoteConfig> vo
     );
 
     @Override
-    public Codec<RootConfig> getCodec() {
+    public Codec<ServerRootConfig> getCodec() {
         return CODEC;
     }
 

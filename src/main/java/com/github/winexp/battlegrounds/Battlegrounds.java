@@ -5,7 +5,7 @@ import com.github.winexp.battlegrounds.command.BattlegroundsCommand;
 import com.github.winexp.battlegrounds.command.RandomTpCommand;
 import com.github.winexp.battlegrounds.command.argument.PVPModeArgumentType;
 import com.github.winexp.battlegrounds.config.ConfigUtil;
-import com.github.winexp.battlegrounds.config.RootConfig;
+import com.github.winexp.battlegrounds.config.ServerRootConfig;
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.entity.EntityTypes;
 import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
@@ -54,7 +54,7 @@ public class Battlegrounds implements ModInitializer {
     public void loadConfigs() {
         Variables.config = ConfigUtil.readOrCreateConfig(
                 Constants.CONFIG_PATH, "config",
-                RootConfig.CODEC, RootConfig.DEFAULT_CONFIG
+                ServerRootConfig.CODEC, ServerRootConfig.DEFAULT_CONFIG
         );
     }
 

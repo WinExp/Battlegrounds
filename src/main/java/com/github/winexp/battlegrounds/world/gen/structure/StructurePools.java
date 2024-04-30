@@ -1,4 +1,4 @@
-package com.github.winexp.battlegrounds.structure;
+package com.github.winexp.battlegrounds.world.gen.structure;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
@@ -26,7 +26,7 @@ public class StructurePools extends net.minecraft.structure.pool.StructurePools 
         return RegistryKey.of(RegistryKeys.TEMPLATE_POOL, new Identifier("battlegrounds", id));
     }
 
-    public static void bootstrap(Registerable<StructurePool> structurePoolsRegisterable) {
+    public static void register(Registerable<StructurePool> structurePoolsRegisterable) {
         RegistryEntry<StructurePool> emptyEntry = structurePoolsRegisterable.getRegistryLookup(RegistryKeys.TEMPLATE_POOL)
                 .getOrThrow(StructurePools.EMPTY);
         structurePoolsRegisterable.register(StructurePools.ANCIENT_RUINS, new StructurePool(emptyEntry, ImmutableList.of(
