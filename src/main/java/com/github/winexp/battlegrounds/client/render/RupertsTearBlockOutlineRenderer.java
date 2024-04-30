@@ -28,7 +28,7 @@ import net.minecraft.world.World;
 import java.util.Objects;
 
 public class RupertsTearBlockOutlineRenderer implements WorldRenderEvents.BeforeBlockOutline {
-    private static final double LERP_DELTA = 0.0165;
+    private static final double LERP_DELTA = 0.016;
     private static final long LERP_DURATION = 1000 * 1000;
     private static final Vec3d NaN = new Vec3d(Double.NaN, Double.NaN, Double.NaN);
 
