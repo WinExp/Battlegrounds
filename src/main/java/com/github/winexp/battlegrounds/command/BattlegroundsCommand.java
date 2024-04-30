@@ -51,7 +51,7 @@ public class BattlegroundsCommand {
     }
 
     public static ArgumentBuilder<ServerCommandSource, ?> registerPvpMode() {
-        var cPvpMode = literal("pvp_mode").requires(ServerCommandSource::isExecutedByPlayer);
+        var cPvpMode = literal("pvp_mode").requires(source -> source.hasPermissionLevel(2));
         var aPvpMode = argument("pvp_mode", PVPModeArgumentType.pvpMode())
                 .executes(BattlegroundsCommand::executePvpMode);
         return cPvpMode.then(aPvpMode);
