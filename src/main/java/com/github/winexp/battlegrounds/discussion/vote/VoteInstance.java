@@ -1,8 +1,8 @@
 package com.github.winexp.battlegrounds.discussion.vote;
 
 import com.github.winexp.battlegrounds.event.ServerVoteEvents;
-import com.github.winexp.battlegrounds.task.ScheduledTask;
-import com.github.winexp.battlegrounds.task.ServerTaskScheduler;
+import com.github.winexp.battlegrounds.util.task.ScheduledTask;
+import com.github.winexp.battlegrounds.util.task.TaskScheduler;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
 import com.github.winexp.battlegrounds.util.time.Duration;
 import com.google.common.collect.ImmutableList;
@@ -104,7 +104,7 @@ public class VoteInstance {
     }
 
     public Collection<UUID> getParticipants() {
-        return this.voteResultMap.keySet();
+        return this.participants;
     }
 
     public int getAcceptedNum() {
@@ -169,7 +169,7 @@ public class VoteInstance {
                         VoteInstance.this.closeVote(VoteSettings.CloseReason.TIMEOUT);
                     }
                 };
-                ServerTaskScheduler.INSTANCE.schedule(this.timeoutTask);
+                TaskScheduler.INSTANCE.schedule(this.timeoutTask);
             }
             this.voting = true;
             ServerVoteEvents.OPENED.invoker().onOpened(this);

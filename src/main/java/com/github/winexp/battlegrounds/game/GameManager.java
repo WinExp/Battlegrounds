@@ -4,10 +4,10 @@ import com.github.winexp.battlegrounds.event.ModServerPlayerEvents;
 import com.github.winexp.battlegrounds.helper.WorldHelper;
 import com.github.winexp.battlegrounds.network.packet.s2c.play.config.ModGameConfigS2CPacket;
 import com.github.winexp.battlegrounds.sound.SoundEvents;
-import com.github.winexp.battlegrounds.task.LimitRepeatTask;
-import com.github.winexp.battlegrounds.task.RepeatTask;
-import com.github.winexp.battlegrounds.task.ScheduledTask;
-import com.github.winexp.battlegrounds.task.ServerTaskScheduler;
+import com.github.winexp.battlegrounds.util.task.LimitRepeatTask;
+import com.github.winexp.battlegrounds.util.task.RepeatTask;
+import com.github.winexp.battlegrounds.util.task.ScheduledTask;
+import com.github.winexp.battlegrounds.util.task.TaskScheduler;
 import com.github.winexp.battlegrounds.util.Constants;
 import com.github.winexp.battlegrounds.util.EntityUtil;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
@@ -236,7 +236,7 @@ public class GameManager extends PersistentState implements GameListener {
                             GameManager.this.startGame();
                         }
                     };
-                    ServerTaskScheduler.INSTANCE.schedule(this.startTask);
+                    TaskScheduler.INSTANCE.schedule(this.startTask);
                 }
             } else {
                 PlayerUtil.changeGameMode(player, GameMode.SPECTATOR);
@@ -439,7 +439,7 @@ public class GameManager extends PersistentState implements GameListener {
                 GameManager.this.updateInfoBossBar();
             }
         };
-        ServerTaskScheduler.INSTANCE.schedule(this.updateBossBarTask);
+        TaskScheduler.INSTANCE.schedule(this.updateBossBarTask);
     }
 
     public void disableInfoBossBar() {
@@ -459,7 +459,7 @@ public class GameManager extends PersistentState implements GameListener {
 
     private void updateInfoBossBar() {
         if (!this.gameStage.isGaming()) return;
-        if (ServerTaskScheduler.INSTANCE.isRunning(this.timeoutTask)) {
+        if (TaskScheduler.INSTANCE.isRunning(this.timeoutTask)) {
             int timeoutTimeTicks = this.gameProperties.timeout().toTicks();
             this.resizeBossBar.setName(
                     Text.translatable(
@@ -523,7 +523,7 @@ public class GameManager extends PersistentState implements GameListener {
                 GameManager.this.stopServerToDeleteWorld(participants);
             }
         };
-        ServerTaskScheduler.INSTANCE.schedule(stopTask);
+        TaskScheduler.INSTANCE.schedule(stopTask);
     }
 
     public void stopServerToDeleteWorld(Collection<UUID> participants) {
@@ -628,7 +628,7 @@ public class GameManager extends PersistentState implements GameListener {
                         listener.onGameTie(GameManager.this));
             }
         };
-        ServerTaskScheduler.INSTANCE.schedule(this.timeoutTask);
+        TaskScheduler.INSTANCE.schedule(this.timeoutTask);
     }
 
     public void disableTimeoutTimer() {
@@ -643,7 +643,7 @@ public class GameManager extends PersistentState implements GameListener {
                 GameManager.this.borderStage = GameBorderStage.WAITING;
             }
         };
-        ServerTaskScheduler.INSTANCE.schedule(this.borderResizingTask);
+        TaskScheduler.INSTANCE.schedule(this.borderResizingTask);
     }
 
     public void stopBorderResizingTimer() {
@@ -661,7 +661,7 @@ public class GameManager extends PersistentState implements GameListener {
                 GameManager.this.resizeBorder();
             }
         };
-        ServerTaskScheduler.INSTANCE.schedule(this.resizeBorderTask);
+        TaskScheduler.INSTANCE.schedule(this.resizeBorderTask);
     }
 
     public void disableBorderResizing() {
@@ -761,7 +761,7 @@ public class GameManager extends PersistentState implements GameListener {
         if (this.gameStage.isGaming()) {
             nbt.putInt("resize_timer", this.resizeBorderTask.getDelayTicks());
             nbt.putInt("resizing_timer", this.borderResizingTask.getDelayTicks());
-            if (ServerTaskScheduler.INSTANCE.isRunning(this.timeoutTask)) {
+            if (TaskScheduler.INSTANCE.isRunning(this.timeoutTask)) {
                 nbt.putInt("timeout_timer", this.timeoutTask.getDelayTicks());
             }
         }

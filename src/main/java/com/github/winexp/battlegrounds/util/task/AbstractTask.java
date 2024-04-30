@@ -1,4 +1,4 @@
-package com.github.winexp.battlegrounds.task;
+package com.github.winexp.battlegrounds.util.task;
 
 import java.util.concurrent.CancellationException;
 

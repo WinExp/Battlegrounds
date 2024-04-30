@@ -1,4 +1,4 @@
-package com.github.winexp.battlegrounds.task;
+package com.github.winexp.battlegrounds.util.task;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class ServerTaskScheduler {
-    public static final ServerTaskScheduler INSTANCE = new ServerTaskScheduler();
+public class TaskScheduler {
+    public static final TaskScheduler INSTANCE = new TaskScheduler();
 
     private MinecraftServer server;
     private final List<AbstractTask> tasks = new CopyOnWriteArrayList<>();
 
-    public ServerTaskScheduler() {
+    public TaskScheduler() {
         ServerTickEvents.START_SERVER_TICK.register(this::startTick);
         ServerTickEvents.END_SERVER_TICK.register(this::endTick);
         ServerLifecycleEvents.SERVER_STARTED.register(server ->
@@ -49,7 +49,6 @@ public class ServerTaskScheduler {
     }
 
     public void schedule(AbstractTask task) {
-        if (this.server == null || this.tasks.contains(task)) return;
         this.tasks.add(task);
     }
 

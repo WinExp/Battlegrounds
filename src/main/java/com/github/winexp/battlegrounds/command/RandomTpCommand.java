@@ -3,8 +3,8 @@ package com.github.winexp.battlegrounds.command;
 import com.github.winexp.battlegrounds.event.ModServerPlayerEvents;
 import com.github.winexp.battlegrounds.game.GameListener;
 import com.github.winexp.battlegrounds.game.GameManager;
-import com.github.winexp.battlegrounds.task.ServerTaskScheduler;
-import com.github.winexp.battlegrounds.task.RepeatTask;
+import com.github.winexp.battlegrounds.util.task.TaskScheduler;
+import com.github.winexp.battlegrounds.util.task.RepeatTask;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
 import com.github.winexp.battlegrounds.util.Variables;
 import com.github.winexp.battlegrounds.util.time.Duration;
@@ -106,7 +106,7 @@ public class RandomTpCommand {
                 }
             };
         }
-        ServerTaskScheduler.INSTANCE.schedule(coolDownUpdateTask);
+        TaskScheduler.INSTANCE.schedule(coolDownUpdateTask);
 
         ServerCommandSource source = context.getSource();
         assert source.getPlayer() != null;
