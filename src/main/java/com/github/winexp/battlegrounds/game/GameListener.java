@@ -13,5 +13,5 @@ public interface GameListener {
 
     void onPlayerWin(GameManager manager, ServerPlayerEntity player);
 
-    void onGameTie(GameManager manager);
+    void onTimeout(GameManager manager);
 }

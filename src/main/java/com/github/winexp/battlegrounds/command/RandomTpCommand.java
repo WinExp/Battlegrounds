@@ -58,7 +58,7 @@ public class RandomTpCommand {
             @Override
             public void onPlayerWin(GameManager manager, ServerPlayerEntity player) { }
             @Override
-            public void onGameTie(GameManager manager) { }
+            public void onTimeout(GameManager manager) { }
         });
     }
 

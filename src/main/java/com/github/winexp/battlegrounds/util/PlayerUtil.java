@@ -41,10 +41,6 @@ public class PlayerUtil {
         }
     }
 
-    public static void sendTitle(ServerPlayerEntity player, Text title) {
-        sendTitle(player, title, Text.empty());
-    }
-
     public static void sendTitle(ServerPlayerEntity player, Text title, Text subtitle) {
         player.networkHandler.sendPacket(new TitleS2CPacket(title));
         player.networkHandler.sendPacket(new SubtitleS2CPacket(subtitle));
@@ -55,10 +51,6 @@ public class PlayerUtil {
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
             player.playSound(sound, volume, pitch);
         }
-    }
-
-    public static void broadcastTitle(MinecraftServer server, Text title) {
-        broadcastTitle(server, title, Text.empty());
     }
 
     public static void broadcastTitle(MinecraftServer server, Text title, Text subtitle) {

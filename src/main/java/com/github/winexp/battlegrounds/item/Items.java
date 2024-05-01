@@ -69,7 +69,7 @@ public class Items extends net.minecraft.item.Items {
             .enrichEffect(new StatusEffectInstance(StatusEffects.SPEED, 2 * 20, 1))
             .attackEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 5 * 20, 1))
             .attackEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 5 * 20, 0))
-            .attackEffectBound(35)
+            .attackEffectBound(5)
     ));
     public static final StevesPainSwordItem STEVES_PAIN_SWORD = registerItem("steves_pain_sword", new StevesPainSwordItem(ToolMaterials.STEVES_PAIN_SWORD, new LegendarySwordItem.Settings()
             .rarity(Rarity.EPIC)

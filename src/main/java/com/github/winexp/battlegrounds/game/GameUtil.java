@@ -3,6 +3,7 @@ package com.github.winexp.battlegrounds.game;
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.util.Constants;
 import com.github.winexp.battlegrounds.util.FileUtil;
+import com.github.winexp.battlegrounds.util.RandomUtil;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.component.ComponentChanges;
@@ -34,11 +35,11 @@ public class GameUtil {
         World world = player.getWorld();
         Random random = player.getRandom();
         for (int i = 0; i < amount; i++) {
-            double xOffset = (random.nextFloat() * offset * 2) - offset;
-            double x = player.getX() + 0.5 + xOffset;
+            double xOffset = RandomUtil.nextDoubleBetween(random, -offset, offset);
+            double x = player.getX() + xOffset;
             double y = player.getRandomBodyY();
-            double zOffset = (random.nextFloat() * offset * 2) - offset;
-            double z = player.getZ() + 0.5 + zOffset;
+            double zOffset = RandomUtil.nextDoubleBetween(random, -offset, offset);
+            double z = player.getZ() + zOffset;
             int flightTime = random.nextBetween(2, 3);
             FireworkExplosionComponent.Type shape = FireworkExplosionComponent.Type.byId(random.nextBetween(0, 4));
             IntList colors = new IntArrayList();
