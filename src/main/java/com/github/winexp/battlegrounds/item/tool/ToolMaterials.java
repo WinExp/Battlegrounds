@@ -16,7 +16,7 @@ public enum ToolMaterials implements ToolMaterial {
     LEACHING_SWORD(1792, 8.0F, 3.0F, BlockTags.INCORRECT_FOR_DIAMOND_TOOL, 0, Ingredient::empty),
     MINERS_PICKAXE(998, 8.0F, 3.0F, BlockTags.INCORRECT_FOR_DIAMOND_TOOL, 0, Ingredient::empty),
     BUTCHERS_AXE(3, 8.0F, 24.0F, BlockTags.INCORRECT_FOR_DIAMOND_TOOL, 0, Ingredient::empty),
-    RUPERTS_TEAR(15, 0, 0, BlockTags.INCORRECT_FOR_WOODEN_TOOL, 0, Ingredient::empty),
+    RUPERTS_TEAR(12, 0, 0, BlockTags.INCORRECT_FOR_WOODEN_TOOL, 0, Ingredient::empty),
     KNOCKBACK_STICK(15, 0, 0, BlockTags.INCORRECT_FOR_WOODEN_TOOL, 0, Ingredient::empty);
 
     private final int durability;

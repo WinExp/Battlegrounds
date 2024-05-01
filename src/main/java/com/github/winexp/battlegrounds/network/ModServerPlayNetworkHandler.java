@@ -8,15 +8,11 @@ import com.github.winexp.battlegrounds.item.tool.RupertsTearItem;
 import com.github.winexp.battlegrounds.network.payload.c2s.play.*;
 import com.github.winexp.battlegrounds.network.payload.c2s.play.vote.*;
 import com.github.winexp.battlegrounds.network.payload.s2c.play.vote.*;
-import com.github.winexp.battlegrounds.sound.SoundEvents;
-import com.github.winexp.battlegrounds.util.ParticleUtil;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
@@ -73,26 +69,11 @@ public final class ModServerPlayNetworkHandler {
     private static void onRupertsTearTeleport(RupertsTearTeleportPayloadC2S packet, ServerPlayNetworking.Context context) {
         ServerPlayerEntity player = context.player();
         ItemStack stack = packet.itemStack();
-        Vec3d pos = player.getPos();
         Vec3d teleportPos = packet.teleportPos();
-        ServerWorld world = player.getServerWorld();
         double distance = Math.floor(teleportPos.distanceTo(player.getEyePos()));
         if (player.getInventory().contains(stack) && distance <= RupertsTearItem.MAX_DISTANCE) {
-            player.server.execute(() -> {
-                int cooldown = (int) (RupertsTearItem.MAX_COOLDOWN * (Math.pow(distance, 1.5) / Math.pow(RupertsTearItem.MAX_DISTANCE, 1.5)));
-                player.getItemCooldownManager().set(Items.RUPERTS_TEAR, Math.max(RupertsTearItem.MIN_COOLDOWN, cooldown));
-                player.requestTeleport(teleportPos.x, teleportPos.y, teleportPos.z);
-                player.onLanding();
-                world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_TELEPORT, SoundCategory.PLAYERS);
-
-                Vec3d posOffset = teleportPos.subtract(pos);
-                double ratio = Math.max(Math.max(Math.abs(posOffset.x), Math.abs(posOffset.z)), Math.abs(posOffset.y));
-                Vec3d particleSpeed = posOffset.multiply(1 / ratio).multiply(0.5);
-                for (int i = 1; i <= posOffset.length() / particleSpeed.length(); i++) {
-                    Vec3d particlePos = pos.add(particleSpeed.multiply(i));
-                    ParticleUtil.spawnForceLongParticle(ParticleTypes.WHITE_SMOKE, world, particlePos.x, particlePos.y, particlePos.z, 2, 0.15, 0.15, 0.15, 0.015);
-                }
-            });
+            player.server.execute(() -> RupertsTearItem.teleport(player, teleportPos, distance));
+            stack.damage(1, player, EquipmentSlot.MAINHAND);
         } else {
             player.getItemCooldownManager().set(Items.RUPERTS_TEAR, RupertsTearItem.FAILED_COOLDOWN);
             player.sendMessage(Text.translatable("item.battlegrounds.ruperts_tear.use_failed"), true);
