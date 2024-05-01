@@ -7,11 +7,11 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 
-public record RupertsTearTeleportS2CPacket(ItemStack itemStack, Vec3d teleportPos) implements FabricPacket {
+public record RupertsTearTeleportC2SPacket(ItemStack itemStack, Vec3d teleportPos) implements FabricPacket {
     public static final Identifier ID = new Identifier("battlegrounds", "play/ruperts_tear_teleport");
-    public static final PacketType<RupertsTearTeleportS2CPacket> TYPE = PacketType.create(ID, RupertsTearTeleportS2CPacket::new);
+    public static final PacketType<RupertsTearTeleportC2SPacket> TYPE = PacketType.create(ID, RupertsTearTeleportC2SPacket::new);
 
-    public RupertsTearTeleportS2CPacket(PacketByteBuf buf) {
+    public RupertsTearTeleportC2SPacket(PacketByteBuf buf) {
         this(buf.readItemStack(), buf.readVec3d());
     }
 

@@ -13,7 +13,7 @@ public enum ToolMaterials implements ToolMaterial {
     LEACHING_SWORD(1792, 8.0F, 3.0F, 3, 0),
     MINERS_PICKAXE(998, 8.0F, 3.0F, 3, 0),
     BUTCHERS_AXE(3, 8.0F, 24.0F, 3, 0),
-    RUPERTS_TEAR(15, 0, 0, 0, 0),
+    RUPERTS_TEAR(12, 0, 0, 0, 0),
     KNOCKBACK_STICK(15, 0, 0, 0, 0);
 
     private final int durability;

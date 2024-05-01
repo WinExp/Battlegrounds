@@ -1,7 +1,7 @@
 package com.github.winexp.battlegrounds.item.tool;
 
 import com.github.winexp.battlegrounds.item.EnchantRestrict;
-import com.github.winexp.battlegrounds.network.packet.c2s.play.RupertsTearTeleportS2CPacket;
+import com.github.winexp.battlegrounds.network.packet.c2s.play.RupertsTearTeleportC2SPacket;
 import com.github.winexp.battlegrounds.registry.tag.ModFluidTags;
 import com.github.winexp.battlegrounds.util.MathUtil;
 import com.github.winexp.battlegrounds.util.BlockUtil;
@@ -13,6 +13,7 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ToolItem;
 import net.minecraft.item.ToolMaterial;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
@@ -64,6 +65,10 @@ public class RupertsTearItem extends ToolItem implements EnchantRestrict {
         return false;
     }
 
+    public static void teleport(ServerPlayerEntity player, Vec3d teleportPos, double distance) {
+
+    }
+
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack stack = user.getStackInHand(hand);
@@ -81,7 +86,7 @@ public class RupertsTearItem extends ToolItem implements EnchantRestrict {
             double y = BlockUtil.getBlockMaxY(world, pos);
             Box boundingBox = BlockUtil.getCollisionShape(world, pos).getBoundingBox();
             Vec3d tpPos = boundingBox.getCenter().add(Vec3d.of(pos)).withAxis(Direction.Axis.Y, y);
-            RupertsTearTeleportS2CPacket packet = new RupertsTearTeleportS2CPacket(stack, tpPos);
+            RupertsTearTeleportC2SPacket packet = new RupertsTearTeleportC2SPacket(stack, tpPos);
             ClientPlayNetworking.send(packet);
         }
         return TypedActionResult.success(stack, world.isClient);
