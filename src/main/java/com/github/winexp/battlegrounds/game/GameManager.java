@@ -341,7 +341,6 @@ public class GameManager extends PersistentState {
 
     public void enableInfoBossBar() {
         this.ensureIsGaming();
-        this.ensureBorderResizeEnabled();
         BossBarManager manager = this.server.getBossBarManager();
         CommandBossBar bossBar = manager.get(RESIZE_BOSS_BAR_ID);
         if (bossBar == null) {
@@ -387,7 +386,7 @@ public class GameManager extends PersistentState {
                             .formatted(Formatting.RED));
             this.resizeBossBar.setMaxValue(timeoutTimeTicks);
             this.resizeBossBar.setValue(this.timeoutTask.getDelayTicks());
-        } else if (this.borderStage == GameBorderStage.WAITING) {
+        } else if (this.borderStage == GameBorderStage.WAITING && TaskScheduler.INSTANCE.isRunning(this.resizeBorderTask)) {
             int delayTimeTicks = this.currentStage.resizeTimeInfo().delayTime().toTicks();
             this.resizeBossBar.setName(
                     Text.translatable(
@@ -397,7 +396,7 @@ public class GameManager extends PersistentState {
                     .formatted(Formatting.GREEN));
             this.resizeBossBar.setMaxValue(delayTimeTicks);
             this.resizeBossBar.setValue(this.resizeBorderTask.getDelayTicks());
-        } else if (this.borderStage == GameBorderStage.RESIZING) {
+        } else if (this.borderStage == GameBorderStage.RESIZING && TaskScheduler.INSTANCE.isRunning(this.borderResizingTask)) {
             int spendTimeTicks = this.currentStage.resizeTimeInfo().spendTime().toTicks();
             this.resizeBossBar.setName(
                     Text.translatable(
@@ -407,6 +406,8 @@ public class GameManager extends PersistentState {
                             .formatted(Formatting.GOLD));
             this.resizeBossBar.setMaxValue(spendTimeTicks);
             this.resizeBossBar.setValue(this.borderResizingTask.getDelayTicks());
+        } else {
+            this.updateBossBarTask.cancel();
         }
     }
 
@@ -553,22 +554,15 @@ public class GameManager extends PersistentState {
     public void resumeGame(int resizeTimer, int resizingTimer, int timeoutTimer) {
         this.ensureIsGaming();
         this.ensureGamePropertiesNotNull();
-        if (resizeTimer > 0) {
-            this.enableBorderResizing(resizeTimer);
-        }
-        if (resizingTimer > 0) {
-            this.startBorderResizingTimer(resizingTimer);
-        }
-        if (timeoutTimer > 0) {
-            this.enableTimeoutTimer(timeoutTimer);
-        }
-        if (resizeTimer >= 0 || resizingTimer > 0 || timeoutTimer > 0) {
-            this.enableInfoBossBar();
-        }
+        this.enableBorderResizing(resizeTimer);
+        this.startBorderResizingTimer(resizingTimer);
+        this.enableTimeoutTimer(timeoutTimer);
+        this.enableInfoBossBar();
         this.syncData();
     }
 
     public void enableTimeoutTimer(int ticksLeft) {
+        if (ticksLeft < 0) return;
         this.timeoutTask = new ScheduledTask(Duration.withTicks(ticksLeft)) {
             @Override
             public void run() throws CancellationException {
@@ -590,6 +584,7 @@ public class GameManager extends PersistentState {
     }
 
     public void startBorderResizingTimer(int delayTicks) {
+        if (delayTicks < 0) return;
         this.borderResizingTask = new ScheduledTask(Duration.withTicks(delayTicks)) {
             @Override
             public void run() throws CancellationException {
@@ -625,6 +620,7 @@ public class GameManager extends PersistentState {
     }
 
     public void enableBorderResizing(int delayTicks) {
+        if (delayTicks < 0) return;
         this.ensureIsGaming();
         this.resizeBorderTask = new RepeatTask(Duration.withTicks(delayTicks), () -> {
             GameProperties.StageInfo.ResizeTimeInfo resizeTimeInfo = this.currentStage.resizeTimeInfo();
