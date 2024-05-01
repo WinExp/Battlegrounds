@@ -468,7 +468,7 @@ public class GameManager extends PersistentState implements GameListener {
                             .formatted(Formatting.RED));
             this.resizeBossBar.setMaxValue(timeoutTimeTicks);
             this.resizeBossBar.setValue(this.timeoutTask.getDelayTicks());
-        } else if (this.borderStage == GameBorderStage.WAITING && !this.resizeBorderTask.isCancelled()) {
+        } else if (this.borderStage == GameBorderStage.WAITING && TaskScheduler.INSTANCE.isRunning(this.resizeBorderTask)) {
             int delayTimeTicks = this.currentStage.resizeTimeInfo().delayTime().toTicks();
             this.resizeBossBar.setName(
                     Text.translatable(
@@ -478,7 +478,7 @@ public class GameManager extends PersistentState implements GameListener {
                     .formatted(Formatting.GREEN));
             this.resizeBossBar.setMaxValue(delayTimeTicks);
             this.resizeBossBar.setValue(this.resizeBorderTask.getDelayTicks());
-        } else if (this.borderStage == GameBorderStage.RESIZING && !this.borderResizingTask.isCancelled()) {
+        } else if (this.borderStage == GameBorderStage.RESIZING && TaskScheduler.INSTANCE.isRunning(this.borderResizingTask)) {
             int spendTimeTicks = this.currentStage.resizeTimeInfo().spendTime().toTicks();
             this.resizeBossBar.setName(
                     Text.translatable(
