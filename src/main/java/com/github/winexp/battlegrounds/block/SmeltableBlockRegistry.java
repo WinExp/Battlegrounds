@@ -43,6 +43,7 @@ public class SmeltableBlockRegistry {
         register(Blocks.GOLD_ORE, Blocks.DEEPSLATE_GOLD_ORE);
         register(Blocks.COPPER_ORE, Blocks.DEEPSLATE_COPPER_ORE);
         register(Blocks.NETHER_GOLD_ORE, ReplaceItemLootFunction.builder(Items.GOLD_INGOT));
+        register(Blocks.POTATOES);
     }
 
     public static void register(Block... blocks) {
