@@ -2,7 +2,6 @@ package com.github.winexp.battlegrounds.network.packet.c2s.play;
 
 import net.fabricmc.fabric.api.networking.v1.FabricPacket;
 import net.fabricmc.fabric.api.networking.v1.PacketType;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
