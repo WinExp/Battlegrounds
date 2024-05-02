@@ -21,6 +21,7 @@ import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 
@@ -98,12 +99,14 @@ public final class ModServerPlayNetworkHandler {
     }
 
     private static void onRupertsTearTeleport(RupertsTearTeleportC2SPacket packet, ServerPlayerEntity player, PacketSender responseSender) {
-        ItemStack stack = packet.itemStack();
         Vec3d teleportPos = packet.teleportPos();
+        Hand hand = packet.hand();
+        ItemStack stack = player.getStackInHand(hand);
         double distance = Math.floor(teleportPos.distanceTo(player.getEyePos()));
-        if (player.getInventory().contains(stack) && distance <= RupertsTearItem.MAX_DISTANCE) {
+        if (distance <= RupertsTearItem.MAX_DISTANCE) {
+            if (!stack.isOf(Items.RUPERTS_TEAR) || stack.getDamage() >= stack.getMaxDamage()) return;
             player.server.execute(() -> RupertsTearItem.teleport(player, teleportPos, distance));
-            stack.damage(1, player, (e) -> e.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
+            RupertsTearItem.damageStack(player, hand);
         } else {
             player.getItemCooldownManager().set(Items.RUPERTS_TEAR, RupertsTearItem.FAILED_COOLDOWN);
             player.sendMessage(Text.translatable("item.battlegrounds.ruperts_tear.use_failed"), true);
