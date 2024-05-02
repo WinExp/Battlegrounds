@@ -4,17 +4,28 @@ import net.minecraft.block.BlockState;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 public class RandomUtil {
+    public static float nextFloatBetween(Random random, float begin, float end) {
+        return random.nextFloat() * (end - begin) + begin;
+    }
+
+    public static double nextDoubleBetween(Random random, double begin, double end) {
+        return random.nextDouble() * (end - begin) + begin;
+    }
+
     public static boolean isSecure(World world, BlockBox box, BlockPos pos) {
         if (!box.contains(pos.getX(), pos.getY(), pos.getZ())) return false;
         for (int i = pos.getY() + 1; i <= box.getMaxY(); i++) {
             BlockPos pos1 = pos.withY(i);
-            if (!WorldUtil.canMobSpawnInside(world, pos1)) return false;
+            if (!BlockUtil.canMobSpawnInside(world, pos1)) return false;
         }
         return true;
     }
@@ -27,29 +38,35 @@ public class RandomUtil {
         return getSecureLocation(world, box);
     }
 
+    @NotNull
+    @Contract("_, _ -> new")
     public static BlockPos getSecureLocation(World world, BlockBox box) {
         Random random = world.getRandom();
         int maxY = box.getMaxY();
         int minY = box.getMinY();
-        int x = random.nextBetween(box.getMinX(), box.getMaxX());
-        int y = box.getMaxY();
-        int z = random.nextBetween(box.getMinZ(), box.getMaxZ());
+        int chunkX = ChunkSectionPos.getSectionCoord(random.nextBetween(box.getMinX(), box.getMaxX()));
+        int chunkZ = ChunkSectionPos.getSectionCoord(random.nextBetween(box.getMinZ(), box.getMaxZ()));
+        long begin = System.currentTimeMillis();
         for (int k = 0; k < 200; k++) {
-            boolean found = false;
-            for (int i = maxY; i >= minY; i--) {
-                BlockPos pos = new BlockPos(x, i, z);
-                BlockState state = world.getBlockState(pos);
-                if (state.isIn(BlockTags.VALID_SPAWN)) {
-                    y = i;
-                    found = true;
-                    break;
+            for (int x = ChunkSectionPos.getBlockCoord(chunkX); x <= ChunkSectionPos.getBlockCoord(chunkX + 1) - 1; x++) {
+                for (int z = ChunkSectionPos.getBlockCoord(chunkZ); z <= ChunkSectionPos.getBlockCoord(chunkZ + 1) - 1; z++) {
+                    if (!box.contains(x, maxY, z)) continue;
+                    for (int i = maxY; i >= minY; i--) {
+                        BlockPos pos = new BlockPos(x, i, z);
+                        BlockState state = world.getBlockState(pos);
+                        if (state.isIn(BlockTags.VALID_SPAWN)
+                        && isSecure(world, box, pos)) {
+                            long end = System.currentTimeMillis();
+                            Constants.LOGGER.info("随机传送耗时 {}ms", end - begin);
+                            return new BlockPos(x, i + 1, z);
+                        }
+                    }
                 }
             }
-            if (found && isSecure(world, box, new BlockPos(x, y, z))) break;
-            x = random.nextBetween(box.getMinX(), box.getMaxX());
-            y = maxY;
-            z = random.nextBetween(box.getMinZ(), box.getMaxZ());
+            chunkX = ChunkSectionPos.getSectionCoord(random.nextBetween(box.getMinX(), box.getMaxX()));
+            chunkZ = ChunkSectionPos.getSectionCoord(random.nextBetween(box.getMinZ(), box.getMaxZ()));
         }
-        return new BlockPos(x, y + 1, z);
+        BlockPos centerPos = box.getCenter();
+        return new BlockPos(centerPos.getX(), maxY, centerPos.getX());
     }
 }

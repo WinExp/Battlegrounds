@@ -1,8 +1,46 @@
 {
-  "tube_fall": {
-    "subtitle": "subtitles.battlegrounds.tube_fall",
+  "entity.prop.generic.trigger": {
+    "subtitle": "subtitles.battlegrounds.entity.prop.generic.trigger",
     "sounds": [
-      "battlegrounds:tube_fall"
+      {
+        "name": "minecraft:entity.generic.explode",
+        "type": "event"
+      }
+    ]
+  },
+  "entity.prop.generic.rebound": {
+    "subtitle": "subtitles.battlegrounds.entity.prop.generic.rebound",
+    "sounds": [
+      {
+        "name": "battlegrounds:entity/prop/generic/rebound"
+      }
+    ]
+  },
+  "entity.flash_bang.explode": {
+    "subtitle": "subtitles.battlegrounds.entity.flash_bang.explode",
+    "sounds": [
+      {
+        "name": "minecraft:entity.generic.explode",
+        "type": "event"
+      }
+    ]
+  },
+  "entity.flash_bang.rebound": {
+    "subtitle": "subtitles.battlegrounds.entity.prop.generic.rebound",
+    "sounds": [
+      {
+        "name": "battlegrounds:entity.prop.generic.rebound",
+        "type": "event"
+      }
+    ]
+  },
+  "player.tube_fall": {
+    "subtitle": "subtitles.battlegrounds.player.tube_fall",
+    "sounds": [
+      {
+        "name": "battlegrounds:player/tube_fall",
+        "volume": 0.8
+      }
     ]
   }
 }

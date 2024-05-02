@@ -1,7 +1,9 @@
 package com.github.winexp.battlegrounds.entity.projectile;
 
 import com.github.winexp.battlegrounds.entity.EntityTypes;
+import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
 import com.github.winexp.battlegrounds.item.Items;
+import com.github.winexp.battlegrounds.util.ParticleUtil;
 import com.google.common.collect.Sets;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LightningEntity;
@@ -9,13 +11,13 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
@@ -23,14 +25,21 @@ import net.minecraft.potion.Potions;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 public class ChannelingArrowEntity extends PersistentProjectileEntity {
+    private static final Map<StatusEffect, Integer> STATUS_EFFECTS = Map.of(
+            StatusEffects.SLOWNESS, 1,
+            StatusEffects.WEAKNESS, 0,
+            StatusEffects.POISON, 1,
+            StatusEffects.APPROACHING_EXTINCTION, 0
+    );
+    private static final int STATUS_DURATION = 5 * 20;
     private static final ItemStack DEFAULT_STACK = new ItemStack(Items.ARROW);
     private static final TrackedData<Integer> COLOR = DataTracker.registerData(ChannelingArrowEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Boolean> CHANNELING = DataTracker.registerData(ChannelingArrowEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
@@ -106,16 +115,6 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
         this.dataTracker.startTracking(CHANNELING, false);
     }
 
-    private void spawnParticlesWithOffset(ParticleEffect particle, int amount, double speedOffset) {
-        Random random = this.getWorld().getRandom();
-        for (int i = 0; i < amount; i++) {
-            double x = random.nextDouble() * (speedOffset * 2) - speedOffset;
-            double y = random.nextDouble() * (speedOffset * 2) - speedOffset;
-            double z = random.nextDouble() * (speedOffset * 2) - speedOffset;
-            this.getWorld().addParticle(particle, this.getParticleX(0.5), this.getRandomBodyY(), this.getParticleZ(0.5), x, y, z);
-        }
-    }
-
     private void spawnParticles(int amount) {
         int i = this.getColor();
         if (i != -1 && amount > 0) {
@@ -126,7 +125,6 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
             for (int j = 0; j < amount; ++j) {
                 this.getWorld().addParticle(ParticleTypes.ENTITY_EFFECT, this.getParticleX(0.5), this.getRandomBodyY(), this.getParticleZ(0.5), d, e, f);
             }
-
         }
     }
 
@@ -146,11 +144,11 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
             if (this.inGround) {
                 if (this.inGroundTime % 5 == 0) {
                     this.spawnParticles(1);
-                    this.spawnParticlesWithOffset(ParticleTypes.END_ROD, 1, 0.1);
+                    ParticleUtil.addParticlesWithOffset(this.getWorld(), ParticleTypes.END_ROD, this.getX(), this.getY(), this.getZ(), 0, 0.1, 1);
                 }
             } else {
                 this.spawnParticles(2);
-                this.spawnParticlesWithOffset(ParticleTypes.END_ROD, 1, 0.15);
+                ParticleUtil.addParticlesWithOffset(this.getWorld(), ParticleTypes.END_ROD, this.getX(), this.getY(), this.getZ(), 0, 0.15, 1);
             }
         } else if (this.inGround && this.inGroundTime != 0 && !this.effects.isEmpty() && this.inGroundTime >= 600) {
             this.getWorld().sendEntityStatus(this, (byte) 0);
@@ -181,6 +179,8 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
             }
         }
 
+        STATUS_EFFECTS.forEach((key, value) ->
+                target.addStatusEffect(new StatusEffectInstance(key, STATUS_DURATION, value)));
         if (this.getChanneling()) {
             LightningEntity lightning = net.minecraft.entity.EntityType.LIGHTNING_BOLT.create(target.getWorld());
             if (lightning != null) {
@@ -263,8 +263,8 @@ public class ChannelingArrowEntity extends PersistentProjectileEntity {
                 }
             }
         } else if (status == 3) {
-            this.spawnParticlesWithOffset(ParticleTypes.FLASH, 20, 0);
-            this.spawnParticlesWithOffset(ParticleTypes.END_ROD, 30, 0.3);
+            ParticleUtil.addParticlesWithOffset(this.getWorld(), ParticleTypes.FLASH, this.getX(), this.getY(), this.getZ(), 0, 0, 20);
+            ParticleUtil.addParticlesWithOffset(this.getWorld(), ParticleTypes.END_ROD, this.getX(), this.getY(), this.getZ(), 0, 0.3, 30);
         } else {
             super.handleStatus(status);
         }

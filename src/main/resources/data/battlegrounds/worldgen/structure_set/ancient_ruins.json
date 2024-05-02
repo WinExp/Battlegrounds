@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 29471073,
+    "separation": 4,
+    "spacing": 15
+  },
+  "structures": [
+    {
+      "structure": "battlegrounds:ancient_ruins",
+      "weight": 1
+    }
+  ]
+}

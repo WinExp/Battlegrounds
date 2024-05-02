@@ -1,8 +1,8 @@
 package com.github.winexp.battlegrounds.discussion.vote;
 
 import com.github.winexp.battlegrounds.event.ServerVoteEvents;
-import com.github.winexp.battlegrounds.task.ScheduledTask;
-import com.github.winexp.battlegrounds.task.TaskScheduler;
+import com.github.winexp.battlegrounds.util.task.ScheduledTask;
+import com.github.winexp.battlegrounds.util.task.TaskScheduler;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
 import com.github.winexp.battlegrounds.util.time.Duration;
 import com.google.common.collect.ImmutableList;
@@ -25,7 +25,7 @@ public class VoteInstance {
     private ScheduledTask timeoutTask = ScheduledTask.NONE_TASK;
     private ImmutableList<UUID> participants = ImmutableList.of();
     private final Object lock = new Object();
-    private final ConcurrentHashMap<UUID, Boolean> voteResultMap = new ConcurrentHashMap<>();
+    private final Map<UUID, Boolean> voteResultMap = new ConcurrentHashMap<>();
 
     public VoteInstance(Identifier identifier, VoteSettings settings, Map<String, Object> parameters) {
         this.identifier = identifier;
@@ -104,7 +104,7 @@ public class VoteInstance {
     }
 
     public Collection<UUID> getParticipants() {
-        return this.voteResultMap.keySet();
+        return this.participants;
     }
 
     public int getAcceptedNum() {
@@ -115,11 +115,11 @@ public class VoteInstance {
         return num;
     }
 
-    public boolean isParticipants(ServerPlayerEntity player) {
-        return this.isParticipants(PlayerUtil.getAuthUUID(player));
+    public boolean isParticipant(ServerPlayerEntity player) {
+        return this.isParticipant(PlayerUtil.getAuthUUID(player));
     }
 
-    public boolean isParticipants(UUID uuid) {
+    public boolean isParticipant(UUID uuid) {
         return this.participants.contains(uuid);
     }
 
@@ -134,11 +134,11 @@ public class VoteInstance {
     public boolean acceptVote(ServerPlayerEntity player) {
         UUID uuid = PlayerUtil.getAuthUUID(player);
         if (!this.voting) return false;
-        if (!this.isParticipants(player)) return false;
+        if (!this.isParticipant(player)) return false;
         if (!this.settings.allowChangeVote() && this.isVoted(uuid)) return false;
         this.voteResultMap.put(uuid, true);
         this.settings.playerVotedAction().accept(this, player, true);
-        ServerVoteEvents.PLAYER_VOTED.invoker().onPlayerVoted(player, this.getVoteInfo(player), true);
+        ServerVoteEvents.PLAYER_VOTED.invoker().onPlayerVoted(player, this, true);
         if (this.settings.voteMode().acceptPredicate.test(this.participants.size(), this.getAcceptedNum())) {
             this.closeVote(VoteSettings.CloseReason.ACCEPTED);
         }
@@ -148,12 +148,12 @@ public class VoteInstance {
     public boolean denyVote(ServerPlayerEntity player) {
         UUID uuid = PlayerUtil.getAuthUUID(player);
         if (!this.voting) return false;
-        if (!this.isParticipants(player)) return false;
+        if (!this.isParticipant(player)) return false;
         if (!this.settings.allowChangeVote() && this.isVoted(uuid)) return false;
         if (this.settings.voteMode().canDenyCancel) this.closeVote(VoteSettings.CloseReason.DENIED);
         this.voteResultMap.put(uuid, false);
         this.settings.playerVotedAction().accept(this, player, false);
-        ServerVoteEvents.PLAYER_VOTED.invoker().onPlayerVoted(player, this.getVoteInfo(player), false);
+        ServerVoteEvents.PLAYER_VOTED.invoker().onPlayerVoted(player, this, false);
         return true;
     }
 
@@ -172,7 +172,7 @@ public class VoteInstance {
                 TaskScheduler.INSTANCE.schedule(this.timeoutTask);
             }
             this.voting = true;
-            ServerVoteEvents.OPENED.invoker().onOpened(this.getVoteInfo());
+            ServerVoteEvents.OPENED.invoker().onOpened(this);
             return true;
         }
     }
@@ -183,7 +183,7 @@ public class VoteInstance {
             this.timeoutTask.cancel();
             this.voting = false;
             this.settings.voteClosedAction().accept(this, closeReason);
-            ServerVoteEvents.CLOSED.invoker().onClosed(this.getVoteInfo(), closeReason);
+            ServerVoteEvents.CLOSED.invoker().onClosed(this, closeReason);
             return true;
         }
     }

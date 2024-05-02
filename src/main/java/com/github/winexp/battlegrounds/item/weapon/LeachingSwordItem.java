@@ -2,19 +2,20 @@ package com.github.winexp.battlegrounds.item.weapon;
 
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.item.Items;
-import com.github.winexp.battlegrounds.item.recipe.ItemNbtCrafting;
+import com.github.winexp.battlegrounds.item.recipe.ItemNbtRecipe;
+import com.github.winexp.battlegrounds.item.recipe.ShapedItemNbtRecipe;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SwordItem;
 import net.minecraft.item.ToolMaterial;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RawShapedRecipe;
-import net.minecraft.recipe.ShapedRecipe;
+import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 
 import java.util.Map;
 
-public class LeachingSwordItem extends SwordItem implements ItemNbtCrafting {
+public class LeachingSwordItem extends SwordItem implements ItemNbtRecipe {
     public static final Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
             Enchantments.LEACHING, 1,
             Enchantments.KNOCKBACK, 3,
@@ -38,21 +39,21 @@ public class LeachingSwordItem extends SwordItem implements ItemNbtCrafting {
     }
 
     @Override
-    public ShapedRecipe getRecipe() {
-        RawShapedRecipe rawShaped = RawShapedRecipe.create(Map.of(
-                        'a', Ingredient.ofItems(Items.DIAMOND),
-                        'b', Ingredient.ofItems(Items.COBWEB),
-                        'c', Ingredient.ofItems(Items.SPIDER_EYE),
-                        'd', Ingredient.ofItems(Items.DIAMOND_SWORD),
-                        'e', Ingredient.ofItems(Items.DIAMOND_BLOCK)
+    public Recipe<?> getRecipe() {
+        return new ShapedItemNbtRecipe(
+                RawShapedRecipe.create(Map.of(
+                                'a', Ingredient.ofItems(Items.DIAMOND),
+                                'b', Ingredient.ofItems(Items.COBWEB),
+                                'c', Ingredient.ofItems(Items.SPIDER_EYE),
+                                'd', Ingredient.ofItems(Items.DIAMOND_SWORD),
+                                'e', Ingredient.ofItems(Items.DIAMOND_BLOCK)
+                        ),
+                        "abe",
+                        "cdc",
+                        "aba"
                 ),
-                "abe",
-                "cdc",
-                "aba");
-        return new ShapedRecipe(this.getIdentifier().toString(),
                 CraftingRecipeCategory.EQUIPMENT,
-                rawShaped,
                 this.getDefaultStack()
-        );
+        ).getRecipe();
     }
 }

@@ -13,12 +13,13 @@ import net.minecraft.util.Colors;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Environment(EnvType.CLIENT)
 public class VoteListWidget extends AlwaysSelectedEntryListWidget<VoteListWidget.Entry> {
     private final VoteScreen screen;
-    private final CopyOnWriteArrayList<Entry> entries = new CopyOnWriteArrayList<>();
+    private final List<Entry> entries = new CopyOnWriteArrayList<>();
 
     public VoteListWidget(VoteScreen screen, MinecraftClient minecraftClient, int width, int height, int y, int itemHeight) {
         super(minecraftClient, width, height, y, itemHeight);

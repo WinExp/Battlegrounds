@@ -1,15 +1,16 @@
 package com.github.winexp.battlegrounds.util;
 
-import com.github.winexp.battlegrounds.item.recipe.NbtCrafting;
+import com.github.winexp.battlegrounds.item.recipe.NbtRecipe;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.util.Identifier;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 public class RecipeUtil {
-    private static final HashMap<Identifier, RecipeEntry<? extends Recipe<?>>> recipeMap = new HashMap<>();
+    private static final Map<Identifier, RecipeEntry<? extends Recipe<?>>> recipeMap = new HashMap<>();
 
     public static Collection<RecipeEntry<?>> getRecipes() {
         return recipeMap.values();
@@ -19,8 +20,8 @@ public class RecipeUtil {
         return recipeMap.get(id);
     }
 
-    public static void addRecipe(NbtCrafting nbtCrafting) {
-        addRecipe(nbtCrafting.toRecipeEntry());
+    public static void addRecipe(NbtRecipe nbtRecipe) {
+        addRecipe(nbtRecipe.toRecipeEntry());
     }
 
     public static <T extends Recipe<?>> void addRecipe(RecipeEntry<T> entry) {

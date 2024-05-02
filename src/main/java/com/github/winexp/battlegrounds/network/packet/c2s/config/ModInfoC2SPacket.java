@@ -1,6 +1,6 @@
 package com.github.winexp.battlegrounds.network.packet.c2s.config;
 
-import com.github.winexp.battlegrounds.util.ModVersion;
+import com.github.winexp.battlegrounds.util.data.ModVersion;
 import net.fabricmc.fabric.api.networking.v1.FabricPacket;
 import net.fabricmc.fabric.api.networking.v1.PacketType;
 import net.minecraft.network.PacketByteBuf;

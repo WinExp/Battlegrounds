@@ -1,16 +1,15 @@
 package com.github.winexp.battlegrounds.command;
 
-import com.github.winexp.battlegrounds.event.ServerGameEvents;
+import com.github.winexp.battlegrounds.event.ModServerPlayerEvents;
+import com.github.winexp.battlegrounds.game.GameListener;
 import com.github.winexp.battlegrounds.game.GameManager;
-import com.github.winexp.battlegrounds.task.TaskScheduler;
-import com.github.winexp.battlegrounds.task.RepeatTask;
+import com.github.winexp.battlegrounds.util.task.TaskScheduler;
+import com.github.winexp.battlegrounds.util.task.RepeatTask;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
 import com.github.winexp.battlegrounds.util.Variables;
 import com.github.winexp.battlegrounds.util.time.Duration;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
-import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -21,12 +20,13 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CancellationException;
 
 public class RandomTpCommand {
-    private static final HashMap<UUID, Integer> cooldownTimers = new HashMap<>();
+    private static final Map<UUID, Integer> cooldownTimers = new HashMap<>();
     private static RepeatTask coolDownUpdateTask = RepeatTask.NONE_TASK;
     private static Identifier cooldownId;
 
@@ -41,28 +41,35 @@ public class RandomTpCommand {
 
         dispatcher.register(cRoot_redir);
 
-        ServerLivingEntityEvents.ALLOW_DAMAGE.register(RandomTpCommand::onLivingEntityDamaged);
-        ServerGameEvents.STAGE_TRIGGERED.register(RandomTpCommand::onStageTriggered);
-    }
-
-    private static void onStageTriggered(GameManager gameManager, @Nullable Identifier id) {
-        if (id == null) {
-            cooldownId = null;
-        } else if (Variables.config.randomTp().cooldownMap().get(id) != null) {
-            cooldownId = id;
-        }
-    }
-
-    private static boolean onLivingEntityDamaged(LivingEntity entity, DamageSource source, float amount) {
-        if (entity instanceof ServerPlayerEntity player) {
-            UUID uuid = PlayerUtil.getAuthUUID(player);
-            if (Variables.gameManager.getGameStage().isGaming() && source.getSource() != null
-                    && source.getSource().isPlayer()
-                    && Variables.gameManager.isParticipant(uuid)) {
-                RandomTpCommand.updateCooldown(uuid, getConfigCooldown());
+        ModServerPlayerEvents.AFTER_PLAYER_DAMAGED.register(RandomTpCommand::onPlayerDamaged);
+        GameManager.addGlobalListener(new GameListener() {
+            @Override
+            public void onStageTriggered(GameManager manager, @Nullable Identifier triggerId) {
+                if (triggerId == null) {
+                    cooldownId = null;
+                } else if (Variables.config.randomTp().cooldownMap().get(triggerId) != null) {
+                    cooldownId = triggerId;
+                }
             }
+            @Override
+            public void onBorderResizing(GameManager manager) { }
+            @Override
+            public void onBorderResized(GameManager manager) { }
+            @Override
+            public void onPlayerWin(GameManager manager, ServerPlayerEntity player) { }
+            @Override
+            public void onGameTie(GameManager manager) { }
+        });
+    }
+
+    private static void onPlayerDamaged(ServerPlayerEntity player, DamageSource source, float amount) {
+        UUID uuid = PlayerUtil.getAuthUUID(player);
+        if (Variables.gameManager.getGameStage().isGaming()
+                && source.getSource() != null
+                && source.getSource().isPlayer()
+                && Variables.gameManager.isParticipant(uuid)) {
+            RandomTpCommand.updateCooldown(uuid, Variables.config.randomTp().damagedCooldown().toTicks());
         }
-        return true;
     }
 
     public static int getConfigCooldown() {

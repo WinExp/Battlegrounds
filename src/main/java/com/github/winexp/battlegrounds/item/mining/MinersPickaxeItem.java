@@ -3,7 +3,7 @@ package com.github.winexp.battlegrounds.item.mining;
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.item.Items;
-import com.github.winexp.battlegrounds.item.recipe.ItemNbtCrafting;
+import com.github.winexp.battlegrounds.item.recipe.ItemNbtRecipe;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PickaxeItem;
@@ -16,7 +16,7 @@ import net.minecraft.registry.tag.ItemTags;
 
 import java.util.Map;
 
-public class MinersPickaxeItem extends PickaxeItem implements ItemNbtCrafting, EnchantRestrict {
+public class MinersPickaxeItem extends PickaxeItem implements ItemNbtRecipe, EnchantRestrict {
     public static final Map<Enchantment, Integer> ENCHANTMENTS = Map.of(
             Enchantments.FORTUNE, 3,
             Enchantments.EFFICIENCY, 5,

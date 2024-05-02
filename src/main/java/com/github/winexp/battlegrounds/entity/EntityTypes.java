@@ -1,8 +1,8 @@
 package com.github.winexp.battlegrounds.entity;
 
 import com.github.winexp.battlegrounds.entity.projectile.ChannelingArrowEntity;
-import com.github.winexp.battlegrounds.entity.projectile.FlashBangEntity;
-import com.github.winexp.battlegrounds.entity.projectile.MolotovEntity;
+import com.github.winexp.battlegrounds.entity.projectile.thrown.FlashBangEntity;
+import com.github.winexp.battlegrounds.entity.projectile.thrown.MolotovEntity;
 import com.google.common.collect.ImmutableSet;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.block.Block;

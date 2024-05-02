@@ -1,11 +1,13 @@
 package com.github.winexp.battlegrounds.command;
 
 import com.github.winexp.battlegrounds.Battlegrounds;
+import com.github.winexp.battlegrounds.command.argument.PVPModeArgumentType;
 import com.github.winexp.battlegrounds.discussion.vote.VoteManager;
 import com.github.winexp.battlegrounds.discussion.vote.VotePreset;
-import com.github.winexp.battlegrounds.entity.projectile.FlashBangEntity;
+import com.github.winexp.battlegrounds.entity.projectile.thrown.FlashBangEntity;
 import com.github.winexp.battlegrounds.game.GameProperties;
-import com.github.winexp.battlegrounds.task.TaskScheduler;
+import com.github.winexp.battlegrounds.game.PVPMode;
+import com.github.winexp.battlegrounds.util.task.TaskScheduler;
 import com.github.winexp.battlegrounds.util.*;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.ArgumentBuilder;
@@ -34,23 +36,38 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class BattlegroundsCommand {
     public static void registerRoot(CommandDispatcher<ServerCommandSource> dispatcher) {
         var cRoot = literal("battlegrounds");
+        var cPvpMode = registerPvpMode();
+        var cGameMode = registerGameMode();
         var cStart = registerStart();
         var cStop = literal("stop").requires(source ->
                 source.hasPermissionLevel(2)).executes(BattlegroundsCommand::executeStop);
         var cReload = literal("reload").requires(source ->
                 source.hasPermissionLevel(2)).executes(BattlegroundsCommand::executeReload);
         var cFlash = registerSummonFlash();
-        var cMode = registerGameMode();
-        var cNode = dispatcher.register(cRoot.then(cMode).then(cStart).then(cStop).then(cReload).then(cFlash));
+        var cNode = dispatcher.register(cRoot.then(cPvpMode).then(cGameMode).then(cStart).then(cStop).then(cReload).then(cFlash));
         // 命令缩写
         var cRoot_redir = literal("bg").redirect(cNode);
         dispatcher.register(cRoot_redir);
     }
 
+    public static ArgumentBuilder<ServerCommandSource, ?> registerPvpMode() {
+        var cPvpMode = literal("pvp_mode").requires(source -> source.hasPermissionLevel(2));
+        var aPvpMode = argument("pvp_mode", PVPModeArgumentType.pvpMode())
+                .executes(BattlegroundsCommand::executePvpMode);
+        return cPvpMode.then(aPvpMode);
+    }
+
+    public static int executePvpMode(CommandContext<ServerCommandSource> context) {
+        PVPMode pvpMode = PVPModeArgumentType.getPVPMode(context, "pvp_mode");
+        Variables.gameManager.setPVPMode(pvpMode);
+        return 1;
+    }
+
     public static ArgumentBuilder<ServerCommandSource, ?> registerStart() {
         var cStart = literal("start");
-        var aProp = argument("gameProperties", IdentifierArgumentType.identifier()).suggests(((context, builder) ->
-                CommandSource.suggestMatching(Constants.GAME_PROPERTIES.keySet().stream().map(Identifier::toString), builder)))
+        var aProp = argument("gameProperties", IdentifierArgumentType.identifier())
+                .suggests(((context, builder) ->
+                        CommandSource.suggestMatching(Constants.GAME_PROPERTIES.keySet().stream().map(Identifier::toString), builder)))
                 .executes(BattlegroundsCommand::executeStart);
         return cStart.then(aProp);
     }
@@ -67,13 +84,13 @@ public class BattlegroundsCommand {
             ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
             World world = player.getWorld();
             Vec3d pos = player.getPos();
-            FlashBangEntity.flash(world, pos);
+            FlashBangEntity.summonFlash(world, pos);
         } else if (isSelf && !context.getSource().isExecutedByPlayer()) {
             throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument().create();
         } else {
             Vec3d pos = Vec3ArgumentType.getVec3(context, "pos");
             World world = Variables.server.getOverworld();
-            FlashBangEntity.flash(world, pos);
+            FlashBangEntity.summonFlash(world, pos);
         }
         return 1;
     }

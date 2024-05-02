@@ -6,7 +6,7 @@
   "description": "",
   "authors": [],
   "contact": {
-    "repo": "https://github.com/wenb2/Battlegrounds"
+    "repo": "https://github.com/WinExp/Battlegrounds"
   },
   "license": "Apache-2.0",
   "icon": "assets/battlegrounds/icon.png",
@@ -29,7 +29,6 @@
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": "*",
-    "minecraft": "${minecraft_version}",
-    "roughlyenoughitems": ">=14.0"
+    "minecraft": "${minecraft_version}"
   }
 }
