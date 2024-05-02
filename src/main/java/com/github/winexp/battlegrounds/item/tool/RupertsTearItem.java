@@ -11,6 +11,7 @@ import com.github.winexp.battlegrounds.util.ParticleUtil;
 import com.github.winexp.battlegrounds.util.raycast.BlockRaycastResult;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.ItemStack;
@@ -36,7 +37,7 @@ public class RupertsTearItem extends ToolItem implements EnchantRestrict {
     public static final int MAX_DISTANCE = 100;
     public static final int MAX_COOLDOWN = 30 * 20;
     public static final int MIN_COOLDOWN = 3 * 20;
-    public static final int FAILED_COOLDOWN = 20;
+    public static final int FAILED_COOLDOWN = 30;
 
     public RupertsTearItem(ToolMaterial toolMaterial, Settings settings) {
         super(toolMaterial, settings);
@@ -69,6 +70,12 @@ public class RupertsTearItem extends ToolItem implements EnchantRestrict {
     @Override
     public boolean isEnchantable(ItemStack stack) {
         return false;
+    }
+
+    public static void damageStack(ServerPlayerEntity player, Hand hand) {
+        ItemStack stack = player.getStackInHand(hand);
+        EquipmentSlot slot = hand == Hand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
+        stack.damage(1, player, slot);
     }
 
     public static void teleport(ServerPlayerEntity player, Vec3d teleportPos, double distance) {
@@ -106,7 +113,7 @@ public class RupertsTearItem extends ToolItem implements EnchantRestrict {
             double y = BlockUtil.getBlockMaxY(world, pos);
             Box boundingBox = BlockUtil.getCollisionShape(world, pos).getBoundingBox();
             Vec3d tpPos = boundingBox.getCenter().add(Vec3d.of(pos)).withAxis(Direction.Axis.Y, y);
-            RupertsTearTeleportPayloadC2S packet = new RupertsTearTeleportPayloadC2S(stack, tpPos);
+            RupertsTearTeleportPayloadC2S packet = new RupertsTearTeleportPayloadC2S(hand, tpPos);
             ClientPlayNetworking.send(packet);
         }
         return TypedActionResult.success(stack, world.isClient);
