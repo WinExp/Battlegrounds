@@ -191,14 +191,6 @@ public class ModRecipeGenerator extends FabricRecipeProvider {
                 .input('N', Items.NETHERITE_SWORD)
                 .offerTo(exporter);
         ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.LEACHING_SWORD, 1)
-                .pattern("RRR")
-                .pattern("CSC")
-                .pattern(" S ")
-                .input('R', ConventionalItemTags.IRON_RAW_MATERIALS)
-                .input('C', ItemTags.COALS)
-                .input('S', ConventionalItemTags.WOODEN_RODS)
-                .offerTo(exporter);
-        ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.MINERS_PICKAXE, 1)
                 .pattern("DCB")
                 .pattern("ESE")
                 .pattern("DCD")
@@ -207,6 +199,14 @@ public class ModRecipeGenerator extends FabricRecipeProvider {
                 .input('B', ConventionalItemTags.STORAGE_BLOCKS_DIAMOND)
                 .input('E', Items.SPIDER_EYE)
                 .input('S', Items.DIAMOND_SWORD)
+                .offerTo(exporter);
+        ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.MINERS_PICKAXE, 1)
+                .pattern("RRR")
+                .pattern("CSC")
+                .pattern(" S ")
+                .input('R', ConventionalItemTags.IRON_RAW_MATERIALS)
+                .input('C', ItemTags.COALS)
+                .input('S', ConventionalItemTags.WOODEN_RODS)
                 .offerTo(exporter);
         ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.NETHERITE_SWORD)
                 .pattern("PGP")

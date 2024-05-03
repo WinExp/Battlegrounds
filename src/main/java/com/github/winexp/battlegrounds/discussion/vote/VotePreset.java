@@ -14,7 +14,7 @@ public record VotePreset(Identifier identifier, Text name, Text description, Vot
             new VoteSettings(
                     (voteInstance, closeReason) -> {
                         if (closeReason == VoteSettings.CloseReason.ACCEPTED) {
-                            GameProperties gameProperties = (GameProperties) voteInstance.getParameter("gameProperties").orElseThrow();
+                            GameProperties gameProperties = (GameProperties) voteInstance.getParameter("game_properties").orElseThrow();
                             Variables.gameManager.setGameProperties(gameProperties);
                             Variables.gameManager.prepareToDeleteWorld(voteInstance.getParticipants());
                         }

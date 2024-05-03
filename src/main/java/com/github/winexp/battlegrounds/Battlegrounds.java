@@ -18,12 +18,12 @@ import com.github.winexp.battlegrounds.loot.function.LootFunctionTypes;
 import com.github.winexp.battlegrounds.mixin.ArgumentTypesInvoker;
 import com.github.winexp.battlegrounds.network.ModServerConfigurationNetworkHandler;
 import com.github.winexp.battlegrounds.network.ModServerPlayNetworkHandler;
-import com.github.winexp.battlegrounds.network.payload.c2s.config.ModInfoPayloadC2S;
+import com.github.winexp.battlegrounds.network.payload.c2s.config.ModVersionPayloadC2S;
 import com.github.winexp.battlegrounds.network.payload.c2s.play.RupertsTearTeleportPayloadC2S;
 import com.github.winexp.battlegrounds.network.payload.c2s.play.vote.GetVoteInfoPayloadC2S;
 import com.github.winexp.battlegrounds.network.payload.c2s.play.vote.SyncVoteInfosPayloadC2S;
 import com.github.winexp.battlegrounds.network.payload.c2s.play.vote.VotePayloadC2S;
-import com.github.winexp.battlegrounds.network.payload.s2c.config.ModInfoPayloadS2C;
+import com.github.winexp.battlegrounds.network.payload.s2c.config.ModVersionPayloadS2C;
 import com.github.winexp.battlegrounds.network.payload.s2c.play.FlashPayloadS2C;
 import com.github.winexp.battlegrounds.network.payload.s2c.play.config.ModGameConfigPayloadS2C;
 import com.github.winexp.battlegrounds.network.payload.s2c.play.vote.*;
@@ -103,7 +103,7 @@ public class Battlegrounds implements ModInitializer {
     }
 
     private void registerCustomPayloads() {
-        PayloadTypeRegistry.configurationS2C().register(ModInfoPayloadS2C.ID, ModInfoPayloadS2C.PACKET_CODEC);
+        PayloadTypeRegistry.configurationS2C().register(ModVersionPayloadS2C.ID, ModVersionPayloadS2C.PACKET_CODEC);
         PayloadTypeRegistry.playS2C().register(ModGameConfigPayloadS2C.ID, ModGameConfigPayloadS2C.PACKET_CODEC);
         PayloadTypeRegistry.playS2C().register(SyncVoteInfosPayloadS2C.ID, SyncVoteInfosPayloadS2C.PACKET_CODEC);
         PayloadTypeRegistry.playS2C().register(UpdateVoteInfoPayloadS2C.ID, UpdateVoteInfoPayloadS2C.PACKET_CODEC);
@@ -112,7 +112,7 @@ public class Battlegrounds implements ModInitializer {
         PayloadTypeRegistry.playS2C().register(PlayerVotedPayloadS2C.ID, PlayerVotedPayloadS2C.PACKET_CODEC);
         PayloadTypeRegistry.playS2C().register(FlashPayloadS2C.ID, FlashPayloadS2C.PACKET_CODEC);
 
-        PayloadTypeRegistry.configurationC2S().register(ModInfoPayloadC2S.ID, ModInfoPayloadC2S.PACKET_CODEC);
+        PayloadTypeRegistry.configurationC2S().register(ModVersionPayloadC2S.ID, ModVersionPayloadC2S.PACKET_CODEC);
         PayloadTypeRegistry.playC2S().register(SyncVoteInfosPayloadC2S.ID, SyncVoteInfosPayloadC2S.PACKET_CODEC);
         PayloadTypeRegistry.playC2S().register(GetVoteInfoPayloadC2S.ID, GetVoteInfoPayloadC2S.PACKET_CODEC);
         PayloadTypeRegistry.playC2S().register(VotePayloadC2S.ID, VotePayloadC2S.PACKET_CODEC);
@@ -142,21 +142,21 @@ public class Battlegrounds implements ModInitializer {
         ResourceManagerHelper resourceManagerHelper = ResourceManagerHelper.get(ResourceType.SERVER_DATA);
         resourceManagerHelper.registerReloadListener(new DataPackResourceReloadListener());
         // 注册物品
-        Items.registerItems();
+        Items.bootstrap();
         // 注册物品组
-        ItemGroups.registerItemGroups();
+        ItemGroups.bootstrap();
         // 注册战利品表物品修饰器
-        LootFunctionTypes.registerLootFunctions();
+        LootFunctionTypes.bootstrap();
         // 注册实体
-        EntityTypes.registerEntityTypes();
+        EntityTypes.bootstrap();
         // 注册状态效果
-        StatusEffects.registerStatusEffects();
+        StatusEffects.bootstrap();
         // 注册附魔
-        Enchantments.registerEnchantments();
+        Enchantments.bootstrap();
         // 自动冶炼
         SmeltableBlockRegistry.registerDefaults();
         // 注册声音事件
-        SoundEvents.registerSoundEvents();
+        SoundEvents.bootstrap();
         // 注册指令参数类型
         this.registerCommandArgumentTypes();
         // 尝试重置存档

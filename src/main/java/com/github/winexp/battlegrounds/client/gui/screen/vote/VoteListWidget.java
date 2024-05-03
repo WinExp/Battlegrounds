@@ -18,11 +18,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Environment(EnvType.CLIENT)
 public class VoteListWidget extends AlwaysSelectedEntryListWidget<VoteListWidget.Entry> {
+    private static final int LINES = 4;
+    private static final int LINE_HEIGHT = 10;
+
     private final VoteScreen screen;
     private final List<Entry> entries = new CopyOnWriteArrayList<>();
 
-    public VoteListWidget(VoteScreen screen, MinecraftClient minecraftClient, int width, int height, int y, int itemHeight) {
-        super(minecraftClient, width, height, y, itemHeight);
+    public VoteListWidget(VoteScreen screen, MinecraftClient minecraftClient, int width, int height, int y) {
+        super(minecraftClient, width, height, y, LINES * LINE_HEIGHT + 4);
         this.screen = screen;
     }
 
@@ -85,13 +88,21 @@ public class VoteListWidget extends AlwaysSelectedEntryListWidget<VoteListWidget
             return text;
         }
 
+        private Text getInitiatorName() {
+            return this.voteInfo.initiatorProfile == null ? Text.translatable("vote.battlegrounds.initiator.unknown")
+                    : Text.literal(this.voteInfo.initiatorProfile.getName());
+        }
+
         @Override
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             context.drawText(this.client.textRenderer, this.voteInfo.name, x + 3, y + 1, Colors.WHITE, false);
-            context.drawText(this.client.textRenderer, this.voteInfo.description, x + 3, y + 1 + 10, Colors.GRAY, false);
+            context.drawText(this.client.textRenderer, this.voteInfo.description, x + 3, y + 1 + LINE_HEIGHT, Colors.GRAY, false);
+            context.drawText(this.client.textRenderer,
+                    Text.translatable("vote.battlegrounds.initiator", this.getInitiatorName()),
+                    x + 3, y + 1 + LINE_HEIGHT * 2, Colors.GRAY, false);
             context.drawText(this.client.textRenderer,
                     Text.translatable("gui.battlegrounds.vote.time_left", this.voteInfo.timeLeft / 20),
-                    x + 3, y + 1 + 20, Colors.GRAY, false);
+                    x + 3, y + 1 + LINE_HEIGHT * 3, Colors.GRAY, false);
         }
 
         public boolean isSelectable() {

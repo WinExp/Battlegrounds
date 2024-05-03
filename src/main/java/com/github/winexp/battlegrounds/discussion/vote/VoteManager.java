@@ -98,14 +98,6 @@ public class VoteManager {
         this.voteMap.forEach(consumer);
     }
 
-
-    public Optional<VoteInstance> openVoteWithPreset(VotePreset preset, Collection<ServerPlayerEntity> participants, Map<String, Object> parameters) {
-        VoteInstance instance = new VoteInstance(preset.identifier(), preset.name(), preset.description(), preset.voteSettings(), parameters);
-        if (this.openVote(instance, participants)) {
-            return Optional.of(instance);
-        } else return Optional.empty();
-    }
-
     public boolean openVote(VoteInstance voteInstance, Collection<ServerPlayerEntity> participants) {
         Identifier identifier = voteInstance.getIdentifier();
         if (this.isVoting(identifier)) return false;

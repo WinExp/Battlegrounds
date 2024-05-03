@@ -52,7 +52,7 @@ public class Structures extends net.minecraft.world.gen.structure.Structures {
         registerDefault(structureRegisterable, Structures.ANCIENT_RUINS, StructurePools.ANCIENT_RUINS, 1);
         registerDefault(structureRegisterable, Structures.CANOPIES, StructurePools.CANOPIES, 1);
         registerDefault(structureRegisterable, Structures.DESERT_HUT, StructurePools.DESERT_HUT, 0);
-        registerDefault(structureRegisterable, Structures.IZAKAYA, StructurePools.IZAKAYA, 0);
+        registerDefault(structureRegisterable, Structures.IZAKAYA, StructurePools.IZAKAYA, -1);
         registerDefault(structureRegisterable, Structures.KIOSK, StructurePools.KIOSK, -2);
         registerDefault(structureRegisterable, Structures.LIBRARY, StructurePools.LIBRARY, 1);
         registerDefault(structureRegisterable, Structures.MEDIEVAL_FORTRESS, StructurePools.MEDIEVAL_FORTRESS, 0);

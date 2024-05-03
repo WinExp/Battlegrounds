@@ -16,6 +16,6 @@ public class Enchantments extends net.minecraft.enchantment.Enchantments {
         return Registry.register(Registries.ENCHANTMENT, new Identifier("battlegrounds", name), enchantment);
     }
 
-    public static void registerEnchantments() {
+    public static void bootstrap() {
     }
 }

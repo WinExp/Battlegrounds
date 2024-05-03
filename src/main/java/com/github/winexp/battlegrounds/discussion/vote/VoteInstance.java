@@ -6,9 +6,11 @@ import com.github.winexp.battlegrounds.util.task.TaskScheduler;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
 import com.github.winexp.battlegrounds.util.time.Duration;
 import com.google.common.collect.ImmutableList;
+import com.mojang.authlib.GameProfile;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.CancellationException;
@@ -20,6 +22,8 @@ public class VoteInstance {
     private final Text name;
     private final Text description;
     private final VoteSettings settings;
+    @Nullable
+    private final ServerPlayerEntity initiator;
     private final Map<String, Object> parameters;
     private boolean voting = false;
     private ScheduledTask timeoutTask = ScheduledTask.NONE_TASK;
@@ -27,28 +31,17 @@ public class VoteInstance {
     private final Object lock = new Object();
     private final Map<UUID, Boolean> voteResultMap = new ConcurrentHashMap<>();
 
-    public VoteInstance(Identifier identifier, VoteSettings settings, Map<String, Object> parameters) {
-        this.identifier = identifier;
-        this.name = Text.of(identifier);
-        this.description = Text.empty();
-        this.settings = settings;
-        this.parameters = parameters == null ? new HashMap<>() : parameters;
-    }
-
-    public VoteInstance(Identifier identifier, Text name, VoteSettings settings, Map<String, Object> parameters) {
-        this.identifier = identifier;
-        this.name = name;
-        this.description = Text.empty();
-        this.settings = settings;
-        this.parameters = parameters == null ? new HashMap<>() : parameters;
-    }
-
-    public VoteInstance(Identifier identifier, Text name, Text description, VoteSettings settings, Map<String, Object> parameters) {
+    public VoteInstance(Identifier identifier, Text name, Text description, VoteSettings settings, @Nullable ServerPlayerEntity initiator, Map<String, Object> parameters) {
         this.identifier = identifier;
         this.name = name;
         this.description = description;
         this.settings = settings;
+        this.initiator = initiator;
         this.parameters = parameters == null ? new HashMap<>() : parameters;
+    }
+
+    public static VoteInstance createWithPreset(VotePreset preset, @Nullable ServerPlayerEntity initiator, Map<String, Object> parameters) {
+        return new VoteInstance(preset.identifier(), preset.name(), preset.description(), preset.voteSettings(), initiator, parameters);
     }
 
     public int getTimeLeft() {
@@ -81,18 +74,23 @@ public class VoteInstance {
         return uuid;
     }
 
+    @Nullable
+    private GameProfile getInitiatorProfile() {
+        return this.initiator == null ? null : this.initiator.getGameProfile();
+    }
+
     public VoteInfo getVoteInfo(ServerPlayerEntity player) {
         UUID uuid = PlayerUtil.getAuthUUID(player);
         return this.getVoteInfo(uuid);
     }
 
     public VoteInfo getVoteInfo(UUID uuid) {
-        return new VoteInfo(this.identifier, this.uuid, this.name, this.description, this.getTimeLeft(), this.voting &&
-                (this.settings.allowChangeVote() || !this.isVoted(uuid)));
+        return new VoteInfo(this.identifier, this.uuid, this.name, this.description, this.getInitiatorProfile(), this.getTimeLeft(), this.voting &&
+                (this.settings.allowChangeVote() || !this.isVoted(uuid)) && this.isParticipant(uuid));
     }
 
     public VoteInfo getVoteInfo() {
-        return new VoteInfo(this.identifier, this.uuid, this.name, this.description, this.getTimeLeft(), this.voting);
+        return new VoteInfo(this.identifier, this.uuid, this.name, this.description, this.getInitiatorProfile(), this.getTimeLeft(), this.voting);
     }
 
     public Optional<Object> getParameter(String key) {
@@ -101,6 +99,11 @@ public class VoteInstance {
 
     public VoteSettings getSettings() {
         return settings;
+    }
+
+    @Nullable
+    public ServerPlayerEntity getInitiator() {
+        return this.initiator;
     }
 
     public Collection<UUID> getParticipants() {

@@ -49,6 +49,6 @@ public class EntityTypes<T extends Entity> extends net.minecraft.entity.EntityTy
         );
     }
 
-    public static void registerEntityTypes() {
+    public static void bootstrap() {
     }
 }

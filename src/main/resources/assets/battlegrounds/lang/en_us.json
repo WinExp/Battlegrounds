@@ -111,6 +111,8 @@
   "vote.battlegrounds.button.accept.description": "Accept the vote.",
   "vote.battlegrounds.button.deny": "[Deny Vote]",
   "vote.battlegrounds.button.deny.description": "Deny the vote.",
+  "vote.battlegrounds.initiator": "Initiated by %s",
+  "vote.battlegrounds.initiator.unknown": "Unknown",
   "vote.battlegrounds.manual.broadcast": "Voting is terminated by the administrator.",
   "vote.battlegrounds.not_voting.feedback": "There isn't any vote in progress!",
   "vote.battlegrounds.start_game.description": "The vote to start the game, needs to be passed by all players.",

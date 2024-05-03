@@ -5,11 +5,11 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
 
-public record ModInfoPayloadS2C(ModVersion modVersion) implements CustomPayload {
-    public static final Id<ModInfoPayloadS2C> ID = CustomPayload.id("battlegrounds:config/mod_info");
-    public static final PacketCodec<PacketByteBuf, ModInfoPayloadS2C> PACKET_CODEC = CustomPayload.codecOf(ModInfoPayloadS2C::write, ModInfoPayloadS2C::new);
+public record ModVersionPayloadS2C(ModVersion modVersion) implements CustomPayload {
+    public static final Id<ModVersionPayloadS2C> ID = CustomPayload.id("battlegrounds:config/mod_version");
+    public static final PacketCodec<PacketByteBuf, ModVersionPayloadS2C> PACKET_CODEC = CustomPayload.codecOf(ModVersionPayloadS2C::write, ModVersionPayloadS2C::new);
 
-    public ModInfoPayloadS2C(PacketByteBuf buf) {
+    public ModVersionPayloadS2C(PacketByteBuf buf) {
         this(ModVersion.PACKET_CODEC.decode(buf));
     }
 
