@@ -66,9 +66,9 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
             HitResult.Type type = this.lastHitResult.getType();
             if (type == HitResult.Type.BLOCK) {
                 BlockHitResult blockHitResult = (BlockHitResult) this.lastHitResult;
-                if (blockHitResult != null && !this.isRemoved()) {
+                if (!this.isRemoved()) {
                     Direction side = blockHitResult.getSide();
-                    Vec3d velocity = this.computeBlockReboundVelocity(this.getVelocity(), side);
+                    Vec3d velocity = this.computeBlockReboundVelocity(this.getVelocity(), blockHitResult);
                     Vec3d pos = blockHitResult.getPos();
                     this.setPosition(pos);
                     double speed = velocity.length();
@@ -136,7 +136,8 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
         this.lastHitResult = entityHitResult;
     }
 
-    private Vec3d computeBlockReboundVelocity(Vec3d velocity, Direction side) {
+    private Vec3d computeBlockReboundVelocity(Vec3d velocity, BlockHitResult blockHitResult) {
+        Direction side = blockHitResult.getSide();
         Vec3d newVelocity;
         double velocityMultiplier = this.getBlockReboundVelocityMultiplier();
         Direction.Axis axis = side.getAxis();

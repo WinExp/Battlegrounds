@@ -133,8 +133,8 @@ public class BattlegroundsCommand {
             source.sendFeedback(() -> Text.translatable("vote.battlegrounds.already_voting.feedback")
                     .formatted(Formatting.RED), false);
         } else {
-            VoteManager.INSTANCE.openVoteWithPreset(VotePreset.START_GAME, Variables.server.getPlayerManager().getPlayerList(),
-                            Map.of("gameProperties", gameProperties))
+            VoteManager.INSTANCE.openVoteWithPreset(VotePreset.START_GAME, source.getPlayer(), Map.of("gameProperties", gameProperties),
+                            Variables.server.getPlayerManager().getPlayerList())
                     .orElseThrow();
         }
         return 1;

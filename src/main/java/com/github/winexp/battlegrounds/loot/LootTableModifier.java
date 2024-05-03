@@ -1,6 +1,6 @@
 package com.github.winexp.battlegrounds.loot;
 
-import com.github.winexp.battlegrounds.block.BlockSmeltableRegistry;
+import com.github.winexp.battlegrounds.block.SmeltableBlockRegistry;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableSource;
 import net.minecraft.loot.LootManager;
@@ -15,8 +15,8 @@ public class LootTableModifier implements LootTableEvents.Modify {
     }
 
     public void modifySmelting(Identifier id, LootTable.Builder tableBuilder) {
-        if (BlockSmeltableRegistry.isSmeltable(id)) {
-            tableBuilder.apply(BlockSmeltableRegistry.getLootFunction(id));
+        if (SmeltableBlockRegistry.isSmeltable(id)) {
+            tableBuilder.apply(SmeltableBlockRegistry.getLootFunction(id));
         }
     }
 }

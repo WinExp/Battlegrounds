@@ -6,9 +6,12 @@ import com.github.winexp.battlegrounds.util.task.TaskScheduler;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
 import com.github.winexp.battlegrounds.util.time.Duration;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.mojang.authlib.GameProfile;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.CancellationException;
@@ -20,38 +23,29 @@ public class VoteInstance {
     private final Text name;
     private final Text description;
     private final VoteSettings settings;
-    private final Map<String, Object> parameters;
+    @Nullable
+    private final ServerPlayerEntity initiator;
+    private final ImmutableMap<String, Object> parameters;
     private boolean voting = false;
     private ScheduledTask timeoutTask = ScheduledTask.NONE_TASK;
     private ImmutableList<UUID> participants = ImmutableList.of();
     private final Object lock = new Object();
     private final Map<UUID, Boolean> voteResultMap = new ConcurrentHashMap<>();
 
-    public VoteInstance(Identifier identifier, VoteSettings settings, Map<String, Object> parameters) {
-        this.identifier = identifier;
-        this.name = Text.of(identifier);
-        this.description = Text.empty();
-        this.settings = settings;
-        this.parameters = parameters == null ? new HashMap<>() : parameters;
-    }
-
-    public VoteInstance(Identifier identifier, Text name, VoteSettings settings, Map<String, Object> parameters) {
-        this.identifier = identifier;
-        this.name = name;
-        this.description = Text.empty();
-        this.settings = settings;
-        this.parameters = parameters == null ? new HashMap<>() : parameters;
-    }
-
-    public VoteInstance(Identifier identifier, Text name, Text description, VoteSettings settings, Map<String, Object> parameters) {
+    public VoteInstance(Identifier identifier, Text name, Text description, VoteSettings settings, @Nullable ServerPlayerEntity initiator, Map<String, Object> parameters) {
         this.identifier = identifier;
         this.name = name;
         this.description = description;
         this.settings = settings;
-        this.parameters = parameters == null ? new HashMap<>() : parameters;
+        this.initiator = initiator;
+        this.parameters = parameters == null ? ImmutableMap.of() : ImmutableMap.copyOf(parameters);
     }
 
-    public int getTimeLeft() {
+    public static VoteInstance createWithPreset(VotePreset preset, @Nullable ServerPlayerEntity initiator, Map<String, Object> parameters) {
+        return new VoteInstance(preset.identifier(), preset.name(), preset.description(), preset.voteSettings(), initiator, parameters);
+    }
+
+    public int getTimeLeftTicks() {
         if (this.settings.timeout() == Duration.INFINITY) {
             return -1;
         } else return this.timeoutTask.getDelayTicks();
@@ -73,12 +67,12 @@ public class VoteInstance {
         return this.description;
     }
 
-    public int getTotal() {
-        return this.voteResultMap.size();
+    public int getParticipantsTotal() {
+        return this.participants.size();
     }
 
     public UUID getUuid() {
-        return uuid;
+        return this.uuid;
     }
 
     public VoteInfo getVoteInfo(ServerPlayerEntity player) {
@@ -87,12 +81,12 @@ public class VoteInstance {
     }
 
     public VoteInfo getVoteInfo(UUID uuid) {
-        return new VoteInfo(this.identifier, this.uuid, this.name, this.description, this.getTimeLeft(), this.voting &&
+        return new VoteInfo(this.identifier, this.uuid, this.name, this.description, this.getInitiatorProfile(), this.getTimeLeftTicks(), this.voting &&
                 (this.settings.allowChangeVote() || !this.isVoted(uuid)));
     }
 
     public VoteInfo getVoteInfo() {
-        return new VoteInfo(this.identifier, this.uuid, this.name, this.description, this.getTimeLeft(), this.voting);
+        return new VoteInfo(this.identifier, this.uuid, this.name, this.description, this.getInitiatorProfile(), this.getTimeLeftTicks(), this.voting);
     }
 
     public Optional<Object> getParameter(String key) {
@@ -100,11 +94,22 @@ public class VoteInstance {
     }
 
     public VoteSettings getSettings() {
-        return settings;
+        return this.settings;
     }
 
     public Collection<UUID> getParticipants() {
         return this.participants;
+    }
+
+    @Nullable
+    public ServerPlayerEntity getInitiator() {
+        return this.initiator;
+    }
+
+    @Nullable
+    private GameProfile getInitiatorProfile() {
+        if (this.initiator != null) return this.initiator.getGameProfile();
+        else return null;
     }
 
     public int getAcceptedNum() {
@@ -132,29 +137,33 @@ public class VoteInstance {
     }
     
     public boolean acceptVote(ServerPlayerEntity player) {
-        UUID uuid = PlayerUtil.getAuthUUID(player);
-        if (!this.voting) return false;
-        if (!this.isParticipant(player)) return false;
-        if (!this.settings.allowChangeVote() && this.isVoted(uuid)) return false;
-        this.voteResultMap.put(uuid, true);
-        this.settings.playerVotedAction().accept(this, player, true);
-        ServerVoteEvents.PLAYER_VOTED.invoker().onPlayerVoted(player, this, true);
-        if (this.settings.voteMode().acceptPredicate.test(this.participants.size(), this.getAcceptedNum())) {
-            this.closeVote(VoteSettings.CloseReason.ACCEPTED);
+        synchronized (this.lock) {
+            UUID uuid = PlayerUtil.getAuthUUID(player);
+            if (!this.voting) return false;
+            if (!this.isParticipant(player)) return false;
+            if (!this.settings.allowChangeVote() && this.isVoted(uuid)) return false;
+            this.voteResultMap.put(uuid, true);
+            this.settings.playerVotedAction().accept(this, player, true);
+            ServerVoteEvents.PLAYER_VOTED.invoker().onPlayerVoted(player, this, true);
+            if (this.settings.voteMode().acceptPredicate.test(this.participants.size(), this.getAcceptedNum())) {
+                this.closeVote(VoteSettings.CloseReason.ACCEPTED);
+            }
+            return true;
         }
-        return true;
     }
 
     public boolean denyVote(ServerPlayerEntity player) {
-        UUID uuid = PlayerUtil.getAuthUUID(player);
-        if (!this.voting) return false;
-        if (!this.isParticipant(player)) return false;
-        if (!this.settings.allowChangeVote() && this.isVoted(uuid)) return false;
-        if (this.settings.voteMode().canDenyCancel) this.closeVote(VoteSettings.CloseReason.DENIED);
-        this.voteResultMap.put(uuid, false);
-        this.settings.playerVotedAction().accept(this, player, false);
-        ServerVoteEvents.PLAYER_VOTED.invoker().onPlayerVoted(player, this, false);
-        return true;
+        synchronized (this.lock) {
+            UUID uuid = PlayerUtil.getAuthUUID(player);
+            if (!this.voting) return false;
+            if (!this.isParticipant(player)) return false;
+            if (!this.settings.allowChangeVote() && this.isVoted(uuid)) return false;
+            if (this.settings.voteMode().canDenyCancel) this.closeVote(VoteSettings.CloseReason.DENIED);
+            this.voteResultMap.put(uuid, false);
+            this.settings.playerVotedAction().accept(this, player, false);
+            ServerVoteEvents.PLAYER_VOTED.invoker().onPlayerVoted(player, this, false);
+            return true;
+        }
     }
 
     public boolean openVote(Collection<ServerPlayerEntity> participants) {

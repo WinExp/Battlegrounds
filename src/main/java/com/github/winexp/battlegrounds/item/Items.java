@@ -253,7 +253,7 @@ public class Items extends net.minecraft.item.Items {
         });
     }
 
-    public static void registerItems() {
+    public static void bootstrap() {
         registerDispenserBehaviors();
         addRecipes();
     }

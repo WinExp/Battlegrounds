@@ -12,6 +12,7 @@ import net.minecraft.network.ClientConnection;
 import net.minecraft.server.network.ConnectedClientData;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -99,8 +100,8 @@ public class VoteManager {
     }
 
 
-    public Optional<VoteInstance> openVoteWithPreset(VotePreset preset, Collection<ServerPlayerEntity> participants, Map<String, Object> parameters) {
-        VoteInstance instance = new VoteInstance(preset.identifier(), preset.name(), preset.description(), preset.voteSettings(), parameters);
+    public Optional<VoteInstance> openVoteWithPreset(VotePreset preset, @Nullable ServerPlayerEntity initiator, Map<String, Object> parameters, Collection<ServerPlayerEntity> participants) {
+        VoteInstance instance = VoteInstance.createWithPreset(preset, initiator, parameters);
         if (this.openVote(instance, participants)) {
             return Optional.of(instance);
         } else return Optional.empty();

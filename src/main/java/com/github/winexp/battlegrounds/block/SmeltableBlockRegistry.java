@@ -17,7 +17,7 @@ import net.minecraft.util.Identifier;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BlockSmeltableRegistry {
+public class SmeltableBlockRegistry {
     private static final LootCondition.Builder DEFAULT_SMELTABLE_CONDITION = MatchToolLootCondition.builder(ItemPredicate.Builder.create()
             .enchantment(new EnchantmentPredicate(Enchantments.SMELTING, NumberRange.IntRange.atLeast(1))));
     public static final ConditionalLootFunction.Builder<?> DEFAULT_SMELTABLE_FUNCTION = FurnaceSmeltLootFunction.builder();

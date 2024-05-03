@@ -8,59 +8,23 @@ import com.github.winexp.battlegrounds.item.tool.RupertsTearItem;
 import com.github.winexp.battlegrounds.network.packet.c2s.play.*;
 import com.github.winexp.battlegrounds.network.packet.c2s.play.vote.*;
 import com.github.winexp.battlegrounds.network.packet.s2c.play.vote.*;
-import com.github.winexp.battlegrounds.util.Constants;
-import com.github.winexp.battlegrounds.util.data.ModVersion;
-import com.github.winexp.battlegrounds.util.PlayerUtil;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.Optional;
-import java.util.UUID;
 
 public final class ModServerPlayNetworkHandler {
     public static void register() {
-        ServerPlayConnectionEvents.INIT.register(ModServerPlayNetworkHandler::onPlayInit);
-        ServerPlayConnectionEvents.DISCONNECT.register(ModServerPlayNetworkHandler::onPlayDisconnect);
         ServerPlayNetworking.registerGlobalReceiver(SyncVoteInfosC2SPacket.TYPE, ModServerPlayNetworkHandler::onSyncVoteInfos);
         ServerPlayNetworking.registerGlobalReceiver(GetVoteInfoC2SPacket.TYPE, ModServerPlayNetworkHandler::onGetVoteInfo);
         ServerPlayNetworking.registerGlobalReceiver(VoteC2SPacket.TYPE, ModServerPlayNetworkHandler::onVote);
         ServerPlayNetworking.registerGlobalReceiver(RupertsTearTeleportC2SPacket.TYPE, ModServerPlayNetworkHandler::onRupertsTearTeleport);
-    }
-
-    private static void onPlayInit(ServerPlayNetworkHandler handler, MinecraftServer server) {
-        UUID uuid = handler.getDebugProfile().getId();
-        ModVersion playerModVersion = PlayerUtil.getPlayerModVersion(uuid);
-        if (playerModVersion == null) {
-            handler.disconnect(Text.translatable(
-                    "disconnect.battlegrounds.config.mod_info.not_found",
-                    Constants.MOD_VERSION.version().getFriendlyString(),
-                    Constants.MOD_VERSION.protocolVersion()
-            ).formatted(Formatting.RED).styled(style -> style.withBold(true)));
-        } else if (playerModVersion.protocolVersion() != Constants.MOD_VERSION.protocolVersion()) {
-            handler.disconnect(Text.translatable(
-                            "disconnect.battlegrounds.config.mod_info.failed",
-                            playerModVersion.version().getFriendlyString(),
-                            playerModVersion.protocolVersion(),
-                            Constants.MOD_VERSION.version().getFriendlyString(),
-                            Constants.MOD_VERSION.protocolVersion()
-                    )
-                    .formatted(Formatting.RED)
-                    .styled(style -> style.withBold(true)));
-        }
-    }
-
-    private static void onPlayDisconnect(ServerPlayNetworkHandler handler, MinecraftServer server) {
-        PlayerUtil.setPlayerModVersion(handler.getDebugProfile().getId(), null);
     }
 
     private static void onSyncVoteInfos(SyncVoteInfosC2SPacket packet, ServerPlayerEntity player, PacketSender sender) {

@@ -54,6 +54,6 @@ public class ItemGroups extends net.minecraft.item.ItemGroups {
         return Registry.register(Registries.ITEM_GROUP, new Identifier("battlegrounds", name), itemGroup);
     }
 
-    public static void registerItemGroups() {
+    public static void bootstrap() {
     }
 }

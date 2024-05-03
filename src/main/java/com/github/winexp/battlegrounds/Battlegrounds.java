@@ -1,6 +1,6 @@
 package com.github.winexp.battlegrounds;
 
-import com.github.winexp.battlegrounds.block.BlockSmeltableRegistry;
+import com.github.winexp.battlegrounds.block.SmeltableBlockRegistry;
 import com.github.winexp.battlegrounds.command.BattlegroundsCommand;
 import com.github.winexp.battlegrounds.command.RandomTpCommand;
 import com.github.winexp.battlegrounds.command.argument.PVPModeArgumentType;
@@ -115,21 +115,21 @@ public class Battlegrounds implements ModInitializer {
         ResourceManagerHelper resourceManagerHelper = ResourceManagerHelper.get(ResourceType.SERVER_DATA);
         resourceManagerHelper.registerReloadListener(new DataPackResourceReloadListener());
         // 注册物品
-        Items.registerItems();
+        Items.bootstrap();
         // 注册物品组
-        ItemGroups.registerItemGroups();
+        ItemGroups.bootstrap();
         // 注册战利品表物品修饰器
-        LootFunctionTypes.registerLootFunctions();
+        LootFunctionTypes.bootstrap();
         // 注册实体
-        EntityTypes.registerEntityTypes();
+        EntityTypes.bootstrap();
         // 注册状态效果
-        StatusEffects.registerStatusEffects();
+        StatusEffects.bootstrap();
         // 注册附魔
-        Enchantments.registerEnchantments();
+        Enchantments.bootstrap();
         // 自动冶炼
-        BlockSmeltableRegistry.registerDefaults();
+        SmeltableBlockRegistry.registerDefaults();
         // 注册声音事件
-        SoundEvents.registerSoundEvents();
+        SoundEvents.bootstrap();
         // 注册指令参数类型
         this.registerCommandArgumentTypes();
         // 尝试重置存档

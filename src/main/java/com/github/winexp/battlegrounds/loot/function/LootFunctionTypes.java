@@ -14,6 +14,6 @@ public class LootFunctionTypes extends net.minecraft.loot.function.LootFunctionT
         return Registry.register(Registries.LOOT_FUNCTION_TYPE, id, new LootFunctionType(codec));
     }
 
-    public static void registerLootFunctions() {
+    public static void bootstrap() {
     }
 }

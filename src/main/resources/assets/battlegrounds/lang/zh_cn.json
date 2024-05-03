@@ -110,6 +110,7 @@
   "vote.battlegrounds.button.accept.description": "赞成票",
   "vote.battlegrounds.button.deny": "[反对]",
   "vote.battlegrounds.button.deny.description": "反对票",
+  "vote.battlegrounds.initiator": "由 %s 发起",
   "vote.battlegrounds.manual.broadcast": "投票被管理员终止。",
   "vote.battlegrounds.not_voting.feedback": "现在没有正在进行的投票！",
   "vote.battlegrounds.start_game.description": "开始游戏的投票，需全玩家通过",

@@ -20,6 +20,6 @@ public class StatusEffects extends net.minecraft.entity.effect.StatusEffects {
                 effect);
     }
 
-    public static void registerStatusEffects() {
+    public static void bootstrap() {
     }
 }

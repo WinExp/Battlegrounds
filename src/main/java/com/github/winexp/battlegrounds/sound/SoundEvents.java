@@ -17,6 +17,6 @@ public class SoundEvents extends net.minecraft.sound.SoundEvents {
         return Registry.register(Registries.SOUND_EVENT, id, SoundEvent.of(id));
     }
 
-    public static void registerSoundEvents() {
+    public static void bootstrap() {
     }
 }

@@ -1,7 +1,6 @@
 package com.github.winexp.battlegrounds.datagen;
 
 import com.github.winexp.battlegrounds.item.Items;
-import com.github.winexp.battlegrounds.registry.RegistryKeys;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricAdvancementProvider;
 import net.minecraft.advancement.Advancement;
@@ -14,6 +13,7 @@ import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
 import net.minecraft.predicate.entity.LocationPredicate;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.gen.structure.Structure;
