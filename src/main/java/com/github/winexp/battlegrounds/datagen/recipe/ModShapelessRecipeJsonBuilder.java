@@ -1,16 +1,26 @@
 package com.github.winexp.battlegrounds.datagen.recipe;
 
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
+import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementCriterion;
+import net.minecraft.advancement.AdvancementEntry;
+import net.minecraft.component.ComponentChanges;
+import net.minecraft.component.DataComponentType;
+import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.ShapelessRecipe;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 public class ModShapelessRecipeJsonBuilder extends ShapelessRecipeJsonBuilder {
+    private final ComponentChanges.Builder componentChanges = ComponentChanges.builder();
+
     public ModShapelessRecipeJsonBuilder(RecipeCategory category, ItemConvertible output, int count) {
         super(category, output, count);
     }
@@ -21,6 +31,11 @@ public class ModShapelessRecipeJsonBuilder extends ShapelessRecipeJsonBuilder {
 
     public static ModShapelessRecipeJsonBuilder create(RecipeCategory category, ItemConvertible output, int count) {
         return new ModShapelessRecipeJsonBuilder(category, output, count);
+    }
+
+    public <T> ModShapelessRecipeJsonBuilder component(DataComponentType<T> componentType, T component) {
+        this.componentChanges.add(componentType, component);
+        return this;
     }
 
     @Override
@@ -70,5 +85,23 @@ public class ModShapelessRecipeJsonBuilder extends ShapelessRecipeJsonBuilder {
     public ModShapelessRecipeJsonBuilder group(@Nullable String string) {
         super.group(string);
         return this;
+    }
+
+    @Override
+    public void offerTo(RecipeExporter exporter, Identifier recipeId) {
+        RecipeExporter modifiedExporter = new RecipeExporter() {
+            @Override
+            public void accept(Identifier recipeId, Recipe<?> recipe, @Nullable AdvancementEntry advancement) {
+                ShapelessRecipe shapelessRecipe = (ShapelessRecipe) recipe;
+                shapelessRecipe.getResult(null).applyChanges(ModShapelessRecipeJsonBuilder.this.componentChanges.build());
+                exporter.accept(recipeId, shapelessRecipe, advancement);
+            }
+
+            @Override
+            public Advancement.Builder getAdvancementBuilder() {
+                return exporter.getAdvancementBuilder();
+            }
+        };
+        super.offerTo(modifiedExporter, recipeId);
     }
 }

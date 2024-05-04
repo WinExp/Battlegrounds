@@ -15,7 +15,7 @@ public class Constants {
     public static final String MOD_NAME = "Battlegrounds";
     public static final ModMetadata MOD_METADATA = FabricLoader.getInstance().getModContainer(MOD_ID)
             .orElseThrow().getMetadata();
-    public static final ModVersion MOD_VERSION = new ModVersion(MOD_METADATA.getVersion(), 13);
+    public static final ModVersion MOD_VERSION = new ModVersion(MOD_METADATA.getVersion(), 14);
     public static final Logger LOGGER = LogManager.getLogger(MOD_NAME);
     public static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve(MOD_ID);
     public static final Path DELETE_WORLD_TMP_FILE_PATH = FabricLoader.getInstance().getGameDir()

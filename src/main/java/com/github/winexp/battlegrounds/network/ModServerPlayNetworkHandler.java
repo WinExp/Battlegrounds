@@ -22,7 +22,7 @@ import java.util.Optional;
 public final class ModServerPlayNetworkHandler {
     public static void register() {
         ServerPlayNetworking.registerGlobalReceiver(SyncVoteInfosPayloadC2S.ID, ModServerPlayNetworkHandler::onSyncVoteInfos);
-        ServerPlayNetworking.registerGlobalReceiver(GetVoteInfoPayloadC2S.ID, ModServerPlayNetworkHandler::onGetVoteInfo);
+        ServerPlayNetworking.registerGlobalReceiver(UpdateVoteInfoPayloadC2S.ID, ModServerPlayNetworkHandler::onGetVoteInfo);
         ServerPlayNetworking.registerGlobalReceiver(VotePayloadC2S.ID, ModServerPlayNetworkHandler::onVote);
         ServerPlayNetworking.registerGlobalReceiver(RupertsTearTeleportPayloadC2S.ID, ModServerPlayNetworkHandler::onRupertsTearTeleport);
     }
@@ -32,7 +32,7 @@ public final class ModServerPlayNetworkHandler {
         player.server.execute(() -> VoteManager.INSTANCE.syncVoteInfos(player));
     }
 
-    private static void onGetVoteInfo(GetVoteInfoPayloadC2S packet, ServerPlayNetworking.Context context) {
+    private static void onGetVoteInfo(UpdateVoteInfoPayloadC2S packet, ServerPlayNetworking.Context context) {
         ServerPlayerEntity player = context.player();
         PacketSender sender = context.responseSender();
         VoteManager.INSTANCE.getVoteInstance(packet.voteId()).ifPresentOrElse(voteInstance -> {

@@ -5,11 +5,11 @@ import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
 
-public record GetVoteInfoPayloadC2S(Identifier voteId) implements CustomPayload {
-    public static final Id<GetVoteInfoPayloadC2S> ID = CustomPayload.id("battlegrounds:play/vote/get_vote_info");
-    public static final PacketCodec<PacketByteBuf, GetVoteInfoPayloadC2S> PACKET_CODEC = CustomPayload.codecOf(GetVoteInfoPayloadC2S::write, GetVoteInfoPayloadC2S::new);
+public record UpdateVoteInfoPayloadC2S(Identifier voteId) implements CustomPayload {
+    public static final Id<UpdateVoteInfoPayloadC2S> ID = CustomPayload.id("battlegrounds:play/vote/get_vote_info");
+    public static final PacketCodec<PacketByteBuf, UpdateVoteInfoPayloadC2S> PACKET_CODEC = CustomPayload.codecOf(UpdateVoteInfoPayloadC2S::write, UpdateVoteInfoPayloadC2S::new);
 
-    public GetVoteInfoPayloadC2S(PacketByteBuf buf) {
+    public UpdateVoteInfoPayloadC2S(PacketByteBuf buf) {
         this(buf.readIdentifier());
     }
 

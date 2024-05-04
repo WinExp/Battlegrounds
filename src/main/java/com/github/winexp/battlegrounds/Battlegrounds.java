@@ -20,7 +20,7 @@ import com.github.winexp.battlegrounds.network.ModServerConfigurationNetworkHand
 import com.github.winexp.battlegrounds.network.ModServerPlayNetworkHandler;
 import com.github.winexp.battlegrounds.network.payload.c2s.config.ModVersionPayloadC2S;
 import com.github.winexp.battlegrounds.network.payload.c2s.play.RupertsTearTeleportPayloadC2S;
-import com.github.winexp.battlegrounds.network.payload.c2s.play.vote.GetVoteInfoPayloadC2S;
+import com.github.winexp.battlegrounds.network.payload.c2s.play.vote.UpdateVoteInfoPayloadC2S;
 import com.github.winexp.battlegrounds.network.payload.c2s.play.vote.SyncVoteInfosPayloadC2S;
 import com.github.winexp.battlegrounds.network.payload.c2s.play.vote.VotePayloadC2S;
 import com.github.winexp.battlegrounds.network.payload.s2c.config.ModVersionPayloadS2C;
@@ -114,7 +114,7 @@ public class Battlegrounds implements ModInitializer {
 
         PayloadTypeRegistry.configurationC2S().register(ModVersionPayloadC2S.ID, ModVersionPayloadC2S.PACKET_CODEC);
         PayloadTypeRegistry.playC2S().register(SyncVoteInfosPayloadC2S.ID, SyncVoteInfosPayloadC2S.PACKET_CODEC);
-        PayloadTypeRegistry.playC2S().register(GetVoteInfoPayloadC2S.ID, GetVoteInfoPayloadC2S.PACKET_CODEC);
+        PayloadTypeRegistry.playC2S().register(UpdateVoteInfoPayloadC2S.ID, UpdateVoteInfoPayloadC2S.PACKET_CODEC);
         PayloadTypeRegistry.playC2S().register(VotePayloadC2S.ID, VotePayloadC2S.PACKET_CODEC);
         PayloadTypeRegistry.playC2S().register(RupertsTearTeleportPayloadC2S.ID, RupertsTearTeleportPayloadC2S.PACKET_CODEC);
     }

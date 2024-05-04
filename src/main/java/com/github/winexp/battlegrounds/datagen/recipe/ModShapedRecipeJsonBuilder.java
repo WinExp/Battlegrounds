@@ -1,11 +1,11 @@
 package com.github.winexp.battlegrounds.datagen.recipe;
 
-import com.github.winexp.battlegrounds.mixin.ShapedRecipeAccessor;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementCriterion;
 import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.component.ComponentChanges;
+import net.minecraft.component.DataComponentType;
 import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.item.Item;
@@ -19,7 +19,7 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 public class ModShapedRecipeJsonBuilder extends ShapedRecipeJsonBuilder {
-    private ComponentChanges componentChanges = ComponentChanges.EMPTY;
+    private final ComponentChanges.Builder componentChanges = ComponentChanges.builder();
 
     public ModShapedRecipeJsonBuilder(RecipeCategory category, ItemConvertible output, int count) {
         super(category, output, count);
@@ -33,8 +33,8 @@ public class ModShapedRecipeJsonBuilder extends ShapedRecipeJsonBuilder {
         return new ModShapedRecipeJsonBuilder(category, output, count);
     }
 
-    public ModShapedRecipeJsonBuilder componentChanges(ComponentChanges componentChanges) {
-        this.componentChanges = componentChanges;
+    public <T> ModShapedRecipeJsonBuilder component(DataComponentType<T> componentType, T component) {
+        this.componentChanges.add(componentType, component);
         return this;
     }
 
@@ -88,9 +88,7 @@ public class ModShapedRecipeJsonBuilder extends ShapedRecipeJsonBuilder {
             @Override
             public void accept(Identifier recipeId, Recipe<?> recipe, @Nullable AdvancementEntry advancement) {
                 ShapedRecipe shapedRecipe = (ShapedRecipe) recipe;
-                ShapedRecipeAccessor accessor = (ShapedRecipeAccessor) shapedRecipe;
-                shapedRecipe.getResult(null).applyChanges(ModShapedRecipeJsonBuilder.this.componentChanges);
-                shapedRecipe = new ShapedRecipe(shapedRecipe.getGroup(), shapedRecipe.getCategory(), accessor.getRaw(), shapedRecipe.getResult(null), shapedRecipe.showNotification());
+                shapedRecipe.getResult(null).applyChanges(ModShapedRecipeJsonBuilder.this.componentChanges.build());
                 exporter.accept(recipeId, shapedRecipe, advancement);
             }
 

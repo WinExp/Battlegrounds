@@ -39,11 +39,11 @@ public final class ModClientPlayNetworkHandler {
     }
 
     private static void onSyncVoteInfos(SyncVoteInfosPayloadS2C packet, ClientPlayNetworking.Context context) {
-        VoteScreen.onSyncVoteInfos(context.client(), packet);
+        VoteScreen.onVoteInfosReceived(context.client(), packet);
     }
 
     private static void onUpdateVoteInfo(UpdateVoteInfoPayloadS2C packet, ClientPlayNetworking.Context context) {
-        VoteScreen.onUpdateVoteInfo(context.client(), packet);
+        VoteScreen.updateVoteInfo(context.client(), packet);
     }
 
     private static void onVoteOpened(VoteOpenedPayloadS2C packet, ClientPlayNetworking.Context context) {

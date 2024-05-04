@@ -85,12 +85,15 @@ public class VoteListWidget extends AlwaysSelectedEntryListWidget<VoteListWidget
             text.append(Text.translatable("narrator.select", this.voteInfo.name));
             text.append(ScreenTexts.SENTENCE_SEPARATOR);
             text.append(this.voteInfo.description);
+            text.append(ScreenTexts.SENTENCE_SEPARATOR);
+            text.append(Text.translatable("vote.battlegrounds.initiator", this.getInitiatorName()));
+            text.append(ScreenTexts.SENTENCE_SEPARATOR);
+            text.append(Text.translatable("gui.battlegrounds.vote.time_left", this.voteInfo.timeLeft / 20));
             return text;
         }
 
         private Text getInitiatorName() {
-            return this.voteInfo.initiatorProfile == null ? Text.translatable("vote.battlegrounds.initiator.unknown")
-                    : Text.literal(this.voteInfo.initiatorProfile.getName());
+            return Text.translatableWithFallback("vote.battlegrounds.initiator." + this.voteInfo.initiatorName.getString(), this.voteInfo.initiatorName.getString());
         }
 
         @Override

@@ -2,15 +2,19 @@ package com.github.winexp.battlegrounds.datagen;
 
 import com.github.winexp.battlegrounds.datagen.recipe.ModShapedRecipeJsonBuilder;
 import com.github.winexp.battlegrounds.datagen.recipe.ModShapelessRecipeJsonBuilder;
+import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.item.Items;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -136,6 +140,63 @@ public class ModRecipeGenerator extends FabricRecipeProvider {
                 .input(ConventionalItemTags.COPPER_RAW_MATERIALS, 8)
                 .input(ItemTags.COALS)
                 .offerTo(exporter);
+        ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.ARROW, 32)
+                .pattern("FFF")
+                .pattern("TTT")
+                .pattern("SSS")
+                .input('F', Items.FLINT)
+                .input('T', ConventionalItemTags.WOODEN_RODS)
+                .input('S', Items.STRING)
+                .offerTo(exporter);
+        ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.TRIDENT)
+                .pattern(" QQ")
+                .pattern(" DQ")
+                .pattern("D  ")
+                .input('Q', ConventionalItemTags.QUARTZ_GEMS)
+                .input('D', ConventionalItemTags.DIAMOND_GEMS)
+                .offerTo(exporter);
+        ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.TOTEM_OF_UNDYING)
+                .pattern("GGG")
+                .pattern("GTG")
+                .pattern("GGG")
+                .input('G', ConventionalItemTags.GOLD_INGOTS)
+                .input('T', Items.GHAST_TEAR)
+                .offerTo(exporter);
+        ModShapelessRecipeJsonBuilder.create(RecipeCategory.TOOLS, Items.ZOMBIE_HEAD)
+                .input(Items.DIAMOND_SWORD, 2)
+                .input(Items.ROTTEN_FLESH)
+                .input(Items.GOLDEN_APPLE)
+                .offerTo(exporter);
+        ModShapelessRecipeJsonBuilder.create(RecipeCategory.FOOD, Items.CARROT, 3)
+                .input(ItemTags.DIRT)
+                .input(Items.BONE_MEAL)
+                .offerTo(exporter);
+        ModShapedRecipeJsonBuilder.create(RecipeCategory.FOOD, Items.GOLDEN_CARROT)
+                .pattern(" G ")
+                .pattern("GCG")
+                .pattern(" G ")
+                .input('G', Items.GOLD_NUGGET)
+                .input('C', Items.CARROT)
+                .offerTo(exporter);
+        ModShapelessRecipeJsonBuilder.create(RecipeCategory.FOOD, Items.APPLE)
+                .input(ItemTags.LEAVES, 9)
+                .offerTo(exporter);
+        ModShapedRecipeJsonBuilder.create(RecipeCategory.FOOD, Items.GOLDEN_APPLE)
+                .pattern(" G ")
+                .pattern("GAG")
+                .pattern(" G ")
+                .input('G', ConventionalItemTags.GOLD_INGOTS)
+                .input('A', Items.APPLE)
+                .offerTo(exporter);
+        ModShapedRecipeJsonBuilder.create(RecipeCategory.FOOD, Items.ENCHANTED_GOLDEN_APPLE)
+                .pattern("LGL")
+                .pattern("GAG")
+                .pattern("LGL")
+                .input('L', ConventionalItemTags.LAPIS_GEMS)
+                .input('G', ConventionalItemTags.STORAGE_BLOCKS_GOLD)
+                .input('A', Items.GOLDEN_APPLE)
+                .offerTo(exporter);
+
         ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.CHANNELING_BOW, 1)
                 .pattern("BTB")
                 .pattern("AOL")
@@ -216,61 +277,55 @@ public class ModRecipeGenerator extends FabricRecipeProvider {
                 .input('G', ConventionalItemTags.GOLD_INGOTS)
                 .input('S', Items.DIAMOND_SWORD)
                 .offerTo(exporter);
-        ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.ARROW, 32)
-                .pattern("FFF")
-                .pattern("TTT")
-                .pattern("SSS")
-                .input('F', Items.FLINT)
-                .input('T', ConventionalItemTags.WOODEN_RODS)
-                .input('S', Items.STRING)
+        ModShapedRecipeJsonBuilder.create(RecipeCategory.MISC, Items.ENCHANTED_BOOK)
+                .pattern("FPF")
+                .pattern("PIP")
+                .pattern("FPF")
+                .input('F', ConventionalItemTags.PLAYER_WORKSTATIONS_FURNACES)
+                .input('P', Items.STONE_PICKAXE)
+                .input('I', ConventionalItemTags.IRON_RAW_MATERIALS)
+                .component(DataComponentTypes.STORED_ENCHANTMENTS, Util.make(new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT), builder -> {
+                            builder.add(Enchantments.SMELTING, 1);
+                        })
+                        .build())
                 .offerTo(exporter);
-        ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.TRIDENT)
-                .pattern(" QQ")
-                .pattern(" DQ")
-                .pattern("D  ")
-                .input('Q', ConventionalItemTags.QUARTZ_GEMS)
-                .input('D', ConventionalItemTags.DIAMOND_GEMS)
+        ModShapedRecipeJsonBuilder.create(RecipeCategory.MISC, Items.NETHERITE_CHESTPLATE)
+                .pattern("N N")
+                .pattern("DCD")
+                .pattern("DDD")
+                .input('N', ConventionalItemTags.NETHERITE_INGOTS)
+                .input('D', Items.ANCIENT_DEBRIS)
+                .input('C', Items.DIAMOND_CHESTPLATE)
+                .component(DataComponentTypes.STORED_ENCHANTMENTS, Util.make(new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT), builder -> {
+                            builder.add(Enchantments.PROTECTION, 3);
+                            builder.add(Enchantments.VITALITY, 3);
+                            builder.add(Enchantments.THORNS, 3);
+                        })
+                        .build())
                 .offerTo(exporter);
-        ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.TOTEM_OF_UNDYING)
-                .pattern("GGG")
-                .pattern("GTG")
-                .pattern("GGG")
-                .input('G', ConventionalItemTags.GOLD_INGOTS)
-                .input('T', Items.GHAST_TEAR)
+        ModShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, Items.ENCHANTED_BOOK)
+                .input(Items.IRON_SWORD)
+                .input(Items.BOOK)
+                .component(DataComponentTypes.STORED_ENCHANTMENTS, Util.make(new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT), builder -> {
+                            builder.add(Enchantments.SHARPNESS, 2);
+                        })
+                        .build())
                 .offerTo(exporter);
-        ModShapelessRecipeJsonBuilder.create(RecipeCategory.TOOLS, Items.ZOMBIE_HEAD)
-                .input(Items.DIAMOND_SWORD, 2)
-                .input(Items.ROTTEN_FLESH)
-                .input(Items.GOLDEN_APPLE)
+        ModShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, Items.ENCHANTED_BOOK)
+                .input(Items.IRON_CHESTPLATE)
+                .input(Items.BOOK)
+                .component(DataComponentTypes.STORED_ENCHANTMENTS, Util.make(new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT), builder -> {
+                            builder.add(Enchantments.PROTECTION, 1);
+                        })
+                        .build())
                 .offerTo(exporter);
-        ModShapelessRecipeJsonBuilder.create(RecipeCategory.FOOD, Items.CARROT, 3)
-                .input(ItemTags.DIRT)
-                .input(Items.BONE_MEAL)
-                .offerTo(exporter);
-        ModShapedRecipeJsonBuilder.create(RecipeCategory.FOOD, Items.GOLDEN_CARROT)
-                .pattern(" G ")
-                .pattern("GCG")
-                .pattern(" G ")
-                .input('G', Items.GOLD_NUGGET)
-                .input('C', Items.CARROT)
-                .offerTo(exporter);
-        ModShapelessRecipeJsonBuilder.create(RecipeCategory.FOOD, Items.APPLE)
-                .input(ItemTags.LEAVES, 9)
-                .offerTo(exporter);
-        ModShapedRecipeJsonBuilder.create(RecipeCategory.FOOD, Items.GOLDEN_APPLE)
-                .pattern(" G ")
-                .pattern("GAG")
-                .pattern(" G ")
-                .input('G', ConventionalItemTags.GOLD_INGOTS)
-                .input('A', Items.APPLE)
-                .offerTo(exporter);
-        ModShapedRecipeJsonBuilder.create(RecipeCategory.FOOD, Items.ENCHANTED_GOLDEN_APPLE)
-                .pattern("LGL")
-                .pattern("GAG")
-                .pattern("LGL")
-                .input('L', ConventionalItemTags.LAPIS_GEMS)
-                .input('G', ConventionalItemTags.STORAGE_BLOCKS_GOLD)
-                .input('A', Items.GOLDEN_APPLE)
+        ModShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, Items.ENCHANTED_BOOK)
+                .input(Items.BOW)
+                .input(Items.BOOK)
+                .component(DataComponentTypes.STORED_ENCHANTMENTS, Util.make(new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT), builder -> {
+                            builder.add(Enchantments.POWER, 2);
+                        })
+                        .build())
                 .offerTo(exporter);
     }
 }

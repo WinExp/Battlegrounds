@@ -72,7 +72,7 @@ public class VoteScreen extends Screen {
         }
     }
 
-    public static void onSyncVoteInfos(MinecraftClient client, SyncVoteInfosPayloadS2C packet) {
+    public static void onVoteInfosReceived(MinecraftClient client, SyncVoteInfosPayloadS2C packet) {
         voteInfosCache.clear();
         voteInfosCache.addAll(packet.voteInfos());
         if (client.currentScreen instanceof VoteScreen voteScreen) {
@@ -80,7 +80,7 @@ public class VoteScreen extends Screen {
         }
     }
 
-    public static void onUpdateVoteInfo(MinecraftClient client, UpdateVoteInfoPayloadS2C packet) {
+    public static void updateVoteInfo(MinecraftClient client, UpdateVoteInfoPayloadS2C packet) {
         if (packet.voteInfo().isEmpty()) return;
         VoteInfo voteInfo = packet.voteInfo().get();
         voteInfosCache.remove(voteInfo);

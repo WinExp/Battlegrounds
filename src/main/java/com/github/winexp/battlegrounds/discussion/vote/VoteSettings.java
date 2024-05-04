@@ -10,9 +10,6 @@ import java.util.function.BiPredicate;
 public record VoteSettings(BiConsumer<VoteInstance, CloseReason> voteClosedAction,
                            TriConsumer<VoteInstance, ServerPlayerEntity, Boolean> playerVotedAction,
                            VoteMode voteMode, Duration timeout, boolean allowChangeVote) {
-    public enum CloseReason {
-        ACCEPTED, DENIED, TIMEOUT, MANUAL
-    }
 
     public enum VoteMode {
         ALL_ACCEPT(true, Integer::equals),

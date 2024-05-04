@@ -39,7 +39,7 @@ public class VoteManager {
         }
     }
 
-    private void onVoteClosed(VoteInstance voteInstance, VoteSettings.CloseReason reason) {
+    private void onVoteClosed(VoteInstance voteInstance, CloseReason reason) {
         Identifier identifier = voteInstance.getIdentifier();
         this.voteMap.remove(identifier);
         VoteClosedPayloadS2C packet = new VoteClosedPayloadS2C(voteInstance.getVoteInfo(), reason);
@@ -109,7 +109,7 @@ public class VoteManager {
     public boolean closeVote(Identifier identifier) {
         if (!this.isVoting(identifier)) return false;
         VoteInstance voteInstance = this.voteMap.get(identifier);
-        return voteInstance.closeVote(VoteSettings.CloseReason.MANUAL);
+        return voteInstance.closeVote(CloseReason.MANUAL);
     }
 
     public void closeAllVotes() {

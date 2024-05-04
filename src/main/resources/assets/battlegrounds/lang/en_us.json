@@ -107,15 +107,13 @@
   "subtitles.battlegrounds.player.tube_fall": "Tube: Landing",
 
   "vote.battlegrounds.already_voting.feedback": "There is already a vote in progress!",
-  "vote.battlegrounds.button.accept": "[Accept Vote]",
-  "vote.battlegrounds.button.accept.description": "Accept the vote.",
-  "vote.battlegrounds.button.deny": "[Deny Vote]",
-  "vote.battlegrounds.button.deny.description": "Deny the vote.",
+  "vote.battlegrounds.closed.reason.accepted": "Accepted",
+  "vote.battlegrounds.closed.reason.denied": "Denied",
+  "vote.battlegrounds.closed.reason.timeout": "Timeout",
+  "vote.battlegrounds.closed.reason.manual": "Manual",
   "vote.battlegrounds.initiator": "Initiated by %s",
-  "vote.battlegrounds.initiator.unknown": "Unknown",
-  "vote.battlegrounds.manual.broadcast": "Voting is terminated by the administrator.",
-  "vote.battlegrounds.not_voting.feedback": "There isn't any vote in progress!",
+  "vote.battlegrounds.initiator.@": "Command block",
+  "vote.battlegrounds.initiator.Server": "Server",
   "vote.battlegrounds.start_game.description": "The vote to start the game, needs to be passed by all players.",
-  "vote.battlegrounds.start_game.title": "Start Game",
-  "vote.battlegrounds.timeout.broadcast": "Voting terminated due to timeout."
+  "vote.battlegrounds.start_game.title": "Start Game"
 }
