@@ -38,12 +38,12 @@ public final class ModClientPlayNetworkHandler {
 
     private static void onSyncVoteInfos(SyncVoteInfosS2CPacket packet, ClientPlayerEntity player, PacketSender sender) {
         MinecraftClient client = MinecraftClient.getInstance();
-        VoteScreen.onSyncVoteInfos(client, packet);
+        VoteScreen.syncVoteInfos(client, packet);
     }
 
     private static void onUpdateVoteInfo(UpdateVoteInfoS2CPacket packet, ClientPlayerEntity player, PacketSender sender) {
         MinecraftClient client = MinecraftClient.getInstance();
-        VoteScreen.onUpdateVoteInfo(client, packet);
+        VoteScreen.updateVoteInfo(client, packet);
     }
 
     private static void onVoteOpened(VoteOpenedS2CPacket packet, ClientPlayerEntity player, PacketSender sender) {

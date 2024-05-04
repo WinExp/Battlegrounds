@@ -78,10 +78,6 @@ public class VoteListWidget extends AlwaysSelectedEntryListWidget<VoteListWidget
             return this.isSelectable();
         }
 
-        private String getInitiatorName() {
-            return this.voteInfo.initiatorProfile == null ? "服务器" : this.voteInfo.initiatorProfile.getName();
-        }
-
         @Override
         public Text getNarration() {
             MutableText text = Text.empty();
@@ -93,6 +89,10 @@ public class VoteListWidget extends AlwaysSelectedEntryListWidget<VoteListWidget
             text.append(ScreenTexts.SENTENCE_SEPARATOR);
             text.append(Text.translatable("gui.battlegrounds.vote.time_left", this.voteInfo.timeLeft / 20));
             return text;
+        }
+
+        private Text getInitiatorName() {
+            return Text.translatableWithFallback("vote.battlegrounds.initiator." + this.voteInfo.initiatorName.getString(), this.voteInfo.initiatorName.getString());
         }
 
         @Override

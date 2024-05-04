@@ -7,13 +7,9 @@ import org.apache.commons.lang3.function.TriConsumer;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 
-public record VoteSettings(BiConsumer<VoteInstance, CloseReason> voteClosedAction,
+public record VoteSettings(BiConsumer<VoteInstance, VoteCloseReason> voteClosedAction,
                            TriConsumer<VoteInstance, ServerPlayerEntity, Boolean> playerVotedAction,
                            VoteMode voteMode, Duration timeout, boolean allowChangeVote) {
-    public enum CloseReason {
-        ACCEPTED, DENIED, TIMEOUT, MANUAL
-    }
-
     public enum VoteMode {
         ALL_ACCEPT(true, Integer::equals),
         OVER_HALF_ACCEPT(false, (total, current) -> (double) current / total > 0.5);

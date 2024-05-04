@@ -106,14 +106,13 @@
   "subtitles.battlegrounds.player.tube_fall": "钢管：落地",
 
   "vote.battlegrounds.already_voting.feedback": "已有投票正在进行！",
-  "vote.battlegrounds.button.accept": "[赞成]",
-  "vote.battlegrounds.button.accept.description": "赞成票",
-  "vote.battlegrounds.button.deny": "[反对]",
-  "vote.battlegrounds.button.deny.description": "反对票",
+  "vote.battlegrounds.closed.reason.accepted": "通过",
+  "vote.battlegrounds.closed.reason.denied": "被拒绝",
+  "vote.battlegrounds.closed.reason.timeout": "超时",
+  "vote.battlegrounds.closed.reason.manual": "手动",
   "vote.battlegrounds.initiator": "由 %s 发起",
-  "vote.battlegrounds.manual.broadcast": "投票被管理员终止。",
-  "vote.battlegrounds.not_voting.feedback": "现在没有正在进行的投票！",
+  "vote.battlegrounds.initiator.@": "命令方块",
+  "vote.battlegrounds.initiator.Server": "服务器",
   "vote.battlegrounds.start_game.description": "开始游戏的投票，需全玩家通过",
-  "vote.battlegrounds.start_game.title": "开始游戏",
-  "vote.battlegrounds.timeout.broadcast": "由于超时，投票终止。"
+  "vote.battlegrounds.start_game.title": "开始游戏"
 }

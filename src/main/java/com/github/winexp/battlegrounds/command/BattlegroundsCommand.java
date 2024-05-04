@@ -2,6 +2,7 @@ package com.github.winexp.battlegrounds.command;
 
 import com.github.winexp.battlegrounds.Battlegrounds;
 import com.github.winexp.battlegrounds.command.argument.PVPModeArgumentType;
+import com.github.winexp.battlegrounds.discussion.vote.VoteInstance;
 import com.github.winexp.battlegrounds.discussion.vote.VoteManager;
 import com.github.winexp.battlegrounds.discussion.vote.VotePreset;
 import com.github.winexp.battlegrounds.entity.projectile.thrown.FlashBangEntity;
@@ -65,7 +66,7 @@ public class BattlegroundsCommand {
 
     public static ArgumentBuilder<ServerCommandSource, ?> registerStart() {
         var cStart = literal("start");
-        var aProp = argument("gameProperties", IdentifierArgumentType.identifier())
+        var aProp = argument("game_properties", IdentifierArgumentType.identifier())
                 .suggests(((context, builder) ->
                         CommandSource.suggestMatching(Constants.GAME_PROPERTIES.keySet().stream().map(Identifier::toString), builder)))
                 .executes(BattlegroundsCommand::executeStart);
@@ -73,7 +74,7 @@ public class BattlegroundsCommand {
     }
 
     public static ArgumentBuilder<ServerCommandSource, ?> registerSummonFlash() {
-        var cSummon = literal("summonFlash").requires(source ->
+        var cSummon = literal("summonflash").requires(source ->
                 source.hasPermissionLevel(2)).executes(context -> executeSummonFlash(context, true));
         var aPos = argument("pos", Vec3ArgumentType.vec3()).executes(context -> executeSummonFlash(context, false));
         return cSummon.then(aPos);
@@ -124,7 +125,7 @@ public class BattlegroundsCommand {
 
     private static int executeStart(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerCommandSource source = context.getSource();
-        Identifier id = IdentifierArgumentType.getIdentifier(context, "gameProperties");
+        Identifier id = IdentifierArgumentType.getIdentifier(context, "game_properties");
         if (!Constants.GAME_PROPERTIES.containsKey(id)) {
             throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument().create();
         }
@@ -133,9 +134,8 @@ public class BattlegroundsCommand {
             source.sendFeedback(() -> Text.translatable("vote.battlegrounds.already_voting.feedback")
                     .formatted(Formatting.RED), false);
         } else {
-            VoteManager.INSTANCE.openVoteWithPreset(VotePreset.START_GAME, source.getPlayer(), Map.of("gameProperties", gameProperties),
-                            Variables.server.getPlayerManager().getPlayerList())
-                    .orElseThrow();
+            VoteInstance voteInstance = VoteInstance.createWithPreset(VotePreset.START_GAME, source, Map.of("game_properties", gameProperties));
+            VoteManager.INSTANCE.openVote(voteInstance, source.getServer().getPlayerManager().getPlayerList());
         }
         return 1;
     }

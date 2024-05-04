@@ -1,28 +1,20 @@
 package com.github.winexp.battlegrounds.discussion.vote;
 
-import com.mojang.authlib.GameProfile;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
 public class VoteInfo {
     public static final PacketByteBuf.PacketReader<VoteInfo> PACKET_READER = (buf) ->
-            new VoteInfo(buf.readIdentifier(), buf.readUuid(), buf.readText(), buf.readText(), buf.readBoolean() ? buf.readGameProfile() : null, buf.readInt(), buf.readBoolean());
+            new VoteInfo(buf.readIdentifier(), buf.readUuid(), buf.readText(), buf.readText(), buf.readText(), buf.readInt(), buf.readBoolean());
     public static final PacketByteBuf.PacketWriter<VoteInfo> PACKET_WRITER = (buf, voteInfo) -> {
         buf.writeIdentifier(voteInfo.identifier);
         buf.writeUuid(voteInfo.uuid);
         buf.writeText(voteInfo.name);
         buf.writeText(voteInfo.description);
-        if (voteInfo.initiatorProfile != null) {
-            buf.writeBoolean(true);
-            buf.writeGameProfile(voteInfo.initiatorProfile);
-        } else {
-
-            buf.writeBoolean(false);
-        }
+        buf.writeText(voteInfo.initiatorName);
         buf.writeInt(voteInfo.timeLeft);
         buf.writeBoolean(voteInfo.available);
     };
@@ -31,17 +23,16 @@ public class VoteInfo {
     public final UUID uuid;
     public final Text name;
     public final Text description;
-    @Nullable
-    public final GameProfile initiatorProfile;
+    public final Text initiatorName;
     public int timeLeft;
     public boolean available;
 
-    public VoteInfo(Identifier identifier, UUID uuid, Text name, Text description, @Nullable GameProfile initiatorProfile, int timeLeft, boolean available) {
+    public VoteInfo(Identifier identifier, UUID uuid, Text name, Text description, Text initiatorName, int timeLeft, boolean available) {
         this.identifier = identifier;
         this.uuid = uuid;
         this.name = name;
         this.description = description;
-        this.initiatorProfile = initiatorProfile;
+        this.initiatorName = initiatorName;
         this.timeLeft = timeLeft;
         this.available = available;
     }

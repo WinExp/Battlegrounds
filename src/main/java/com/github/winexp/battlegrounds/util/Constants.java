@@ -20,7 +20,7 @@ public class Constants {
     public static final String MOD_NAME = "Battlegrounds";
     public static final ModMetadata MOD_METADATA = FabricLoader.getInstance().getModContainer(MOD_ID)
             .orElseThrow().getMetadata();
-    public static final ModVersion MOD_VERSION = new ModVersion(MOD_METADATA.getVersion(), 11);
+    public static final ModVersion MOD_VERSION = new ModVersion(MOD_METADATA.getVersion(), 12);
     public static final ModGameConfig DEFAULT_MOD_GAME_CONFIG = new ModGameConfig(true);
     public static final Logger LOGGER = LogManager.getLogger(MOD_NAME);
     public static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve(MOD_ID);

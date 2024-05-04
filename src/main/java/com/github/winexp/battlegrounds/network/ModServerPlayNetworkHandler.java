@@ -22,7 +22,7 @@ import java.util.Optional;
 public final class ModServerPlayNetworkHandler {
     public static void register() {
         ServerPlayNetworking.registerGlobalReceiver(SyncVoteInfosC2SPacket.TYPE, ModServerPlayNetworkHandler::onSyncVoteInfos);
-        ServerPlayNetworking.registerGlobalReceiver(GetVoteInfoC2SPacket.TYPE, ModServerPlayNetworkHandler::onGetVoteInfo);
+        ServerPlayNetworking.registerGlobalReceiver(UpdateVoteInfoC2SPacket.TYPE, ModServerPlayNetworkHandler::onGetVoteInfo);
         ServerPlayNetworking.registerGlobalReceiver(VoteC2SPacket.TYPE, ModServerPlayNetworkHandler::onVote);
         ServerPlayNetworking.registerGlobalReceiver(RupertsTearTeleportC2SPacket.TYPE, ModServerPlayNetworkHandler::onRupertsTearTeleport);
     }
@@ -31,8 +31,8 @@ public final class ModServerPlayNetworkHandler {
         player.server.execute(() -> VoteManager.INSTANCE.syncVoteInfos(player));
     }
 
-    private static void onGetVoteInfo(GetVoteInfoC2SPacket packet, ServerPlayerEntity player, PacketSender sender) {
-        VoteManager.INSTANCE.getVoteInstance(packet.voteId()).ifPresentOrElse(voteInstance -> {
+    private static void onGetVoteInfo(UpdateVoteInfoC2SPacket packet, ServerPlayerEntity player, PacketSender sender) {
+        VoteManager.INSTANCE.getVoteInstance(packet.identifier()).ifPresentOrElse(voteInstance -> {
             VoteInfo voteInfo = voteInstance.getVoteInfo(player);
             UpdateVoteInfoS2CPacket responsePacket = new UpdateVoteInfoS2CPacket(Optional.of(voteInfo));
             sender.sendPacket(responsePacket);

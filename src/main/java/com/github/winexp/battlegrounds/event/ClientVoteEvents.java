@@ -1,7 +1,7 @@
 package com.github.winexp.battlegrounds.event;
 
+import com.github.winexp.battlegrounds.discussion.vote.VoteCloseReason;
 import com.github.winexp.battlegrounds.discussion.vote.VoteInfo;
-import com.github.winexp.battlegrounds.discussion.vote.VoteSettings;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.event.Event;
@@ -38,7 +38,7 @@ public class ClientVoteEvents {
     @Environment(EnvType.CLIENT)
     @FunctionalInterface
     public interface Closed {
-        void onClosed(VoteInfo voteInfo, VoteSettings.CloseReason reason);
+        void onClosed(VoteInfo voteInfo, VoteCloseReason reason);
     }
 
     @Environment(EnvType.CLIENT)

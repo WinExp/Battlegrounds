@@ -12,7 +12,6 @@ import net.minecraft.network.ClientConnection;
 import net.minecraft.server.network.ConnectedClientData;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,7 +39,7 @@ public class VoteManager {
         }
     }
 
-    private void onVoteClosed(VoteInstance voteInstance, VoteSettings.CloseReason reason) {
+    private void onVoteClosed(VoteInstance voteInstance, VoteCloseReason reason) {
         Identifier identifier = voteInstance.getIdentifier();
         this.voteMap.remove(identifier);
         VoteClosedS2CPacket packet = new VoteClosedS2CPacket(voteInstance.getVoteInfo(), reason);
@@ -52,8 +51,8 @@ public class VoteManager {
         }
     }
 
-    private void onPlayerVoted(ServerPlayerEntity player, VoteInstance voteInstance, boolean result) {
-        PlayerVotedS2CPacket packet = new PlayerVotedS2CPacket(player.getDisplayName(), voteInstance.getVoteInfo(player), result);
+    private void onPlayerVoted(ServerPlayerEntity voter, VoteInstance voteInstance, boolean result) {
+        PlayerVotedS2CPacket packet = new PlayerVotedS2CPacket(voter.getDisplayName(), voteInstance.getVoteInfo(voter), result);
         for (UUID uuid : voteInstance.getParticipants()) {
             ServerPlayerEntity player1 = Variables.server.getPlayerManager().getPlayer(uuid);
             if (player1 != null) {
@@ -99,14 +98,6 @@ public class VoteManager {
         this.voteMap.forEach(consumer);
     }
 
-
-    public Optional<VoteInstance> openVoteWithPreset(VotePreset preset, @Nullable ServerPlayerEntity initiator, Map<String, Object> parameters, Collection<ServerPlayerEntity> participants) {
-        VoteInstance instance = VoteInstance.createWithPreset(preset, initiator, parameters);
-        if (this.openVote(instance, participants)) {
-            return Optional.of(instance);
-        } else return Optional.empty();
-    }
-
     public boolean openVote(VoteInstance voteInstance, Collection<ServerPlayerEntity> participants) {
         Identifier identifier = voteInstance.getIdentifier();
         if (this.isVoting(identifier)) return false;
@@ -117,8 +108,8 @@ public class VoteManager {
 
     public boolean closeVote(Identifier identifier) {
         if (!this.isVoting(identifier)) return false;
-        VoteInstance voteInstance = this.voteMap.get(identifier);
-        return voteInstance.closeVote(VoteSettings.CloseReason.MANUAL);
+        VoteInstance voteInstance = this.getVoteInstance(identifier).orElseThrow();
+        return voteInstance.closeVote(VoteCloseReason.MANUAL);
     }
 
     public void closeAllVotes() {

@@ -5,17 +5,17 @@ import net.fabricmc.fabric.api.networking.v1.PacketType;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
-public record GetVoteInfoC2SPacket(Identifier voteId) implements FabricPacket {
-    public static final Identifier ID = new Identifier("battlegrounds", "play/vote/get_vote_info");
-    public static final PacketType<GetVoteInfoC2SPacket> TYPE = PacketType.create(ID, GetVoteInfoC2SPacket::new);
+public record UpdateVoteInfoC2SPacket(Identifier identifier) implements FabricPacket {
+    public static final Identifier ID = new Identifier("battlegrounds", "play/vote/update_vote_info");
+    public static final PacketType<UpdateVoteInfoC2SPacket> TYPE = PacketType.create(ID, UpdateVoteInfoC2SPacket::new);
 
-    public GetVoteInfoC2SPacket(PacketByteBuf buf) {
+    public UpdateVoteInfoC2SPacket(PacketByteBuf buf) {
         this(buf.readIdentifier());
     }
 
     @Override
     public void write(PacketByteBuf buf) {
-        buf.writeIdentifier(this.voteId);
+        buf.writeIdentifier(this.identifier);
     }
 
     @Override

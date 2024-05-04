@@ -1,7 +1,7 @@
 package com.github.winexp.battlegrounds.client.toast.vote;
 
+import com.github.winexp.battlegrounds.discussion.vote.VoteCloseReason;
 import com.github.winexp.battlegrounds.discussion.vote.VoteInfo;
-import com.github.winexp.battlegrounds.discussion.vote.VoteSettings;
 import com.github.winexp.battlegrounds.util.time.Duration;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -12,9 +12,10 @@ import net.minecraft.util.Identifier;
 public class VoteClosedToast extends SimpleToast {
     private static final Identifier TEXTURE = new Identifier("battlegrounds", "toast/vote");
 
-    public VoteClosedToast(VoteInfo voteInfo, VoteSettings.CloseReason closeReason) {
+    public VoteClosedToast(VoteInfo voteInfo, VoteCloseReason closeReason) {
         super(
-                Text.translatable("gui.battlegrounds.vote.closed.toast.title", voteInfo.name, closeReason.name()),
+                Text.translatable("gui.battlegrounds.vote.closed.toast.title", voteInfo.name,
+                        Text.translatableWithFallback("vote.battlegrounds.closed.reason." + closeReason.name().toLowerCase(), closeReason.name())),
                 Text.translatable("gui.battlegrounds.vote.closed.toast.subtitle"),
                 Duration.withSeconds(5)
         );
