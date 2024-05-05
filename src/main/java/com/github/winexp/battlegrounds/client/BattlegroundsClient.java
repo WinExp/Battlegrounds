@@ -63,7 +63,7 @@ public class BattlegroundsClient implements ClientModInitializer {
         ModClientConfigurationNetworkHandler.register();
         ModClientPlayNetworkHandler.register();
         // 注册按键绑定
-        KeyBindings.registerKeyBindings();
+        KeyBindings.bootstrap();
         // 注册物品模型谓词
         Items.registerModelPredicates();
     }

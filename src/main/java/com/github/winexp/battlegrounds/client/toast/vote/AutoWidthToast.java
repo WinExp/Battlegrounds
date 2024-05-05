@@ -10,10 +10,12 @@ import java.util.Collection;
 public abstract class AutoWidthToast implements Toast {
     public abstract Collection<Text> getLines();
 
-    public abstract int getOffset();
+    public int getOffset() {
+        return 15;
+    }
 
     @Override
-    public int getWidth() {
+    public final int getWidth() {
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
         int width = Toast.super.getWidth();
         for (Text text : this.getLines()) {

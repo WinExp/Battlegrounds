@@ -46,6 +46,7 @@ public class Items extends net.minecraft.item.Items {
     public static final PVPProSwordItem PVP_PRO_SWORD = registerItem("pvp_pro_sword", new PVPProSwordItem(ToolMaterials.PVP_PRO_SWORD, 3, -2.4F, new LegendarySwordItem.Settings()
             .rarity(Rarity.EPIC)
             .fireproof()
+            .enrichEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 2 * 20, 0))
             .enrichEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 2 * 20, 0))
             .enrichEffect(new StatusEffectInstance(StatusEffects.SPEED, 2 * 20, 0))
             .glint()

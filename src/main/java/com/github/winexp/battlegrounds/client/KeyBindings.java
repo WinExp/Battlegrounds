@@ -16,6 +16,6 @@ public class KeyBindings {
             "key.categories.battlegrounds"
     ));
 
-    public static void registerKeyBindings() {
+    public static void bootstrap() {
     }
 }
