@@ -135,7 +135,7 @@ public class BattlegroundsCommand {
             source.sendFeedback(() -> Text.translatable("vote.battlegrounds.already_voting.feedback")
                     .formatted(Formatting.RED), false);
         } else {
-            VoteInstance instance = VoteInstance.createWithPreset(VotePreset.START_GAME, source.getPlayer(), Map.of("game_properties", gameProperties));
+            VoteInstance instance = VoteInstance.createWithPreset(VotePreset.START_GAME, source, Map.of("game_properties", gameProperties));
             if (!VoteManager.INSTANCE.openVote(instance, source.getServer().getPlayerManager().getPlayerList())) {
                 throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownCommand().create();
             }

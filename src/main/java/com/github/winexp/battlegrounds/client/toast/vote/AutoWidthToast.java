@@ -10,7 +10,9 @@ import java.util.Collection;
 public abstract class AutoWidthToast implements Toast {
     public abstract Collection<Text> getLines();
 
-    public abstract int getOffset();
+    public int getOffset() {
+        return 15;
+    }
 
     @Override
     public int getWidth() {

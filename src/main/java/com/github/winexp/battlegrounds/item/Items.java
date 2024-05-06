@@ -42,6 +42,7 @@ public class Items extends net.minecraft.item.Items {
                 builder.add(Enchantments.SWEEPING_EDGE, 2);
                 builder.add(Enchantments.LOOTING, 3);
             }).build())
+            .enrichEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 2 * 20, 0))
             .enrichEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 2 * 20, 0))
             .enrichEffect(new StatusEffectInstance(StatusEffects.SPEED, 2 * 20, 0))
             .glint()
@@ -192,7 +193,7 @@ public class Items extends net.minecraft.item.Items {
             )
     ));
 
-    public static <T extends Item> T registerItem(String name, T item) {
+    private static <T extends Item> T registerItem(String name, T item) {
         T result = Registry.register(Registries.ITEM, new Identifier("battlegrounds", name), item);
         if (item instanceof NbtRecipe nbtRecipe) {
             NBT_RECIPE_ITEMS.add(nbtRecipe);

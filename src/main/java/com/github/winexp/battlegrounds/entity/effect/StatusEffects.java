@@ -14,7 +14,7 @@ public class StatusEffects extends net.minecraft.entity.effect.StatusEffects {
     public static final RegistryEntry.Reference<StatusEffect> APPROACHING_EXTINCTION = register("approaching_extinction",
             new ApproachingExtinctionStatusEffect(StatusEffectCategory.HARMFUL, ColorHelper.Argb.getArgb(255, 180, 80, 80)));
 
-    public static <T extends StatusEffect> RegistryEntry.Reference<StatusEffect> register(String id, T effect) {
+    private static <T extends StatusEffect> RegistryEntry.Reference<StatusEffect> register(String id, T effect) {
         return Registry.registerReference(
                 Registries.STATUS_EFFECT,
                 new Identifier("battlegrounds", id),
