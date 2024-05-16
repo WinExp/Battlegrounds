@@ -1,5 +1,7 @@
 package com.github.winexp.battlegrounds.item;
 
+import com.github.winexp.battlegrounds.block.Blocks;
+import com.github.winexp.battlegrounds.component.DataComponentTypes;
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
 import com.github.winexp.battlegrounds.item.food.*;
@@ -13,16 +15,14 @@ import com.github.winexp.battlegrounds.item.tool.*;
 import com.github.winexp.battlegrounds.util.RecipeUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.block.Block;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.dispenser.ProjectileDispenserBehavior;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.FoodComponent;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.*;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.Util;
@@ -192,13 +192,18 @@ public class Items extends net.minecraft.item.Items {
                     .build()
             )
     ));
+    public static final BlockItem SOAK_TABLE = registerBlockItem("soak_table", Blocks.SOAK_TABLE);
 
-    private static <T extends Item> T registerItem(String name, T item) {
-        T result = Registry.register(Registries.ITEM, new Identifier("battlegrounds", name), item);
+    private static BlockItem registerBlockItem(String id, Block block) {
+        return registerItem(id, new BlockItem(block, new Item.Settings()));
+    }
+
+    private static <T extends Item> T registerItem(String id, T item) {
+        register(new Identifier("battlegrounds", id), item);
         if (item instanceof NbtRecipe nbtRecipe) {
             NBT_RECIPE_ITEMS.add(nbtRecipe);
         }
-        return result;
+        return item;
     }
 
     public static void addRecipes() {

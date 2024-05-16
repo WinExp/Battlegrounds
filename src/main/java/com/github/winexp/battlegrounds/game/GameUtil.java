@@ -1,5 +1,6 @@
 package com.github.winexp.battlegrounds.game;
 
+import com.github.winexp.battlegrounds.component.DataComponentTypes;
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.util.Constants;
 import com.github.winexp.battlegrounds.util.FileUtil;
@@ -7,7 +8,6 @@ import com.github.winexp.battlegrounds.util.RandomUtil;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.FireworkExplosionComponent;
 import net.minecraft.component.type.FireworksComponent;
 import net.minecraft.entity.projectile.FireworkRocketEntity;

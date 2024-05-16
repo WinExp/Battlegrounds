@@ -39,17 +39,17 @@ public class BattlegroundsClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         // 注册事件
-        ClientVoteEvents.OPENED.register(voteInfo -> {
+        ClientVoteEvents.OPENED.register(voteInstance -> {
             MinecraftClient client = MinecraftClient.getInstance();
-            client.getToastManager().add(new VoteOpenedToast(voteInfo));
+            client.getToastManager().add(new VoteOpenedToast(voteInstance));
             client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0F));
-            VoteScreen.onVoteOpened(client, voteInfo);
+            VoteScreen.onVoteOpened(client, voteInstance);
         });
-        ClientVoteEvents.CLOSED.register((voteInfo, reason) -> {
+        ClientVoteEvents.CLOSED.register((voteInstance, reason) -> {
             MinecraftClient client = MinecraftClient.getInstance();
-            client.getToastManager().add(new VoteClosedToast(voteInfo, reason));
+            client.getToastManager().add(new VoteClosedToast(voteInstance, reason));
             client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0F));
-            VoteScreen.onVoteClosed(client, voteInfo);
+            VoteScreen.onVoteClosed(client, voteInstance);
         });
         ClientVoteEvents.PLAYER_VOTED.register((playerName, voteInfo, result) -> {
             MinecraftClient client = MinecraftClient.getInstance();

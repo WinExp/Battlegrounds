@@ -1,5 +1,6 @@
 package com.github.winexp.battlegrounds.datagen;
 
+import com.github.winexp.battlegrounds.component.DataComponentTypes;
 import com.github.winexp.battlegrounds.datagen.recipe.ModShapedRecipeJsonBuilder;
 import com.github.winexp.battlegrounds.datagen.recipe.ModShapelessRecipeJsonBuilder;
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
@@ -7,12 +8,12 @@ import com.github.winexp.battlegrounds.item.Items;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 
@@ -197,7 +198,7 @@ public class ModRecipeGenerator extends FabricRecipeProvider {
                 .input('A', Items.GOLDEN_APPLE)
                 .offerTo(exporter);
 
-        ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.CHANNELING_BOW, 1)
+        ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.CHANNELING_BOW)
                 .pattern("BTB")
                 .pattern("AOL")
                 .pattern("BGD")
@@ -209,7 +210,7 @@ public class ModRecipeGenerator extends FabricRecipeProvider {
                 .input('G', Items.ENCHANTED_GOLDEN_APPLE)
                 .input('D', ConventionalItemTags.DIAMOND_GEMS)
                 .offerTo(exporter);
-        ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.PVP_PRO_SWORD, 1)
+        ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.PVP_PRO_SWORD)
                 .pattern("DGD")
                 .pattern("ASA")
                 .pattern("BGB")
@@ -219,7 +220,7 @@ public class ModRecipeGenerator extends FabricRecipeProvider {
                 .input('S', Items.DIAMOND_SWORD)
                 .input('B', ConventionalItemTags.STORAGE_BLOCKS_DIAMOND)
                 .offerTo(exporter);
-        ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.SEVEN_ELEVEN_SWORD, 1)
+        ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.SEVEN_ELEVEN_SWORD)
                 .pattern("DAD")
                 .pattern("SNE")
                 .pattern("BPB")
@@ -231,7 +232,7 @@ public class ModRecipeGenerator extends FabricRecipeProvider {
                 .input('B', ConventionalItemTags.STORAGE_BLOCKS_DIAMOND)
                 .input('P', Items.PRECISION_CORE)
                 .offerTo(exporter);
-        ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.STEVES_PAIN_SWORD, 1)
+        ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.STEVES_PAIN_SWORD)
                 .pattern("DTD")
                 .pattern("GLE")
                 .pattern("DPD")
@@ -242,7 +243,7 @@ public class ModRecipeGenerator extends FabricRecipeProvider {
                 .input('E', Items.ENCHANTED_GOLDEN_APPLE)
                 .input('P', Items.ADVANCED_PRECISION_CORE)
                 .offerTo(exporter);
-        ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.MY_HOLY_SWORD, 1)
+        ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.MY_HOLY_SWORD)
                 .pattern("DPD")
                 .pattern("ENE")
                 .pattern("DPD")
@@ -251,7 +252,7 @@ public class ModRecipeGenerator extends FabricRecipeProvider {
                 .input('E', Items.ENCHANTED_GOLDEN_APPLE)
                 .input('N', Items.NETHERITE_SWORD)
                 .offerTo(exporter);
-        ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.LEACHING_SWORD, 1)
+        ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.LEACHING_SWORD)
                 .pattern("DCB")
                 .pattern("ESE")
                 .pattern("DCD")
@@ -261,12 +262,20 @@ public class ModRecipeGenerator extends FabricRecipeProvider {
                 .input('E', Items.SPIDER_EYE)
                 .input('S', Items.DIAMOND_SWORD)
                 .offerTo(exporter);
-        ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.MINERS_PICKAXE, 1)
+        ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.MINERS_PICKAXE)
                 .pattern("RRR")
                 .pattern("CSC")
                 .pattern(" S ")
                 .input('R', ConventionalItemTags.IRON_RAW_MATERIALS)
                 .input('C', ItemTags.COALS)
+                .input('S', ConventionalItemTags.WOODEN_RODS)
+                .offerTo(exporter);
+        ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.KNOCKBACK_STICK)
+                .pattern("DBD")
+                .pattern("BSB")
+                .pattern("DBD")
+                .input('D', ConventionalItemTags.DIAMOND_GEMS)
+                .input('B', ConventionalItemTags.BLAZE_RODS)
                 .input('S', ConventionalItemTags.WOODEN_RODS)
                 .offerTo(exporter);
         ModShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, Items.NETHERITE_SWORD)
@@ -288,7 +297,7 @@ public class ModRecipeGenerator extends FabricRecipeProvider {
                             builder.add(Enchantments.SMELTING, 1);
                         })
                         .build())
-                .offerTo(exporter);
+                .offerTo(exporter, new Identifier("battlegrounds", "enchanted_book_smelting_1"));
         ModShapedRecipeJsonBuilder.create(RecipeCategory.MISC, Items.NETHERITE_CHESTPLATE)
                 .pattern("N N")
                 .pattern("DCD")
@@ -296,13 +305,14 @@ public class ModRecipeGenerator extends FabricRecipeProvider {
                 .input('N', ConventionalItemTags.NETHERITE_INGOTS)
                 .input('D', Items.ANCIENT_DEBRIS)
                 .input('C', Items.DIAMOND_CHESTPLATE)
-                .component(DataComponentTypes.STORED_ENCHANTMENTS, Util.make(new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT), builder -> {
+                .component(DataComponentTypes.ENCHANTMENTS, Util.make(new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT), builder -> {
                             builder.add(Enchantments.PROTECTION, 3);
                             builder.add(Enchantments.VITALITY, 3);
                             builder.add(Enchantments.THORNS, 3);
                         })
                         .build())
-                .offerTo(exporter);
+                .component(DataComponentTypes.ITEM_NAME, Text.translatable("item.battlegrounds.netherite_chestplate_special"))
+                .offerTo(exporter, new Identifier("battlegrounds", "netherite_chestplate_special"));
         ModShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, Items.ENCHANTED_BOOK)
                 .input(Items.IRON_SWORD)
                 .input(Items.BOOK)
@@ -318,7 +328,7 @@ public class ModRecipeGenerator extends FabricRecipeProvider {
                             builder.add(Enchantments.PROTECTION, 1);
                         })
                         .build())
-                .offerTo(exporter);
+                .offerTo(exporter, new Identifier("battlegrounds", "enchanted_book_protection_1"));
         ModShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, Items.ENCHANTED_BOOK)
                 .input(Items.BOW)
                 .input(Items.BOOK)
@@ -326,6 +336,6 @@ public class ModRecipeGenerator extends FabricRecipeProvider {
                             builder.add(Enchantments.POWER, 2);
                         })
                         .build())
-                .offerTo(exporter);
+                .offerTo(exporter, new Identifier("battlegrounds", "enchanted_book_power_2"));
     }
 }

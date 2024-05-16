@@ -12,8 +12,8 @@ public class Enchantments extends net.minecraft.enchantment.Enchantments {
     public static final VitalityEnchantment VITALITY = register("vitality", new VitalityEnchantment());
     public static final LeachingEnchantment LEACHING = register("leaching", new LeachingEnchantment());
 
-    private static <T extends Enchantment> T register(String name, T enchantment) {
-        return Registry.register(Registries.ENCHANTMENT, new Identifier("battlegrounds", name), enchantment);
+    private static <T extends Enchantment> T register(String id, T enchantment) {
+        return Registry.register(Registries.ENCHANTMENT, new Identifier("battlegrounds", id), enchantment);
     }
 
     public static void bootstrap() {

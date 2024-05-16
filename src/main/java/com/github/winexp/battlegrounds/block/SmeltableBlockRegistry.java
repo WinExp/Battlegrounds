@@ -1,11 +1,10 @@
 package com.github.winexp.battlegrounds.block;
 
+import com.github.winexp.battlegrounds.component.DataComponentTypes;
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.loot.function.ReplaceItemLootFunction;
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.loot.LootTable;
 import net.minecraft.loot.condition.LootCondition;
@@ -27,7 +26,7 @@ public class SmeltableBlockRegistry {
                             new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT), builder ->
                                     builder.add(Enchantments.SMELTING, 1)).build())
                     .build()));
-    public static final ConditionalLootFunction.Builder<?> DEFAULT_SMELTABLE_FUNCTION = FurnaceSmeltLootFunction.builder();
+    private static final ConditionalLootFunction.Builder<?> DEFAULT_SMELTABLE_FUNCTION = FurnaceSmeltLootFunction.builder();
     private static final Map<RegistryKey<LootTable>, ConditionalLootFunction.Builder<?>> smeltableBlocks = new HashMap<>();
 
     public static boolean isSmeltable(RegistryKey<LootTable> key) {

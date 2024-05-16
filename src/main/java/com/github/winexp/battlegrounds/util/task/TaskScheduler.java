@@ -1,7 +1,9 @@
 package com.github.winexp.battlegrounds.util.task;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.minecraft.server.MinecraftServer;
+import net.fabricmc.loader.api.FabricLoader;
 
 import java.util.List;
 import java.util.concurrent.CancellationException;
@@ -13,18 +15,23 @@ public class TaskScheduler {
     private final List<AbstractTask> tasks = new CopyOnWriteArrayList<>();
 
     public TaskScheduler() {
-        ServerTickEvents.START_SERVER_TICK.register(this::startTick);
-        ServerTickEvents.END_SERVER_TICK.register(this::endTick);
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+            ClientTickEvents.START_CLIENT_TICK.register(client -> this.startTick());
+            ClientTickEvents.END_CLIENT_TICK.register(client -> this.endTick());
+        } else {
+            ServerTickEvents.START_SERVER_TICK.register(server -> this.startTick());
+            ServerTickEvents.END_SERVER_TICK.register(server -> this.endTick());
+        }
     }
 
-    private void startTick(MinecraftServer server) {
+    private void startTick() {
         for (AbstractTask task : this.tasks) {
             if (task.getExecuteStage() != AbstractTask.ExecuteStage.BEGIN) continue;
             this.tryExecute(task);
         }
     }
 
-    private void endTick(MinecraftServer server) {
+    private void endTick() {
         for (AbstractTask task : this.tasks) {
             if (task.getExecuteStage() != AbstractTask.ExecuteStage.END) continue;
             this.tryExecute(task);

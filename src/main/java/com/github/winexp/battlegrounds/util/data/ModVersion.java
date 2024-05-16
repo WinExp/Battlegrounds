@@ -7,6 +7,7 @@ import net.fabricmc.loader.api.Version;
 import net.fabricmc.loader.api.VersionParsingException;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.encoding.VarInts;
 
 public record ModVersion(Version version, int protocolVersion) {
     public static final Codec<ModVersion> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -23,7 +24,7 @@ public record ModVersion(Version version, int protocolVersion) {
         @Override
         public ModVersion decode(ByteBuf buf) {
             try {
-                return new ModVersion(Version.parse(PacketCodecs.STRING.decode(buf)), buf.readInt());
+                return new ModVersion(Version.parse(PacketCodecs.STRING.decode(buf)), VarInts.read(buf));
             } catch (VersionParsingException e) {
                 throw new RuntimeException(e);
             }
@@ -32,7 +33,7 @@ public record ModVersion(Version version, int protocolVersion) {
         @Override
         public void encode(ByteBuf buf, ModVersion value) {
             PacketCodecs.STRING.encode(buf, value.version.getFriendlyString());
-            buf.writeInt(value.protocolVersion);
+            VarInts.write(buf, value.protocolVersion);
         }
     };
 

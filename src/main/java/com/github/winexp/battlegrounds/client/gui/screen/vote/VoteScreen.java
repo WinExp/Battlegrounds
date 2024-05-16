@@ -1,7 +1,8 @@
 package com.github.winexp.battlegrounds.client.gui.screen.vote;
 
 import com.github.winexp.battlegrounds.client.KeyBindings;
-import com.github.winexp.battlegrounds.discussion.vote.VoteInfo;
+import com.github.winexp.battlegrounds.discussion.vote.VoteInstance;
+import com.github.winexp.battlegrounds.network.payload.c2s.play.vote.UpdateVoteInfoPayloadC2S;
 import com.github.winexp.battlegrounds.network.payload.c2s.play.vote.VotePayloadC2S;
 import com.github.winexp.battlegrounds.network.payload.c2s.play.vote.SyncVoteInfosPayloadC2S;
 import com.github.winexp.battlegrounds.network.payload.s2c.play.vote.UpdateVoteInfoPayloadS2C;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 
 @Environment(EnvType.CLIENT)
 public class VoteScreen extends Screen {
-    private static final List<VoteInfo> voteInfosCache = new CopyOnWriteArrayList<>();
+    private static final List<VoteInstance> voteInstancesCache = new CopyOnWriteArrayList<>();
     private static long lastRefreshTime = 0;
     private VoteListWidget voteList;
     private ButtonWidget acceptButton;
@@ -33,10 +34,6 @@ public class VoteScreen extends Screen {
     }
 
     public static void globalTick(MinecraftClient client) {
-        // 投票剩余时间
-        for (VoteInfo voteInfo : voteInfosCache) {
-            if (voteInfo.timeLeft > 0) voteInfo.timeLeft--;
-        }
         // 按键绑定
         while (KeyBindings.VOTE_SCREEN.wasPressed()) {
             client.setScreen(new VoteScreen());
@@ -58,40 +55,50 @@ public class VoteScreen extends Screen {
         ClientPlayNetworking.send(new SyncVoteInfosPayloadC2S());
     }
 
-    public static void onVoteOpened(MinecraftClient client, VoteInfo voteInfo) {
-        voteInfosCache.add(voteInfo);
+    public static void onVoteOpened(MinecraftClient client, VoteInstance voteInstance) {
+        voteInstancesCache.add(voteInstance);
         if (client.currentScreen instanceof VoteScreen voteScreen) {
             voteScreen.updateVotesGUI();
         }
     }
 
-    public static void onVoteClosed(MinecraftClient client, VoteInfo voteInfo) {
-        voteInfosCache.removeIf(voteInfo1 -> voteInfo1.equals(voteInfo));
+    public static void onVoteClosed(MinecraftClient client, VoteInstance voteInstance) {
+        voteInstancesCache.removeIf(voteInstance1 -> voteInstance1.equals(voteInstance));
         if (client.currentScreen instanceof VoteScreen voteScreen) {
             voteScreen.updateVotesGUI();
         }
     }
 
     public static void onVoteInfosReceived(MinecraftClient client, SyncVoteInfosPayloadS2C packet) {
-        voteInfosCache.clear();
-        voteInfosCache.addAll(packet.voteInfos());
+        voteInstancesCache.clear();
+        voteInstancesCache.addAll(packet.voteInstances());
         if (client.currentScreen instanceof VoteScreen voteScreen) {
             voteScreen.updateVotesGUI();
         }
     }
 
-    public static void updateVoteInfo(MinecraftClient client, UpdateVoteInfoPayloadS2C packet) {
-        if (packet.voteInfo().isEmpty()) return;
-        VoteInfo voteInfo = packet.voteInfo().get();
-        voteInfosCache.remove(voteInfo);
-        voteInfosCache.add(voteInfo);
+    public static void onVoteExpired(VoteInstance voteInstance) {
+        updateVoteInfo(voteInstance.getIdentifier());
+    }
+
+    public static void updateVoteInfo(Identifier identifier) {
+        UpdateVoteInfoPayloadC2S packet = new UpdateVoteInfoPayloadC2S(identifier);
+        ClientPlayNetworking.send(packet);
+    }
+
+    public static void onUpdateVoteInfo(MinecraftClient client, UpdateVoteInfoPayloadS2C packet) {
+        voteInstancesCache.removeIf(voteInstance1 -> voteInstance1.getIdentifier().equals(packet.identifier()));
+        if (packet.voteInstance().isPresent()) {
+            voteInstancesCache.add(packet.voteInstance().get());
+        }
         if (client.currentScreen instanceof VoteScreen voteScreen) {
             voteScreen.updateVotesGUI();
         }
     }
 
     public void updateVotesGUI() {
-        this.voteList.setEntries(voteInfosCache.stream().map(VoteListWidget.VoteEntry::new)
+        this.voteList.setEntries(voteInstancesCache.stream()
+                .map(VoteListWidget.VoteEntry::new)
                 .collect(Collectors.toList()));
         this.updateButtonState();
     }
@@ -99,7 +106,7 @@ public class VoteScreen extends Screen {
     private void onVoteButtonClicked(boolean result) {
         VoteListWidget.Entry entry = this.voteList.getSelectedOrNull();
         if (entry instanceof VoteListWidget.VoteEntry voteEntry) {
-            Identifier identifier = voteEntry.voteInfo.identifier;
+            Identifier identifier = voteEntry.voteInstance.getIdentifier();
             ClientPlayNetworking.send(new VotePayloadC2S(identifier, result));
             voteEntry.setSelectable(false);
         }

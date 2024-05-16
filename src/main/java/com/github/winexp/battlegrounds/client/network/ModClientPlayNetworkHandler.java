@@ -43,19 +43,19 @@ public final class ModClientPlayNetworkHandler {
     }
 
     private static void onUpdateVoteInfo(UpdateVoteInfoPayloadS2C packet, ClientPlayNetworking.Context context) {
-        VoteScreen.updateVoteInfo(context.client(), packet);
+        VoteScreen.onUpdateVoteInfo(context.client(), packet);
     }
 
     private static void onVoteOpened(VoteOpenedPayloadS2C packet, ClientPlayNetworking.Context context) {
-        ClientVoteEvents.OPENED.invoker().onOpened(packet.voteInfo());
+        ClientVoteEvents.OPENED.invoker().onOpened(packet.voteInstance());
     }
 
     private static void onVoteClosed(VoteClosedPayloadS2C packet, ClientPlayNetworking.Context context) {
-        ClientVoteEvents.CLOSED.invoker().onClosed(packet.voteInfo(), packet.closeReason());
+        ClientVoteEvents.CLOSED.invoker().onClosed(packet.voteInstance(), packet.closeReason());
     }
 
     private static void onPlayerVoted(PlayerVotedPayloadS2C packet, ClientPlayNetworking.Context context) {
-        ClientVoteEvents.PLAYER_VOTED.invoker().onPlayerVoted(packet.playerName(), packet.voteInfo(), packet.result());
+        ClientVoteEvents.PLAYER_VOTED.invoker().onPlayerVoted(packet.playerName(), packet.voteInstance(), packet.result());
     }
 
     private static void onFlash(FlashPayloadS2C packet, ClientPlayNetworking.Context context) {

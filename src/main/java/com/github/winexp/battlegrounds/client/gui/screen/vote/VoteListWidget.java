@@ -1,6 +1,6 @@
 package com.github.winexp.battlegrounds.client.gui.screen.vote;
 
-import com.github.winexp.battlegrounds.discussion.vote.VoteInfo;
+import com.github.winexp.battlegrounds.discussion.vote.VoteInstance;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -66,12 +66,12 @@ public class VoteListWidget extends AlwaysSelectedEntryListWidget<VoteListWidget
     @Environment(EnvType.CLIENT)
     public static final class VoteEntry extends Entry {
         private final MinecraftClient client;
-        public final VoteInfo voteInfo;
+        public final VoteInstance voteInstance;
         private boolean selectable = true;
 
-        public VoteEntry(VoteInfo voteInfo) {
+        public VoteEntry(VoteInstance voteInstance) {
             this.client = MinecraftClient.getInstance();
-            this.voteInfo = voteInfo;
+            this.voteInstance = voteInstance;
         }
 
         @Override
@@ -82,34 +82,34 @@ public class VoteListWidget extends AlwaysSelectedEntryListWidget<VoteListWidget
         @Override
         public Text getNarration() {
             MutableText text = Text.empty();
-            text.append(Text.translatable("narrator.select", this.voteInfo.name));
+            text.append(Text.translatable("narrator.select", this.voteInstance.getName()));
             text.append(ScreenTexts.SENTENCE_SEPARATOR);
-            text.append(this.voteInfo.description);
+            text.append(this.voteInstance.getDescription());
             text.append(ScreenTexts.SENTENCE_SEPARATOR);
             text.append(Text.translatable("vote.battlegrounds.initiator", this.getInitiatorName()));
             text.append(ScreenTexts.SENTENCE_SEPARATOR);
-            text.append(Text.translatable("gui.battlegrounds.vote.time_left", this.voteInfo.timeLeft / 20));
+            text.append(Text.translatable("gui.battlegrounds.vote.time_left", this.voteInstance.getTimeLeft() / 20));
             return text;
         }
 
         private Text getInitiatorName() {
-            return Text.translatableWithFallback("vote.battlegrounds.initiator." + this.voteInfo.initiatorName.getString(), this.voteInfo.initiatorName.getString());
+            return Text.translatableWithFallback("vote.battlegrounds.initiator." + this.voteInstance.getInitiatorName(), this.voteInstance.getInitiatorName().getString());
         }
 
         @Override
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            context.drawText(this.client.textRenderer, this.voteInfo.name, x + 3, y + 1, Colors.WHITE, false);
-            context.drawText(this.client.textRenderer, this.voteInfo.description, x + 3, y + 1 + LINE_HEIGHT, Colors.GRAY, false);
+            context.drawText(this.client.textRenderer, this.voteInstance.getName(), x + 3, y + 1, Colors.WHITE, false);
+            context.drawText(this.client.textRenderer, this.voteInstance.getDescription(), x + 3, y + 1 + LINE_HEIGHT, Colors.GRAY, false);
             context.drawText(this.client.textRenderer,
                     Text.translatable("vote.battlegrounds.initiator", this.getInitiatorName()),
                     x + 3, y + 1 + LINE_HEIGHT * 2, Colors.GRAY, false);
             context.drawText(this.client.textRenderer,
-                    Text.translatable("gui.battlegrounds.vote.time_left", this.voteInfo.timeLeft / 20),
+                    Text.translatable("gui.battlegrounds.vote.time_left", this.voteInstance.getTimeLeft() / 20),
                     x + 3, y + 1 + LINE_HEIGHT * 3, Colors.GRAY, false);
         }
 
         public boolean isSelectable() {
-            return this.selectable && this.voteInfo.available;
+            return this.selectable && this.voteInstance.isAvailableForPlayer(this.client.player);
         }
 
         public void setSelectable(boolean selectable) {

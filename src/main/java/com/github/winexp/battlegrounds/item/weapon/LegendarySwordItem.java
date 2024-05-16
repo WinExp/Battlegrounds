@@ -1,9 +1,9 @@
 package com.github.winexp.battlegrounds.item.weapon;
 
 import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
-import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.google.common.collect.ImmutableList;
 import net.fabricmc.fabric.api.item.v1.CustomDamageHandler;
+import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 import net.fabricmc.fabric.api.item.v1.EquipmentSlotProvider;
 import net.minecraft.client.item.TooltipType;
 import net.minecraft.component.DataComponentType;
@@ -25,12 +25,11 @@ import net.minecraft.world.World;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LegendarySwordItem extends SwordItem implements EnchantRestrict {
+public class LegendarySwordItem extends SwordItem {
     private final List<StatusEffectInstance> enrichEffects;
     private final List<StatusEffectInstance> attackEffects;
     private final int attackEffectBound;
     private final boolean enchantable;
-    private final boolean grindable;
     private final boolean hasGlint;
 
     public LegendarySwordItem(ToolMaterial toolMaterial, Settings settings) {
@@ -39,7 +38,6 @@ public class LegendarySwordItem extends SwordItem implements EnchantRestrict {
         this.attackEffects = settings.attackEffects;
         this.attackEffectBound = settings.attackEffectBound;
         this.enchantable = settings.enchantable;
-        this.grindable = settings.grindable;
         this.hasGlint = settings.hasGlint;
     }
 
@@ -55,13 +53,13 @@ public class LegendarySwordItem extends SwordItem implements EnchantRestrict {
     }
 
     @Override
-    public boolean isEnchantable(Enchantment enchantment, Enchantment.Properties properties) {
+    public boolean isEnchantable(ItemStack stack) {
         return this.enchantable;
     }
 
     @Override
-    public boolean isGrindable(ItemStack stack) {
-        return this.grindable;
+    public boolean canBeEnchantedWith(ItemStack stack, Enchantment enchantment, EnchantingContext context) {
+        return this.enchantable;
     }
 
     @Override
@@ -98,7 +96,6 @@ public class LegendarySwordItem extends SwordItem implements EnchantRestrict {
         ));
         private int attackEffectBound = 100;
         private boolean enchantable = false;
-        private boolean grindable = false;
         private boolean hasGlint = false;
 
         public Settings() {
@@ -196,18 +193,13 @@ public class LegendarySwordItem extends SwordItem implements EnchantRestrict {
             return this;
         }
 
-        public Settings enchantable() {
-            this.enchantable = true;
-            return this;
-        }
-
-        public Settings grindable() {
-            this.grindable = true;
-            return this;
-        }
-
         public Settings glint() {
             this.hasGlint = true;
+            return this;
+        }
+
+        public Settings enchantable() {
+            this.enchantable = true;
             return this;
         }
     }

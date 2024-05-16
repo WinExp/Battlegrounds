@@ -2,9 +2,7 @@ package com.github.winexp.battlegrounds.command;
 
 import com.github.winexp.battlegrounds.Battlegrounds;
 import com.github.winexp.battlegrounds.command.argument.PVPModeArgumentType;
-import com.github.winexp.battlegrounds.discussion.vote.VoteInstance;
-import com.github.winexp.battlegrounds.discussion.vote.VoteManager;
-import com.github.winexp.battlegrounds.discussion.vote.VotePreset;
+import com.github.winexp.battlegrounds.discussion.vote.*;
 import com.github.winexp.battlegrounds.entity.projectile.thrown.FlashBangEntity;
 import com.github.winexp.battlegrounds.game.GameProperties;
 import com.github.winexp.battlegrounds.game.PVPMode;
@@ -30,7 +28,6 @@ import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 
 import java.util.Collection;
-import java.util.Map;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
@@ -135,7 +132,13 @@ public class BattlegroundsCommand {
             source.sendFeedback(() -> Text.translatable("vote.battlegrounds.already_voting.feedback")
                     .formatted(Formatting.RED), false);
         } else {
-            VoteInstance instance = VoteInstance.createWithPreset(VotePreset.START_GAME, source, Map.of("game_properties", gameProperties));
+            VoteInstance instance = VoteInstance.createWithPreset(VotePreset.START_GAME, source.getDisplayName());
+            instance.callback(VoteCallback.onlyOnClosed((voteInstance, closeReason) -> {
+                if (closeReason == CloseReason.ACCEPTED) {
+                    Variables.gameManager.setGameProperties(gameProperties);
+                    Variables.gameManager.prepareToDeleteWorld(voteInstance.getParticipants());
+                }
+            }));
             if (!VoteManager.INSTANCE.openVote(instance, source.getServer().getPlayerManager().getPlayerList())) {
                 throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownCommand().create();
             }

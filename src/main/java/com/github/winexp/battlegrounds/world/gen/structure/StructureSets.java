@@ -22,12 +22,12 @@ public class StructureSets implements net.minecraft.structure.StructureSets {
     public static RegistryKey<StructureSet> RELIC_OF_FANTASY = of("relic_of_fantasy");
     public static RegistryKey<StructureSet> WINE_SHOP = of("wine_shop");
 
-    private static RegistryKey<StructureSet> of(String name) {
-        return RegistryKey.of(RegistryKeys.STRUCTURE_SET, new Identifier("battlegrounds", name));
+    private static RegistryKey<StructureSet> of(String id) {
+        return RegistryKey.of(RegistryKeys.STRUCTURE_SET, new Identifier("battlegrounds", id));
     }
 
-    private static int getSalt(RegistryKey<?> structureSetKey) {
-        return Math.abs(structureSetKey.getValue().hashCode());
+    private static int getSalt(RegistryKey<?> registryKey) {
+        return Math.abs(registryKey.getRegistry().hashCode() + registryKey.getValue().hashCode() * 31);
     }
 
     private static void registerDefault(Registerable<StructureSet> structureSetRegisterable,

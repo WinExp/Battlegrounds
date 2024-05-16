@@ -1,8 +1,9 @@
 package com.github.winexp.battlegrounds.item.tool;
 
 import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
-import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.google.common.collect.ImmutableList;
+import net.fabricmc.fabric.api.item.v1.EnchantingContext;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -12,7 +13,7 @@ import net.minecraft.item.ToolMaterial;
 
 import java.util.List;
 
-public class KnockbackStickItem extends ToolItem implements EnchantRestrict {
+public class KnockbackStickItem extends ToolItem {
     private static final List<StatusEffectInstance> ATTACK_EFFECTS = ImmutableList.of(
             new StatusEffectInstance(StatusEffects.SLOWNESS, 5 * 20, 2),
             new StatusEffectInstance(StatusEffects.NAUSEA, 5 * 20, 0)
@@ -31,14 +32,8 @@ public class KnockbackStickItem extends ToolItem implements EnchantRestrict {
         return true;
     }
 
-    /*
-    RawShapedRecipe rawShaped = RawShapedRecipe.create(Map.of(
-                        'a', Ingredient.ofItems(Items.DIAMOND),
-                        'b', Ingredient.ofItems(Items.BLAZE_ROD),
-                        'c', Ingredient.ofItems(Items.STICK)
-                ),
-                "aba",
-                "bcb",
-                "aba");
-     */
+    @Override
+    public boolean canBeEnchantedWith(ItemStack stack, Enchantment enchantment, EnchantingContext context) {
+        return false;
+    }
 }

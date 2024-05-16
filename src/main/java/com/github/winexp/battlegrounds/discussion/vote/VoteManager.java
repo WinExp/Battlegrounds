@@ -30,7 +30,7 @@ public class VoteManager {
     }
 
     private void onVoteOpened(VoteInstance voteInstance) {
-        VoteOpenedPayloadS2C packet = new VoteOpenedPayloadS2C(voteInstance.getVoteInfo());
+        VoteOpenedPayloadS2C packet = new VoteOpenedPayloadS2C(voteInstance);
         for (UUID uuid : voteInstance.getParticipants()) {
             ServerPlayerEntity player = Variables.server.getPlayerManager().getPlayer(uuid);
             if (player != null) {
@@ -42,7 +42,7 @@ public class VoteManager {
     private void onVoteClosed(VoteInstance voteInstance, CloseReason reason) {
         Identifier identifier = voteInstance.getIdentifier();
         this.voteMap.remove(identifier);
-        VoteClosedPayloadS2C packet = new VoteClosedPayloadS2C(voteInstance.getVoteInfo(), reason);
+        VoteClosedPayloadS2C packet = new VoteClosedPayloadS2C(voteInstance, reason);
         for (UUID uuid : voteInstance.getParticipants()) {
             ServerPlayerEntity player = Variables.server.getPlayerManager().getPlayer(uuid);
             if (player != null) {
@@ -52,7 +52,7 @@ public class VoteManager {
     }
 
     private void onPlayerVoted(ServerPlayerEntity player, VoteInstance voteInstance, boolean result) {
-        PlayerVotedPayloadS2C packet = new PlayerVotedPayloadS2C(player.getDisplayName(), voteInstance.getVoteInfo(player), result);
+        PlayerVotedPayloadS2C packet = new PlayerVotedPayloadS2C(player.getDisplayName(), voteInstance, result);
         for (UUID uuid : voteInstance.getParticipants()) {
             ServerPlayerEntity player1 = Variables.server.getPlayerManager().getPlayer(uuid);
             if (player1 != null) {
@@ -66,15 +66,8 @@ public class VoteManager {
     }
 
     public void syncVoteInfos(ServerPlayerEntity player) {
-        Collection<VoteInstance> votes = this.getVoteList();
-        List<VoteInfo> voteInfos = new ArrayList<>();
-        for (VoteInstance vote : votes) {
-            if (vote.isParticipant(player)) {
-                VoteInfo voteInfo = vote.getVoteInfo(player);
-                voteInfos.add(voteInfo);
-            }
-        }
-        SyncVoteInfosPayloadS2C packet = new SyncVoteInfosPayloadS2C(voteInfos);
+        List<VoteInstance> voteInstances = this.getVoteList();
+        SyncVoteInfosPayloadS2C packet = new SyncVoteInfosPayloadS2C(voteInstances);
         ServerPlayNetworking.send(player, packet);
     }
 
@@ -86,8 +79,8 @@ public class VoteManager {
         return this.containsVote(identifier) && this.voteMap.get(identifier).isVoting();
     }
 
-    public Collection<VoteInstance> getVoteList() {
-        return this.voteMap.values();
+    public List<VoteInstance> getVoteList() {
+        return List.copyOf(this.voteMap.values());
     }
 
     public Optional<VoteInstance> getVoteInstance(Identifier identifier) {

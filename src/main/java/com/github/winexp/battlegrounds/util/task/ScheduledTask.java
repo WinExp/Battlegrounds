@@ -15,7 +15,7 @@ public abstract class ScheduledTask extends AbstractTask {
     public ScheduledTask(Duration delay) {
         super();
         this.delay = delay.toTicks();
-        if (delay.toTicks() < 0) {
+        if (this.delay < 0) {
             this.cancel();
         }
     }

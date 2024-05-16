@@ -1,6 +1,5 @@
 package com.github.winexp.battlegrounds.network;
 
-import com.github.winexp.battlegrounds.discussion.vote.VoteInfo;
 import com.github.winexp.battlegrounds.discussion.vote.VoteInstance;
 import com.github.winexp.battlegrounds.discussion.vote.VoteManager;
 import com.github.winexp.battlegrounds.item.Items;
@@ -33,14 +32,12 @@ public final class ModServerPlayNetworkHandler {
     }
 
     private static void onGetVoteInfo(UpdateVoteInfoPayloadC2S packet, ServerPlayNetworking.Context context) {
-        ServerPlayerEntity player = context.player();
         PacketSender sender = context.responseSender();
         VoteManager.INSTANCE.getVoteInstance(packet.voteId()).ifPresentOrElse(voteInstance -> {
-            VoteInfo voteInfo = voteInstance.getVoteInfo(player);
-            UpdateVoteInfoPayloadS2C responsePacket = new UpdateVoteInfoPayloadS2C(Optional.of(voteInfo));
+            UpdateVoteInfoPayloadS2C responsePacket = new UpdateVoteInfoPayloadS2C(packet.voteId(), Optional.of(voteInstance));
             sender.sendPacket(responsePacket);
         }, () -> {
-            UpdateVoteInfoPayloadS2C responsePacket = new UpdateVoteInfoPayloadS2C(Optional.empty());
+            UpdateVoteInfoPayloadS2C responsePacket = new UpdateVoteInfoPayloadS2C(packet.voteId(), Optional.empty());
             sender.sendPacket(responsePacket);
         });
     }
@@ -59,8 +56,7 @@ public final class ModServerPlayNetworkHandler {
                 voteInstance.denyVote(player);
             }
             if (voteInstance.isVoting()) {
-                VoteInfo voteInfo = voteInstance.getVoteInfo(player);
-                UpdateVoteInfoPayloadS2C responsePacket = new UpdateVoteInfoPayloadS2C(Optional.of(voteInfo));
+                UpdateVoteInfoPayloadS2C responsePacket = new UpdateVoteInfoPayloadS2C(packet.identifier(), Optional.of(voteInstance));
                 sender.sendPacket(responsePacket);
             }
         }

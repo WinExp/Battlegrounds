@@ -27,6 +27,8 @@
   "commands.battlegrounds.reload.feedback": "Reloaded configs.",
   "commands.battlegrounds.stop.feedback": "All tasks have been discontinued.",
 
+  "container.battlegrounds.soak_table": "Soak Table",
+
   "disconnect.battlegrounds.config.mod_info.not_found": "Your version of Battlegrounds is too old or you don't have Battlegrounds installed.\nServer version: %s",
   "disconnect.battlegrounds.config.mod_info.wrong": "Your version of Battlegrounds is not compatible with the server!\nYour version: %s\nServer version: %s",
 

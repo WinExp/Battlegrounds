@@ -1,6 +1,6 @@
 package com.github.winexp.battlegrounds.client.toast.vote;
 
-import com.github.winexp.battlegrounds.discussion.vote.VoteInfo;
+import com.github.winexp.battlegrounds.discussion.vote.VoteInstance;
 import com.github.winexp.battlegrounds.util.time.Duration;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -11,9 +11,9 @@ import net.minecraft.util.Identifier;
 public class VoteOpenedToast extends SimpleToast {
     private static final Identifier TEXTURE = new Identifier("battlegrounds", "toast/vote");
 
-    public VoteOpenedToast(VoteInfo voteInfo) {
+    public VoteOpenedToast(VoteInstance voteInstance) {
         super(
-                Text.translatable("gui.battlegrounds.vote.opened.toast.title", voteInfo.name),
+                Text.translatable("gui.battlegrounds.vote.opened.toast.title", voteInstance.getName()),
                 Text.translatable("gui.battlegrounds.vote.opened.toast.subtitle"),
                 Duration.withSeconds(5)
         );

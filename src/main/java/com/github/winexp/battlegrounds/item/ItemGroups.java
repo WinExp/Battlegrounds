@@ -1,5 +1,6 @@
 package com.github.winexp.battlegrounds.item;
 
+import com.github.winexp.battlegrounds.block.Blocks;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentLevelEntry;
@@ -44,11 +45,13 @@ public class ItemGroups extends net.minecraft.item.ItemGroups {
 
                 entries.add(Items.BEEF_NOODLE_SOUP);
                 entries.add(Items.SIX_FLAVOURED_DIHUANG_PILL);
+
+                entries.add(Blocks.SOAK_TABLE);
             })
             .build());
 
-    private static ItemGroup register(String name, ItemGroup itemGroup) {
-        return Registry.register(Registries.ITEM_GROUP, new Identifier("battlegrounds", name), itemGroup);
+    private static ItemGroup register(String id, ItemGroup itemGroup) {
+        return Registry.register(Registries.ITEM_GROUP, new Identifier("battlegrounds", id), itemGroup);
     }
 
     public static void bootstrap() {

@@ -1,9 +1,10 @@
 package com.github.winexp.battlegrounds.item.weapon;
 
 import com.github.winexp.battlegrounds.entity.effect.StatusEffects;
-import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.sound.SoundEvents;
 import com.google.common.collect.ImmutableList;
+import net.fabricmc.fabric.api.item.v1.EnchantingContext;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -13,7 +14,7 @@ import net.minecraft.item.ToolMaterial;
 
 import java.util.List;
 
-public class ButchersAxeItem extends AxeItem implements EnchantRestrict {
+public class ButchersAxeItem extends AxeItem {
     private static final List<StatusEffectInstance> penaltyEffects = ImmutableList.of(
             new StatusEffectInstance(StatusEffects.SLOWNESS, 7 * 20, 1),
             new StatusEffectInstance(StatusEffects.WITHER, 7 * 20, 0),
@@ -33,6 +34,11 @@ public class ButchersAxeItem extends AxeItem implements EnchantRestrict {
 
     @Override
     public boolean isEnchantable(ItemStack stack) {
+        return false;
+    }
+
+    @Override
+    public boolean canBeEnchantedWith(ItemStack stack, Enchantment enchantment, EnchantingContext context) {
         return false;
     }
 

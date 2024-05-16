@@ -15,7 +15,6 @@ public class SixFlavouredDihuangPillItem extends Item {
 
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        super.appendTooltip(stack, context, tooltip, type);
         tooltip.add(Text.translatable("item.battlegrounds.six_flavoured_dihuang_pill.tooltip")
                 .formatted(Formatting.DARK_PURPLE)
                 .styled(style -> style

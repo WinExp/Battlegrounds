@@ -30,8 +30,8 @@ public class Structures extends net.minecraft.world.gen.structure.Structures {
     public static RegistryKey<Structure> RELIC_OF_FANTASY = of("relic_of_fantasy");
     public static RegistryKey<Structure> WINE_SHOP = of("wine_shop");
 
-    private static RegistryKey<Structure> of(String name) {
-        return RegistryKey.of(RegistryKeys.STRUCTURE, new Identifier("battlegrounds", name));
+    private static RegistryKey<Structure> of(String id) {
+        return RegistryKey.of(RegistryKeys.STRUCTURE, new Identifier("battlegrounds", id));
     }
 
     private static void registerDefault(Registerable<Structure> structureRegisterable,

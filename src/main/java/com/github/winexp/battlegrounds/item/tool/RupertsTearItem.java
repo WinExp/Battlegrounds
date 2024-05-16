@@ -1,6 +1,5 @@
 package com.github.winexp.battlegrounds.item.tool;
 
-import com.github.winexp.battlegrounds.item.EnchantRestrict;
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.network.payload.c2s.play.RupertsTearTeleportPayloadC2S;
 import com.github.winexp.battlegrounds.registry.tag.ModFluidTags;
@@ -33,7 +32,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
-public class RupertsTearItem extends ToolItem implements EnchantRestrict {
+public class RupertsTearItem extends ToolItem {
     public static final int MAX_DISTANCE = 100;
     public static final int MAX_COOLDOWN = 30 * 20;
     public static final int MIN_COOLDOWN = 3 * 20;
@@ -65,11 +64,6 @@ public class RupertsTearItem extends ToolItem implements EnchantRestrict {
             }
         }
         return true;
-    }
-
-    @Override
-    public boolean isEnchantable(ItemStack stack) {
-        return false;
     }
 
     public static void damageStack(ServerPlayerEntity player, Hand hand) {

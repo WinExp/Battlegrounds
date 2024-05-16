@@ -1,5 +1,6 @@
 package com.github.winexp.battlegrounds;
 
+import com.github.winexp.battlegrounds.block.Blocks;
 import com.github.winexp.battlegrounds.block.SmeltableBlockRegistry;
 import com.github.winexp.battlegrounds.command.BattlegroundsCommand;
 import com.github.winexp.battlegrounds.command.RandomTpCommand;
@@ -141,6 +142,8 @@ public class Battlegrounds implements ModInitializer {
         // 注册数据包
         ResourceManagerHelper resourceManagerHelper = ResourceManagerHelper.get(ResourceType.SERVER_DATA);
         resourceManagerHelper.registerReloadListener(new DataPackResourceReloadListener());
+        // 注册方块
+        Blocks.bootstrap();
         // 注册物品
         Items.bootstrap();
         // 注册物品组

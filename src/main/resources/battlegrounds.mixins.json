@@ -8,8 +8,6 @@
     "channeling_RangedWeaponMixin",
     "customRecipe_RecipeManagerMixin",
     "effectRestraint_StatusEffectMixin",
-    "enchantRestrict_EnchantmentMixin",
-    "enchantRestrict_GrindstoneScreenHandlerMixin",
     "events_PlayerEntityMixin",
     "events_PlayerManagerMixin",
     "shapeType_RaycastContextMixin",

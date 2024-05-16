@@ -41,10 +41,10 @@ public class EntityTypes<T extends Entity> extends net.minecraft.entity.EntityTy
         super(factory, spawnGroup, saveable, summonable, fireImmune, spawnableFarFromPlayer, canSpawnInside, dimensions, spawnBoxScale, maxTrackDistance, trackTickInterval, requiredFeatures);
     }
 
-    private static <T extends Entity> EntityType<T> register(String name, EntityType<T> entityType) {
+    private static <T extends Entity> EntityType<T> register(String id, EntityType<T> entityType) {
         return Registry.register(
                 Registries.ENTITY_TYPE,
-                new Identifier("battlegrounds", name),
+                new Identifier("battlegrounds", id),
                 entityType
         );
     }

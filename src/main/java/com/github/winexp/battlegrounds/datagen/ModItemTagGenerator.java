@@ -1,6 +1,7 @@
 package com.github.winexp.battlegrounds.datagen;
 
 import com.github.winexp.battlegrounds.item.Items;
+import com.github.winexp.battlegrounds.registry.tag.ModItemTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
@@ -16,7 +17,6 @@ public class ModItemTagGenerator extends FabricTagProvider.ItemTagProvider {
 
     @Override
     protected void configure(RegistryWrapper.WrapperLookup arg) {
-        // vanilla
         this.getOrCreateTagBuilder(ItemTags.SWORDS)
                 .add(Items.PVP_PRO_SWORD)
                 .add(Items.SEVEN_ELEVEN_SWORD)
@@ -27,7 +27,7 @@ public class ModItemTagGenerator extends FabricTagProvider.ItemTagProvider {
                 .add(Items.MINERS_PICKAXE);
         this.getOrCreateTagBuilder(ItemTags.AXES)
                 .add(Items.BUTCHERS_AXE);
-        // conventional
+
         this.getOrCreateTagBuilder(ConventionalItemTags.TOOLS)
                 .add(Items.KNOCKBACK_STICK)
                 .add(Items.RUPERTS_TEAR);
@@ -38,5 +38,8 @@ public class ModItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         this.getOrCreateTagBuilder(ConventionalItemTags.FOODS)
                 .add(Items.BEEF_NOODLE_SOUP)
                 .add(Items.SIX_FLAVOURED_DIHUANG_PILL);
+
+        this.getOrCreateTagBuilder(ModItemTags.SOAKABLE)
+                .addOptionalTag(ItemTags.WEAPON_ENCHANTABLE);
     }
 }
