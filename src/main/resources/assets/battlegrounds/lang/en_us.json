@@ -103,6 +103,8 @@
   "key.battlegrounds.vote_screen": "Voting Screen",
   "key.categories.battlegrounds": "Battlegrounds",
 
+  "soak.battlegrounds.immerse.tooltip": "Immerse Effects:",
+  "soak.battlegrounds.leach.tooltip": "Leach Effects",
   "subtitles.battlegrounds.entity.flash_bang.explode": "Flash Bang: Explode",
   "subtitles.battlegrounds.entity.prop.generic.trigger": "Thrown Entity: Trigger",
   "subtitles.battlegrounds.entity.prop.generic.rebound": "Thrown Entity: Rebound",

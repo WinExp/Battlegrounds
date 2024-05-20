@@ -2,9 +2,11 @@ package com.github.winexp.battlegrounds;
 
 import com.github.winexp.battlegrounds.block.Blocks;
 import com.github.winexp.battlegrounds.block.SmeltableBlockRegistry;
+import com.github.winexp.battlegrounds.block.entity.BlockEntityType;
 import com.github.winexp.battlegrounds.command.BattlegroundsCommand;
 import com.github.winexp.battlegrounds.command.RandomTpCommand;
 import com.github.winexp.battlegrounds.command.argument.PVPModeArgumentType;
+import com.github.winexp.battlegrounds.component.DataComponentTypes;
 import com.github.winexp.battlegrounds.config.ConfigUtil;
 import com.github.winexp.battlegrounds.config.ServerRootConfig;
 import com.github.winexp.battlegrounds.enchantment.Enchantments;
@@ -144,6 +146,10 @@ public class Battlegrounds implements ModInitializer {
         resourceManagerHelper.registerReloadListener(new DataPackResourceReloadListener());
         // 注册方块
         Blocks.bootstrap();
+        // 注册方块实体
+        BlockEntityType.bootstrap();
+        // 注册物品堆叠组件
+        DataComponentTypes.bootstrap();
         // 注册物品
         Items.bootstrap();
         // 注册物品组

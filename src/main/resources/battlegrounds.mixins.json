@@ -11,7 +11,9 @@
     "events_PlayerEntityMixin",
     "events_PlayerManagerMixin",
     "shapeType_RaycastContextMixin",
-    "shield_LivingEntityMixin"
+    "shield_LivingEntityMixin",
+    "soak_ItemStackMixin",
+    "soak_PlayerEntityMixin"
   ],
   "client": [
     "client.flashSound_AbstractSoundInstanceMixin",

@@ -2,7 +2,6 @@ package com.github.winexp.battlegrounds.discussion.vote;
 
 import com.github.winexp.battlegrounds.client.gui.screen.vote.VoteScreen;
 import com.github.winexp.battlegrounds.event.ServerVoteEvents;
-import com.github.winexp.battlegrounds.network.codec.ModPacketCodecs;
 import com.github.winexp.battlegrounds.util.task.ScheduledTask;
 import com.github.winexp.battlegrounds.util.task.TaskScheduler;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
@@ -26,7 +25,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class VoteInstance {
     public static final PacketCodec<ByteBuf, VoteInstance> PACKET_CODEC = new PacketCodec<>() {
-        private static final PacketCodec<ByteBuf, List<UUID>> UUID_LIST_PACKET_CODEC = PacketCodecs.<ByteBuf, UUID>toList().apply(ModPacketCodecs.UUID);
+        private static final PacketCodec<ByteBuf, UUID> UUID_PACKET_CODEC = PacketCodec.ofStatic(PacketByteBuf::writeUuid, PacketByteBuf::readUuid);
+        private static final PacketCodec<ByteBuf, List<UUID>> UUID_LIST_PACKET_CODEC = PacketCodecs.<ByteBuf, UUID>toList().apply(UUID_PACKET_CODEC);
 
         @Override
         public VoteInstance decode(ByteBuf buf) {

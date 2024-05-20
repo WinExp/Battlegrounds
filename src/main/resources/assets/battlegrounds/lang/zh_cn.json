@@ -103,6 +103,8 @@
   "key.battlegrounds.vote_screen": "打开投票界面",
   "key.categories.battlegrounds": "Battlegrounds",
 
+  "soak.battlegrounds.immerse.tooltip": "浸药效果：",
+  "soak.battlegrounds.leach.tooltip": "浸毒效果：",
   "subtitles.battlegrounds.entity.flash_bang.explode": "闪光弹：爆炸",
   "subtitles.battlegrounds.entity.prop.generic.trigger": "投掷物：触发",
   "subtitles.battlegrounds.entity.prop.generic.rebound": "投掷物：反弹",

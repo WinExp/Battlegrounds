@@ -23,4 +23,7 @@ public class BlockEntityType<T extends BlockEntity> extends net.minecraft.block.
         Type<?> type = Util.getChoiceType(TypeReferences.BLOCK_ENTITY, id);
         return Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier("battlegrounds", id), builder.build(type));
     }
+
+    public static void bootstrap() {
+    }
 }
