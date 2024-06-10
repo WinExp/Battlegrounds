@@ -1,11 +1,9 @@
 package com.github.winexp.battlegrounds.game;
 
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
 
 public interface GameListener {
-    void onStageTriggered(GameManager manager, @Nullable Identifier triggerId);
+    void onTriggered(GameManager manager, GameTrigger gameTrigger);
 
     void onBorderResizing(GameManager manager);
 

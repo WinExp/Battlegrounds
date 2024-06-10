@@ -103,14 +103,16 @@
   "key.battlegrounds.vote_screen": "Voting Screen",
   "key.categories.battlegrounds": "Battlegrounds",
 
-  "soak.battlegrounds.immerse.tooltip": "Immerse Effects:",
-  "soak.battlegrounds.leach.tooltip": "Leach Effects",
+  "soak.battlegrounds.tooltip.immerse": "Immerse:",
+  "soak.battlegrounds.tooltip.leach": "Leach:",
+  "soak.battlegrounds.tooltip.remaining": "%d seconds remaining",
+
   "subtitles.battlegrounds.entity.flash_bang.explode": "Flash Bang: Explode",
   "subtitles.battlegrounds.entity.prop.generic.trigger": "Thrown Entity: Trigger",
   "subtitles.battlegrounds.entity.prop.generic.rebound": "Thrown Entity: Rebound",
   "subtitles.battlegrounds.player.tube_fall": "Tube: Landing",
 
-  "vote.battlegrounds.already_voting.feedback": "There is already a vote in progress!",
+  "vote.battlegrounds.duplicate.feedback": "There is already a vote in progress!",
   "vote.battlegrounds.closed.reason.accepted": "Accepted",
   "vote.battlegrounds.closed.reason.denied": "Denied",
   "vote.battlegrounds.closed.reason.timeout": "Timeout",
@@ -118,6 +120,6 @@
   "vote.battlegrounds.initiator": "Initiated by %s",
   "vote.battlegrounds.initiator.@": "Command block",
   "vote.battlegrounds.initiator.Server": "Server",
-  "vote.battlegrounds.start_game.description": "The vote to start the game, needs to be passed by all players.",
-  "vote.battlegrounds.start_game.title": "Start Game"
+  "vote.battlegrounds.presets.start_game.description": "The vote to start the game, needs to be passed by all players.",
+  "vote.battlegrounds.presets.start_game.title": "§aStart Game"
 }

@@ -7,7 +7,6 @@ import com.github.winexp.battlegrounds.util.FileUtil;
 import com.github.winexp.battlegrounds.util.RandomUtil;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import net.minecraft.component.ComponentChanges;
 import net.minecraft.component.type.FireworkExplosionComponent;
 import net.minecraft.component.type.FireworksComponent;
 import net.minecraft.entity.projectile.FireworkRocketEntity;
@@ -56,9 +55,7 @@ public class GameUtil {
             boolean hasTwinkle = random.nextBoolean();
             FireworkExplosionComponent explosion = new FireworkExplosionComponent(shape, colors, fadeColors, hasTrail, hasTwinkle);
             ItemStack stack = new ItemStack(Items.FIREWORK_ROCKET);
-            stack.applyChanges(ComponentChanges.builder()
-                    .add(DataComponentTypes.FIREWORKS, new FireworksComponent(flightTime, Collections.singletonList(explosion)))
-                    .build());
+            stack.set(DataComponentTypes.FIREWORKS, new FireworksComponent(flightTime, Collections.singletonList(explosion)));
             FireworkRocketEntity firework = new FireworkRocketEntity(world, x, y, z, stack);
             firework.noClip = true;
             world.spawnEntity(firework);

@@ -28,15 +28,15 @@ import net.minecraft.world.World;
 import java.util.Objects;
 
 public class RupertsTearBlockOutlineRenderer implements WorldRenderEvents.BeforeBlockOutline {
-    private static final double LERP_DELTA = 0.016;
+    private static final double LERP_DELTA = 0.015;
     private static final long LERP_DURATION = 1000 * 1000;
-    private static final Vec3d NaN = new Vec3d(Double.NaN, Double.NaN, Double.NaN);
+    private static final Vec3d VEC3D_NaN = new Vec3d(Double.NaN, Double.NaN, Double.NaN);
 
-    private Vec3d prevPos = NaN;
+    private Vec3d prevPos = VEC3D_NaN;
     private long prevTime = System.nanoTime();
 
     private void resetData() {
-        this.prevPos = NaN;
+        this.prevPos = VEC3D_NaN;
     }
 
     @Override
@@ -58,10 +58,10 @@ public class RupertsTearBlockOutlineRenderer implements WorldRenderEvents.Before
             Vec3d begin = entity.getCameraPosVec(tickDelta);
             Vec3d rotation = entity.getRotationVec(tickDelta);
             Vec3d end = begin.add(rotation.multiply(RupertsTearItem.MAX_DISTANCE));
+            long currentTime = System.nanoTime();
             BlockRaycastResult raycastResult = MathUtil.raycastBlock(entity, begin, end, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, MathUtil.NONE_ABORT_PREDICATE, MathUtil.NONE_STRENGTH_FUNCTION);
             BlockHitResult blockHitResult = raycastResult.hitResult();
             BlockPos blockPos = blockHitResult.getBlockPos();
-            long currentTime = System.nanoTime();
             float colorR, colorG, colorB, colorA;
             if (blockHitResult.getType() == HitResult.Type.MISS
                     || !world.getWorldBorder().contains(blockPos)) {
@@ -69,8 +69,8 @@ public class RupertsTearBlockOutlineRenderer implements WorldRenderEvents.Before
                 return true;
             }
             if (RupertsTearItem.isSafe(world, blockHitResult)) {
-                colorR = 0.4F;
-                colorG = 0.4F;
+                colorR = 0.45F;
+                colorG = 0.45F;
                 colorB = 1.0F;
                 colorA = 0.9F;
             } else {

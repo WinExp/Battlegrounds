@@ -19,4 +19,9 @@ public class ModBlockModelGenerator extends FabricModelProvider {
     @Override
     public void generateItemModels(ItemModelGenerator itemModelGenerator) {
     }
+
+    @Override
+    public String getName() {
+        return "Block State Model Definitions";
+    }
 }

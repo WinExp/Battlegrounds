@@ -9,12 +9,12 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 
 public class StatusEffects extends net.minecraft.entity.effect.StatusEffects {
-    public static final RegistryEntry.Reference<StatusEffect> ADRENALINE = register("adrenaline",
+    public static final RegistryEntry<StatusEffect> ADRENALINE = register("adrenaline",
             new AdrenalineStatusEffect(StatusEffectCategory.BENEFICIAL, ColorHelper.Argb.getArgb(255, 120, 180, 20)));
-    public static final RegistryEntry.Reference<StatusEffect> APPROACHING_EXTINCTION = register("approaching_extinction",
+    public static final RegistryEntry<StatusEffect> APPROACHING_EXTINCTION = register("approaching_extinction",
             new ApproachingExtinctionStatusEffect(StatusEffectCategory.HARMFUL, ColorHelper.Argb.getArgb(255, 180, 80, 80)));
 
-    private static <T extends StatusEffect> RegistryEntry.Reference<StatusEffect> register(String id, T effect) {
+    private static <T extends StatusEffect> RegistryEntry<StatusEffect> register(String id, T effect) {
         return Registry.registerReference(
                 Registries.STATUS_EFFECT,
                 new Identifier("battlegrounds", id),

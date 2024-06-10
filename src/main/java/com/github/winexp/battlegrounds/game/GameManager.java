@@ -49,13 +49,12 @@ import net.minecraft.world.GameMode;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.CancellationException;
 
 public class GameManager extends PersistentState {
-    public final MinecraftServer server;
+    private final MinecraftServer server;
     private final WorldHelper worldHelper;
     private final Map<UUID, PlayerPermission> playerPermissions = new HashMap<>();
     private final List<GameListener> listeners = new ArrayList<>();
@@ -84,7 +83,6 @@ public class GameManager extends PersistentState {
     private final static Identifier HEALTH_MODIFIER_ID = new Identifier("battlegrounds", "game/main");
     private final static double HEALTH_MODIFIER_ADD_VALUE = 20;
     private final static List<GameListener> globalListeners = new ArrayList<>();
-    private final static Identifier FINAL_STAGE_IDENTIFIER = new Identifier("battlegrounds", "final");
 
     public GameManager(MinecraftServer server) {
         this.server = server;
@@ -99,6 +97,10 @@ public class GameManager extends PersistentState {
         ServerLivingEntityEvents.AFTER_DEATH.register(this::onLivingEntityDeath);
         ServerLivingEntityEvents.ALLOW_DEATH.register(this::allowLivingEntityDeath);
         ServerPlayerEvents.AFTER_RESPAWN.register(this::onPlayerRespawn);
+    }
+
+    public MinecraftServer getServer() {
+        return this.server;
     }
 
     private void onServerStopping(MinecraftServer server) {
@@ -117,7 +119,7 @@ public class GameManager extends PersistentState {
                         Text.translatable("game.battlegrounds.join.broadcast",
                                 player.getDisplayName(),
                                 this.getJoinedInGamePlayerCount(),
-                                this.getTotalInGamePlayerCount()
+                                this.getTotalAlivePlayerCount()
                         ).formatted(Formatting.GREEN),
                         false
                 );
@@ -178,7 +180,7 @@ public class GameManager extends PersistentState {
     private void onLivingEntityDeath(LivingEntity entity, DamageSource damageSource) {
         if (entity instanceof ServerPlayerEntity && this.gameStage.isGaming() && this.currentStage != null) {
             if (this.getJoinedInGamePlayerCount() == 1) {
-                ServerPlayerEntity winner = this.getLastInGamePlayer();
+                ServerPlayerEntity winner = this.getLastAlivePlayer();
                 this.onPlayerWin(winner);
                 this.listeners.forEach(listener ->
                         listener.onPlayerWin(this, winner));
@@ -191,7 +193,7 @@ public class GameManager extends PersistentState {
             UUID uuid = PlayerUtil.getAuthUUID(player);
             PlayerPermission permission = this.getPlayerPermission(uuid, new PlayerPermission());
             if (!this.currentStage.allowRespawn()) {
-                permission.inGame = false;
+                permission.isDead = true;
                 PlayerUtil.setGameModeToMap(player, GameMode.SPECTATOR);
             } else if (permission.respawnChance > 0) {
                 player.setHealth(player.getMaxHealth());
@@ -246,7 +248,11 @@ public class GameManager extends PersistentState {
     }
 
     public GameStage getGameStage() {
-        return gameStage;
+        return this.gameStage;
+    }
+
+    public void setGameStage(GameStage gameStage) {
+        this.gameStage = gameStage;
     }
 
     public PlayerPermission getPlayerPermission(UUID uuid) {
@@ -293,35 +299,35 @@ public class GameManager extends PersistentState {
         return this.borderStage;
     }
 
-    public void setGameProperties(@NotNull GameProperties gameProperties) {
+    public void setGameProperties(GameProperties gameProperties) {
         this.gameProperties = gameProperties;
     }
 
     public int getJoinedInGamePlayerCount() {
         int count = 0;
         for (Map.Entry<UUID, PlayerPermission> entry : this.playerPermissions.entrySet()) {
-            if (this.server.getPlayerManager().getPlayer(entry.getKey()) != null && entry.getValue().inGame) {
+            if (this.server.getPlayerManager().getPlayer(entry.getKey()) != null && !entry.getValue().isDead) {
                 count++;
             }
         }
         return count;
     }
 
-    public int getTotalInGamePlayerCount() {
+    public int getTotalAlivePlayerCount() {
         int count = 0;
         for (PlayerPermission permission : this.playerPermissions.values()) {
-            if (permission.inGame) {
+            if (!permission.isDead) {
                 count++;
             }
         }
         return count;
     }
 
-    public ServerPlayerEntity getLastInGamePlayer() {
+    public ServerPlayerEntity getLastAlivePlayer() {
         ServerPlayerEntity result = null;
         for (Map.Entry<UUID, PlayerPermission> entry : this.playerPermissions.entrySet()) {
             ServerPlayerEntity player = this.server.getPlayerManager().getPlayer(entry.getKey());
-            if (player != null && entry.getValue().inGame) {
+            if (player != null && !entry.getValue().isDead) {
                 result = player;
             }
         }
@@ -330,13 +336,13 @@ public class GameManager extends PersistentState {
 
     public boolean isParticipant(UUID uuid) {
         for (Map.Entry<UUID, PlayerPermission> entry : this.playerPermissions.entrySet()) {
-            if (entry.getKey().equals(uuid) && entry.getValue().inGame) return true;
+            if (entry.getKey().equals(uuid) && !entry.getValue().isDead) return true;
         }
         return false;
     }
 
     public boolean checkAllPlayersJoined() {
-        return this.getJoinedInGamePlayerCount() == this.getTotalInGamePlayerCount();
+        return this.getJoinedInGamePlayerCount() == this.getTotalAlivePlayerCount();
     }
 
     public void enableInfoBossBar() {
@@ -411,6 +417,17 @@ public class GameManager extends PersistentState {
         }
     }
 
+    public void respawnPlayer(ServerPlayerEntity player) {
+        this.ensureIsGaming();
+        UUID uuid = PlayerUtil.getAuthUUID(player);
+        PlayerPermission playerPermission = this.getPlayerPermission(uuid, new PlayerPermission());
+        playerPermission.gameMode = GameMode.SURVIVAL;
+        playerPermission.isDead = false;
+        playerPermission.respawnChance = 0;
+        this.setPlayerPermission(uuid, playerPermission);
+        PlayerUtil.changeGameModeWithMap(player);
+    }
+
     public void setIdleState() {
         this.gameStage = GameStage.IDLE;
         this.pvpMode = PVPMode.PEACEFUL;
@@ -447,7 +464,7 @@ public class GameManager extends PersistentState {
         this.stopGame();
         for (UUID uuid : participants) {
             PlayerPermission permission = new PlayerPermission();
-            permission.inGame = true;
+            permission.isDead = false;
             this.setPlayerPermission(uuid, permission);
         }
         this.gameStage = GameStage.WAITING_PLAYER;
@@ -463,35 +480,8 @@ public class GameManager extends PersistentState {
                 ? this.currentStage.gameConfig() : ModGameConfig.DEFAULT));
     }
 
-    private void onStageTriggered(Identifier triggerId) {
-        if (triggerId == null) return;
-        this.syncData();
-        if (triggerId.equals(new Identifier("battlegrounds", "enable_pvp"))) {
-            this.pvpMode = PVPMode.PVP_MODE;
-            for (ServerPlayerEntity player : this.server.getPlayerManager().getPlayerList()) {
-                UUID uuid = PlayerUtil.getAuthUUID(player);
-                PlayerPermission permission = this.getPlayerPermission(uuid, new PlayerPermission());
-                if (permission.inGame) {
-                    permission.hasEnrichEffects = false;
-                }
-            }
-            this.server.getPlayerManager().broadcast(
-                    Text.translatable("game.battlegrounds.pvp.enable.broadcast")
-                            .formatted(Formatting.GOLD)
-                            .styled(style -> style.withUnderline(true)),
-                    false
-            );
-        } else if (triggerId.equals(new Identifier("battlegrounds", "deathmatch"))) {
-            this.server.getPlayerManager().broadcast(
-                    Text.translatable("game.battlegrounds.deathmatch.start.broadcast")
-                            .formatted(Formatting.GOLD)
-                            .styled(style -> style.withBold(true).withUnderline(true)),
-                    false
-            );
-        } else if (triggerId.equals(new Identifier("battlegrounds", "final"))) {
-            this.gameStage = GameStage.FINAL;
-            this.enableTimeoutTimer(this.gameProperties.timeout().toTicks());
-        }
+    private void onStageTriggered(GameTrigger gameTrigger) {
+        gameTrigger.apply(this);
     }
 
     public void startGame(){
@@ -505,7 +495,7 @@ public class GameManager extends PersistentState {
             player.getInventory().clear();
             UUID uuid = PlayerUtil.getAuthUUID(player);
             PlayerPermission permission = this.getPlayerPermission(uuid, new PlayerPermission());
-            if (permission.inGame) {
+            if (!permission.isDead) {
                 permission.hasEnrichEffects = true;
                 PlayerUtil.changeGameMode(player, GameMode.SURVIVAL);
                 EntityAttributeInstance attributeInstance = player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
@@ -523,10 +513,8 @@ public class GameManager extends PersistentState {
         PlayerUtil.randomTpAllPlayers(this.server, this.server.getOverworld());
         this.enableBorderResizing(this.currentStage.resizeTimeInfo().delayTime().toTicks());
         this.enableInfoBossBar();
+        this.trigger(this.currentStage.triggers());
         this.syncData();
-        this.onStageTriggered(this.currentStage.trigger());
-        this.listeners.forEach(listener ->
-                listener.onStageTriggered(this, this.currentStage.trigger()));
     }
 
     public void stopGame() {
@@ -545,10 +533,8 @@ public class GameManager extends PersistentState {
             assert attributeInstance != null;
             EntityUtil.removeAttributeModifier(attributeInstance, HEALTH_MODIFIER_ID);
         }
+        this.trigger(GameTriggers.NONE);
         this.syncData();
-        this.onStageTriggered(null);
-        this.listeners.forEach(listener ->
-                listener.onStageTriggered(this, null));
     }
 
     public void resumeGame(int resizeTimer, int resizingTimer, int timeoutTimer) {
@@ -561,7 +547,20 @@ public class GameManager extends PersistentState {
         this.syncData();
     }
 
+    public void trigger(List<GameTrigger> gameTriggers) {
+        for (GameTrigger gameTrigger : gameTriggers) {
+            this.trigger(gameTrigger);
+        }
+    }
+
+    public void trigger(GameTrigger gameTrigger) {
+        this.onStageTriggered(gameTrigger);
+        this.listeners.forEach(listener ->
+                listener.onTriggered(this, gameTrigger));
+    }
+
     public void enableTimeoutTimer(int ticksLeft) {
+        this.ensureIsGaming();
         if (ticksLeft < 0) return;
         this.timeoutTask = new ScheduledTask(Duration.withTicks(ticksLeft)) {
             @Override
@@ -584,6 +583,7 @@ public class GameManager extends PersistentState {
     }
 
     public void startBorderResizingTimer(int delayTicks) {
+        this.ensureIsGaming();
         if (delayTicks < 0) return;
         this.borderResizingTask = new ScheduledTask(Duration.withTicks(delayTicks)) {
             @Override
@@ -592,9 +592,7 @@ public class GameManager extends PersistentState {
                     int prevStageIdx = GameManager.this.gameProperties.stages().indexOf(currentStage);
                     if (prevStageIdx == GameManager.this.gameProperties.stages().size() - 1) {
                         GameManager.this.disableBorderResizing();
-                        GameManager.this.onStageTriggered(FINAL_STAGE_IDENTIFIER);
-                        GameManager.this.listeners.forEach(listener ->
-                                listener.onStageTriggered(GameManager.this, FINAL_STAGE_IDENTIFIER));
+                        GameManager.this.trigger(GameTriggers.FINAL_BEGIN);
                     } else {
                         GameManager.this.currentStage = GameManager.this.gameProperties.stages().get(prevStageIdx + 1);
                         int oldSize = GameManager.this.worldHelper.getBorderSize();
@@ -602,9 +600,7 @@ public class GameManager extends PersistentState {
                         if (oldSize - GameManager.this.currentStage.initialSize() > GameManager.this.worldHelper.getBorder().getSafeZone()) {
                             PlayerUtil.randomTpAllPlayers(GameManager.this.server, GameManager.this.server.getOverworld());
                         }
-                        GameManager.this.onStageTriggered(GameManager.this.currentStage.trigger());
-                        GameManager.this.listeners.forEach(listener ->
-                                listener.onStageTriggered(GameManager.this, GameManager.this.currentStage.trigger()));
+                        GameManager.this.trigger(GameManager.this.currentStage.triggers());
                     }
                     GameManager.this.resizeCount = 0;
                 }

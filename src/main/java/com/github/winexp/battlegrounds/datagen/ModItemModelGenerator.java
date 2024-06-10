@@ -35,4 +35,9 @@ public class ModItemModelGenerator extends FabricModelProvider {
         itemModelGenerator.register(Items.BEEF_NOODLE_SOUP, Models.GENERATED);
         itemModelGenerator.register(Items.SIX_FLAVOURED_DIHUANG_PILL, Models.GENERATED);
     }
+
+    @Override
+    public String getName() {
+        return "Item Model Definitions";
+    }
 }

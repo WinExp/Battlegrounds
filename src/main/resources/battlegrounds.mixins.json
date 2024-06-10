@@ -13,7 +13,9 @@
     "shapeType_RaycastContextMixin",
     "shield_LivingEntityMixin",
     "soak_ItemStackMixin",
-    "soak_PlayerEntityMixin"
+    "soak_PlayerEntityMixin",
+    "StatusEffectInstanceInvoker",
+    "StatusEffectInstanceParametersInvoker"
   ],
   "client": [
     "client.flashSound_AbstractSoundInstanceMixin",

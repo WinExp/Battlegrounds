@@ -1,5 +1,6 @@
 package com.github.winexp.battlegrounds.game;
 
+import com.github.winexp.battlegrounds.registry.ModRegistries;
 import com.github.winexp.battlegrounds.util.data.ModGameConfig;
 import com.github.winexp.battlegrounds.util.time.Duration;
 import com.mojang.serialization.Codec;
@@ -17,11 +18,11 @@ public record GameProperties(Identifier id, List<StageInfo> stages, Duration tim
             Duration.CODEC.fieldOf("timeout").forGetter(GameProperties::timeout)
     ).apply(instance, GameProperties::new));
 
-    public record StageInfo(Identifier trigger, int initialSize, int resizeBlocks,
+    public record StageInfo(List<GameTrigger> triggers, int initialSize, int resizeBlocks,
                             @Range(from = 1, to = Integer.MAX_VALUE) int resizeCount, ResizeTimeInfo resizeTimeInfo,
                             ModGameConfig gameConfig, boolean allowRespawn) {
         public static final Codec<StageInfo> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Identifier.CODEC.fieldOf("trigger").forGetter(StageInfo::trigger),
+                Codec.withAlternative(ModRegistries.GAME_TRIGGER.getCodec().listOf(), ModRegistries.GAME_TRIGGER.getCodec(), List::of).fieldOf("triggers").forGetter(StageInfo::triggers),
                 Codecs.POSITIVE_INT.fieldOf("initial_size").forGetter(StageInfo::initialSize),
                 Codec.INT.fieldOf("decrement_blocks").forGetter(StageInfo::resizeBlocks),
                 Codecs.POSITIVE_INT.fieldOf("total_amount").forGetter(StageInfo::resizeCount),

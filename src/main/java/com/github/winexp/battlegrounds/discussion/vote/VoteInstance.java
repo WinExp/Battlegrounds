@@ -84,6 +84,7 @@ public class VoteInstance {
     private VoteCallback callback = VoteCallback.EMPTY;
     private final Object lock = new Object();
     private final Map<UUID, Boolean> voteResultMap = new ConcurrentHashMap<>();
+    private final Map<String, Object> parameters = new ConcurrentHashMap<>();
 
     private VoteInstance(Identifier identifier, UUID uuid, Text name, Text description, VoteSettings settings, Text initiatorName, boolean mutable) {
         this.identifier = identifier;
@@ -100,7 +101,9 @@ public class VoteInstance {
     }
 
     public static VoteInstance createWithPreset(VotePreset preset, Text initiatorName) {
-        return new VoteInstance(preset.identifier(), preset.name(), preset.description(), preset.voteSettings(), initiatorName);
+        return new VoteInstance(preset.identifier(), preset.name().orElse(Text.translatable(preset.getTranslationKey("title"))),
+                preset.description().orElse(Text.translatable(preset.getTranslationKey("description"))), preset.voteSettings(), initiatorName)
+                .callback(preset.callback().orElse(null));
     }
 
     @Contract(value = "_ -> this", pure = true)
@@ -108,6 +111,14 @@ public class VoteInstance {
         this.ensureIsMutable();
         this.callback = callback;
         return this;
+    }
+
+    public Object getParameter(String key) {
+        return this.parameters.get(key);
+    }
+
+    public void putParameter(String key, Object parameter) {
+        this.parameters.put(key, parameter);
     }
 
     private void ensureIsMutable() {
@@ -199,7 +210,7 @@ public class VoteInstance {
             if (!this.isParticipant(player)) return false;
             if (!this.settings.allowChangeVote() && this.isVoted(uuid)) return false;
             this.voteResultMap.put(uuid, true);
-            this.callback.playerVotedAction().accept(this, player, true);
+            this.callback.onPlayerVoted(this, player, true);
             ServerVoteEvents.PLAYER_VOTED.invoker().onPlayerVoted(player, this, true);
             if (this.settings.voteMode().acceptPredicate.test(this.participants.size(), this.getAcceptedNum())) {
                 this.closeVote(CloseReason.ACCEPTED);
@@ -217,7 +228,7 @@ public class VoteInstance {
             if (!this.settings.allowChangeVote() && this.isVoted(uuid)) return false;
             if (this.settings.voteMode().canDenyCancel) this.closeVote(CloseReason.DENIED);
             this.voteResultMap.put(uuid, false);
-            this.callback.playerVotedAction().accept(this, player, false);
+            this.callback.onPlayerVoted(this, player, false);
             ServerVoteEvents.PLAYER_VOTED.invoker().onPlayerVoted(player, this, false);
             return true;
         }
@@ -250,7 +261,7 @@ public class VoteInstance {
             if (!this.voting) return false;
             this.timeoutTask.cancel();
             this.voting = false;
-            this.callback.closedAction().accept(this, closeReason);
+            this.callback.onClosed(this, closeReason);
             ServerVoteEvents.CLOSED.invoker().onClosed(this, closeReason);
             return true;
         }

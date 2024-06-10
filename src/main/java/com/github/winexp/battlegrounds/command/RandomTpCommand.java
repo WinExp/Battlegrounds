@@ -3,6 +3,8 @@ package com.github.winexp.battlegrounds.command;
 import com.github.winexp.battlegrounds.event.ModServerPlayerEvents;
 import com.github.winexp.battlegrounds.game.GameListener;
 import com.github.winexp.battlegrounds.game.GameManager;
+import com.github.winexp.battlegrounds.game.GameTrigger;
+import com.github.winexp.battlegrounds.game.GameTriggers;
 import com.github.winexp.battlegrounds.util.task.TaskScheduler;
 import com.github.winexp.battlegrounds.util.task.RepeatTask;
 import com.github.winexp.battlegrounds.util.PlayerUtil;
@@ -16,8 +18,6 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +28,7 @@ import java.util.concurrent.CancellationException;
 public class RandomTpCommand {
     private static final Map<UUID, Integer> cooldownTimers = new HashMap<>();
     private static RepeatTask coolDownUpdateTask = RepeatTask.NONE_TASK;
-    private static Identifier cooldownId;
+    private static GameTrigger cooldownTrigger;
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         var cRoot = CommandManager.literal("randomtp").requires(ServerCommandSource::isExecutedByPlayer)
@@ -44,11 +44,11 @@ public class RandomTpCommand {
         ModServerPlayerEvents.AFTER_PLAYER_DAMAGED.register(RandomTpCommand::onPlayerDamaged);
         GameManager.addGlobalListener(new GameListener() {
             @Override
-            public void onStageTriggered(GameManager manager, @Nullable Identifier triggerId) {
-                if (triggerId == null) {
-                    cooldownId = null;
-                } else if (Variables.config.randomTp().cooldownMap().get(triggerId) != null) {
-                    cooldownId = triggerId;
+            public void onTriggered(GameManager manager, GameTrigger gameTrigger) {
+                if (gameTrigger == GameTriggers.NONE) {
+                    cooldownTrigger = GameTriggers.NONE;
+                } else if (Variables.config.randomTp().cooldowns().get(gameTrigger) != null) {
+                    cooldownTrigger = gameTrigger;
                 }
             }
             @Override
@@ -74,9 +74,9 @@ public class RandomTpCommand {
 
     public static int getConfigCooldown() {
         int cooldown = Variables.config.randomTp().defaultCooldown().toTicks();
-        if (cooldownId != null
-                && Variables.config.randomTp().cooldownMap().get(cooldownId) != null) {
-            cooldown = Variables.config.randomTp().cooldownMap().get(cooldownId).toTicks();
+        if (cooldownTrigger != null
+                && Variables.config.randomTp().cooldowns().get(cooldownTrigger) != null) {
+            cooldown = Variables.config.randomTp().cooldowns().get(cooldownTrigger).toTicks();
         }
         return cooldown;
     }

@@ -103,14 +103,16 @@
   "key.battlegrounds.vote_screen": "打开投票界面",
   "key.categories.battlegrounds": "Battlegrounds",
 
-  "soak.battlegrounds.immerse.tooltip": "浸药效果：",
-  "soak.battlegrounds.leach.tooltip": "浸毒效果：",
+  "soak.battlegrounds.tooltip.immerse": "浸药：",
+  "soak.battlegrounds.tooltip.leach": "浸毒：",
+  "soak.battlegrounds.tooltip.remaining": "剩余 %d 秒",
+
   "subtitles.battlegrounds.entity.flash_bang.explode": "闪光弹：爆炸",
   "subtitles.battlegrounds.entity.prop.generic.trigger": "投掷物：触发",
   "subtitles.battlegrounds.entity.prop.generic.rebound": "投掷物：反弹",
   "subtitles.battlegrounds.player.tube_fall": "钢管：落地",
 
-  "vote.battlegrounds.already_voting.feedback": "已有投票正在进行！",
+  "vote.battlegrounds.duplicate.feedback": "已有投票正在进行！",
   "vote.battlegrounds.closed.reason.accepted": "通过",
   "vote.battlegrounds.closed.reason.denied": "被拒绝",
   "vote.battlegrounds.closed.reason.timeout": "超时",
@@ -118,6 +120,6 @@
   "vote.battlegrounds.initiator": "由 %s 发起",
   "vote.battlegrounds.initiator.@": "命令方块",
   "vote.battlegrounds.initiator.Server": "服务器",
-  "vote.battlegrounds.start_game.description": "开始游戏的投票，需全玩家通过",
-  "vote.battlegrounds.start_game.title": "开始游戏"
+  "vote.battlegrounds.presets.start_game.description": "开始游戏的投票，需全玩家通过",
+  "vote.battlegrounds.presets.start_game.title": "§a开始游戏"
 }

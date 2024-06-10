@@ -2,6 +2,7 @@ package com.github.winexp.battlegrounds.datagen;
 
 import com.github.winexp.battlegrounds.datagen.provider.GamePropertiesProvider;
 import com.github.winexp.battlegrounds.game.GameProperties;
+import com.github.winexp.battlegrounds.game.GameTriggers;
 import com.github.winexp.battlegrounds.util.data.ModGameConfig;
 import com.github.winexp.battlegrounds.util.time.Duration;
 import com.google.common.collect.ImmutableList;
@@ -9,6 +10,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -23,7 +25,7 @@ public class ModGamePropertiesGenerator extends GamePropertiesProvider {
                 new Identifier("battlegrounds", "normal"),
                 ImmutableList.of(
                         new GameProperties.StageInfo(
-                                new Identifier("battlegrounds", "develop"),
+                                List.of(GameTriggers.DEVELOP_BEGIN),
                                 5000, 500, 2,
                                 new GameProperties.StageInfo.ResizeTimeInfo(
                                         Duration.withMinutes(4),
@@ -33,7 +35,7 @@ public class ModGamePropertiesGenerator extends GamePropertiesProvider {
                                 true
                         ),
                         new GameProperties.StageInfo(
-                                new Identifier("battlegrounds", "enable_pvp"),
+                                List.of(GameTriggers.ENABLE_PVP),
                                 4000, 500, 2,
                                 new GameProperties.StageInfo.ResizeTimeInfo(
                                         Duration.withMinutes(3),
@@ -43,7 +45,7 @@ public class ModGamePropertiesGenerator extends GamePropertiesProvider {
                                 true
                         ),
                         new GameProperties.StageInfo(
-                                new Identifier("battlegrounds", "deathmatch"),
+                                List.of(GameTriggers.DEATHMATCH_BEGIN),
                                 1000, 200, 2,
                                 new GameProperties.StageInfo.ResizeTimeInfo(
                                         Duration.withMinutes(3),

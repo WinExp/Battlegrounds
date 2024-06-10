@@ -87,6 +87,7 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
                                 : this.getFuse(), detonationFuse));
                     }
                     this.setVelocity(velocity);
+                    this.velocityDirty = true;
                     this.playReboundSound();
                 }
             } else if (type == HitResult.Type.ENTITY) {
@@ -94,6 +95,7 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
                 Vec3d velocity = this.getVelocity();
                 this.setVelocity(velocity.negate()
                         .multiply(this.getEntityReboundVelocityMultiplier()));
+                this.velocityDirty = true;
                 this.playReboundSound();
             }
             this.lastHitResult = null;

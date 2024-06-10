@@ -30,7 +30,9 @@ import com.github.winexp.battlegrounds.network.payload.s2c.config.ModVersionPayl
 import com.github.winexp.battlegrounds.network.payload.s2c.play.FlashPayloadS2C;
 import com.github.winexp.battlegrounds.network.payload.s2c.play.config.ModGameConfigPayloadS2C;
 import com.github.winexp.battlegrounds.network.payload.s2c.play.vote.*;
+import com.github.winexp.battlegrounds.registry.ModRegistries;
 import com.github.winexp.battlegrounds.resource.listener.DataPackResourceReloadListener;
+import com.github.winexp.battlegrounds.screen.ScreenHandlerType;
 import com.github.winexp.battlegrounds.sound.SoundEvents;
 import com.github.winexp.battlegrounds.util.task.TaskScheduler;
 import com.github.winexp.battlegrounds.util.Constants;
@@ -67,7 +69,7 @@ public class Battlegrounds implements ModInitializer {
     }
 
     private void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
-        BattlegroundsCommand.registerRoot(dispatcher);
+        BattlegroundsCommand.registerRoot(dispatcher, registryAccess, environment);
         RandomTpCommand.register(dispatcher);
     }
 
@@ -144,6 +146,8 @@ public class Battlegrounds implements ModInitializer {
         // 注册数据包
         ResourceManagerHelper resourceManagerHelper = ResourceManagerHelper.get(ResourceType.SERVER_DATA);
         resourceManagerHelper.registerReloadListener(new DataPackResourceReloadListener());
+        // 注册屏幕处理器
+        ScreenHandlerType.bootstrap();
         // 注册方块
         Blocks.bootstrap();
         // 注册方块实体
@@ -162,10 +166,12 @@ public class Battlegrounds implements ModInitializer {
         StatusEffects.bootstrap();
         // 注册附魔
         Enchantments.bootstrap();
-        // 自动冶炼
+        // 注册自动冶炼方块
         SmeltableBlockRegistry.registerDefaults();
         // 注册声音事件
         SoundEvents.bootstrap();
+        // 初始化自定义注册表
+        ModRegistries.bootstrap();
         // 注册指令参数类型
         this.registerCommandArgumentTypes();
         // 尝试重置存档
