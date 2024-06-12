@@ -39,6 +39,7 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ConnectedClientData;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -129,7 +130,7 @@ public class GameManager extends PersistentState {
                         public void onTriggered() throws CancellationException {
                             PlayerUtil.broadcastTitle(server, Text.literal(String.valueOf(this.getCount()))
                                     .formatted(Formatting.GREEN), Text.empty());
-                            PlayerUtil.broadcastSound(server, SoundEvents.BLOCK_NOTE_BLOCK_HAT.value(), 0.7F, 1.0F);
+                            PlayerUtil.broadcastSound(server, SoundEvents.BLOCK_NOTE_BLOCK_HAT.value(), SoundCategory.NEUTRAL, 0.7F, 1.0F);
                             if (!GameManager.this.checkAllPlayersJoined()) {
                                 this.cancel();
                                 throw new CancellationException();
@@ -334,6 +335,11 @@ public class GameManager extends PersistentState {
         return result;
     }
 
+    public boolean isParticipant(ServerPlayerEntity player) {
+        UUID uuid = PlayerUtil.getAuthUUID(player);
+        return this.isParticipant(uuid);
+    }
+
     public boolean isParticipant(UUID uuid) {
         for (Map.Entry<UUID, PlayerPermission> entry : this.playerPermissions.entrySet()) {
             if (entry.getKey().equals(uuid) && !entry.getValue().isDead) return true;
@@ -417,13 +423,13 @@ public class GameManager extends PersistentState {
         }
     }
 
-    public void respawnPlayer(ServerPlayerEntity player) {
+    public void spawnPlayer(ServerPlayerEntity player, int respawnChance) {
         this.ensureIsGaming();
         UUID uuid = PlayerUtil.getAuthUUID(player);
         PlayerPermission playerPermission = this.getPlayerPermission(uuid, new PlayerPermission());
         playerPermission.gameMode = GameMode.SURVIVAL;
         playerPermission.isDead = false;
-        playerPermission.respawnChance = 0;
+        playerPermission.respawnChance = respawnChance;
         this.setPlayerPermission(uuid, playerPermission);
         PlayerUtil.changeGameModeWithMap(player);
     }
@@ -448,7 +454,7 @@ public class GameManager extends PersistentState {
             public void onTriggered() throws CancellationException {
                 PlayerUtil.broadcastTitle(GameManager.this.server, Text.literal(String.valueOf(this.getCount()))
                         .formatted(Formatting.GREEN), Text.empty());
-                PlayerUtil.broadcastSound(GameManager.this.server, SoundEvents.BLOCK_NOTE_BLOCK_HAT.value(), 0.7F, 1.0F);
+                PlayerUtil.broadcastSound(GameManager.this.server, SoundEvents.BLOCK_NOTE_BLOCK_HAT.value(), SoundCategory.NEUTRAL, 0.7F, 1.0F);
             }
 
             @Override

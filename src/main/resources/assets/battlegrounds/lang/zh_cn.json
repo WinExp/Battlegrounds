@@ -112,11 +112,12 @@
   "subtitles.battlegrounds.entity.prop.generic.rebound": "投掷物：反弹",
   "subtitles.battlegrounds.player.tube_fall": "钢管：落地",
 
-  "vote.battlegrounds.duplicate.feedback": "已有投票正在进行！",
   "vote.battlegrounds.closed.reason.accepted": "通过",
   "vote.battlegrounds.closed.reason.denied": "被拒绝",
   "vote.battlegrounds.closed.reason.timeout": "超时",
   "vote.battlegrounds.closed.reason.manual": "手动",
+  "vote.battlegrounds.duplicate.feedback": "已有投票正在进行！",
+  "vote.battlegrounds.game.not_gaming": "现在没有正在进行的游戏！",
   "vote.battlegrounds.initiator": "由 %s 发起",
   "vote.battlegrounds.initiator.@": "命令方块",
   "vote.battlegrounds.initiator.Server": "服务器",

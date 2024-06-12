@@ -12,6 +12,7 @@ import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
@@ -47,9 +48,9 @@ public class PlayerUtil {
         player.networkHandler.sendPacket(new TitleFadeS2CPacket(5, 10, 15));
     }
 
-    public static void broadcastSound(MinecraftServer server, SoundEvent sound, float volume, float pitch) {
+    public static void broadcastSound(MinecraftServer server, SoundEvent sound, SoundCategory category, float volume, float pitch) {
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-            player.playSound(sound, volume, pitch);
+            player.playSoundToPlayer(sound, category, volume, pitch);
         }
     }
 

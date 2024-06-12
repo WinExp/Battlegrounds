@@ -40,32 +40,33 @@ public class BattlegroundsCommand {
         var cPvpMode = registerPvpMode();
         var cGameMode = registerGameMode();
         var cTrigger = registerTrigger(registryAccess);
+        var cRespawn = registerRespawnPlayer();
         var cStart = registerStart();
         var cStop = literal("stop").requires(source ->
                 source.hasPermissionLevel(2)).executes(BattlegroundsCommand::executeStop);
         var cReload = literal("reload").requires(source ->
                 source.hasPermissionLevel(2)).executes(BattlegroundsCommand::executeReload);
         var cFlash = registerSummonFlash();
-        var cNode = dispatcher.register(cRoot.then(cPvpMode).then(cGameMode).then(cTrigger).then(cStart).then(cStop).then(cReload).then(cFlash));
+        var cNode = dispatcher.register(cRoot.then(cPvpMode).then(cGameMode).then(cTrigger).then(cRespawn).then(cStart).then(cStop).then(cReload).then(cFlash));
         // 命令缩写
         var cRoot_redir = literal("bg").redirect(cNode);
         dispatcher.register(cRoot_redir);
     }
 
-    public static ArgumentBuilder<ServerCommandSource, ?> registerPvpMode() {
+    private static ArgumentBuilder<ServerCommandSource, ?> registerPvpMode() {
         var cPvpMode = literal("pvp_mode").requires(ServerCommandSource::isExecutedByPlayer);
         var aPvpMode = argument("pvp_mode", PVPModeArgumentType.pvpMode())
                 .executes(BattlegroundsCommand::executePvpMode);
         return cPvpMode.then(aPvpMode);
     }
 
-    public static int executePvpMode(CommandContext<ServerCommandSource> context) {
+    private static int executePvpMode(CommandContext<ServerCommandSource> context) {
         PVPMode pvpMode = PVPModeArgumentType.getPVPMode(context, "pvp_mode");
         Variables.gameManager.setPVPMode(pvpMode);
         return 1;
     }
 
-    public static ArgumentBuilder<ServerCommandSource, ?> registerTrigger(CommandRegistryAccess registryAccess) {
+    private static ArgumentBuilder<ServerCommandSource, ?> registerTrigger(CommandRegistryAccess registryAccess) {
         var cTrigger = literal("trigger").requires(source ->
                 source.hasPermissionLevel(2));
         var aTrigger = argument("trigger", RegistryEntryReferenceArgumentType.registryEntry(registryAccess, ModRegistryKeys.GAME_TRIGGER))
@@ -73,13 +74,13 @@ public class BattlegroundsCommand {
         return cTrigger.then(aTrigger);
     }
 
-    public static int executeTrigger(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    private static int executeTrigger(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         RegistryEntry<GameTrigger> entry = RegistryEntryReferenceArgumentType.getRegistryEntry(context, "trigger", ModRegistryKeys.GAME_TRIGGER);
         entry.value().apply(Variables.gameManager);
         return 1;
     }
 
-    public static ArgumentBuilder<ServerCommandSource, ?> registerStart() {
+    private static ArgumentBuilder<ServerCommandSource, ?> registerStart() {
         var cStart = literal("start");
         var aProp = argument("game_properties", IdentifierArgumentType.identifier())
                 .suggests(((context, builder) ->
@@ -88,7 +89,7 @@ public class BattlegroundsCommand {
         return cStart.then(aProp);
     }
 
-    public static ArgumentBuilder<ServerCommandSource, ?> registerSummonFlash() {
+    private static ArgumentBuilder<ServerCommandSource, ?> registerSummonFlash() {
         var cSummon = literal("summonflash").requires(source ->
                 source.hasPermissionLevel(2)).executes(context -> executeSummonFlash(context, true));
         var aPos = argument("pos", Vec3ArgumentType.vec3()).executes(context -> executeSummonFlash(context, false));
@@ -111,7 +112,7 @@ public class BattlegroundsCommand {
         return 1;
     }
 
-    public static ArgumentBuilder<ServerCommandSource, ?> registerGameMode() {
+    private static ArgumentBuilder<ServerCommandSource, ?> registerGameMode() {
         var cRoot = literal("gamemode").requires(source ->
                 source.hasPermissionLevel(2));
         var aMode = argument("gamemode", GameModeArgumentType.gameMode())
@@ -137,6 +138,31 @@ public class BattlegroundsCommand {
         return 1;
     }
 
+    private static ArgumentBuilder<ServerCommandSource, ?> registerRespawnPlayer() {
+        var cRoot = literal("respawnplayer");
+        var aPlayer = argument("player", EntityArgumentType.player()).executes(BattlegroundsCommand::executeRespawnPlayer);
+        return cRoot.then(aPlayer);
+    }
+
+    private static int executeRespawnPlayer(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        ServerCommandSource source = context.getSource();
+        ServerPlayerEntity player = EntityArgumentType.getPlayer(context, "player");
+        if (VoteManager.INSTANCE.containsVote(VotePreset.RESPAWN_PLAYER.identifier())) {
+            source.sendFeedback(() -> Text.translatable("vote.battlegrounds.duplicate.feedback")
+                    .formatted(Formatting.RED), false);
+        } else if (!Variables.gameManager.getGameStage().isGaming()) {
+            source.sendFeedback(() -> Text.translatable("vote.battlegrounds.game.not_gaming")
+                    .formatted(Formatting.RED), false);
+        } else {
+            VoteInstance voteInstance = VoteInstance.createWithPreset(VotePreset.RESPAWN_PLAYER, source.getDisplayName());
+            voteInstance.putParameter("player", player);
+            if (!VoteManager.INSTANCE.openVote(voteInstance, source.getServer().getPlayerManager().getPlayerList())) {
+                throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownCommand().create();
+            }
+        }
+        return 1;
+    }
+
     private static int executeStart(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerCommandSource source = context.getSource();
         Identifier id = IdentifierArgumentType.getIdentifier(context, "game_properties");
@@ -148,35 +174,11 @@ public class BattlegroundsCommand {
             source.sendFeedback(() -> Text.translatable("vote.battlegrounds.duplicate.feedback")
                     .formatted(Formatting.RED), false);
         } else {
-            VoteInstance instance = VoteInstance.createWithPreset(VotePreset.START_GAME, source.getDisplayName());
-            instance.putParameter("game_properties", gameProperties);
-            if (!VoteManager.INSTANCE.openVote(instance, source.getServer().getPlayerManager().getPlayerList())) {
+            VoteInstance voteInstance = VoteInstance.createWithPreset(VotePreset.START_GAME, source.getDisplayName());
+            voteInstance.putParameter("game_properties", gameProperties);
+            if (!VoteManager.INSTANCE.openVote(voteInstance, source.getServer().getPlayerManager().getPlayerList())) {
                 throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownCommand().create();
             }
-        }
-        return 1;
-    }
-
-    private static int executeRespawnPlayer(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        ServerCommandSource source = context.getSource();
-        ServerPlayerEntity player = EntityArgumentType.getPlayer(context, "player");
-        if (VoteManager.INSTANCE.containsVote(VotePreset.RESPAWN_PLAYER.identifier())) {
-            source.sendFeedback(() -> Text.translatable("vote.battlegrounds.duplicate.feedback")
-                    .formatted(Formatting.RED), false);
-        } else {
-            VoteInstance voteInstance = VoteInstance.createWithPreset(VotePreset.RESPAWN_PLAYER, source.getDisplayName());
-            voteInstance.callback(new VoteCallback() {
-                @Override
-                public void onPlayerVoted(VoteInstance voteInstance, ServerPlayerEntity player, boolean result) {
-                }
-
-                @Override
-                public void onClosed(VoteInstance voteInstance, CloseReason closeReason) {
-                    if (closeReason == CloseReason.ACCEPTED) {
-
-                    }
-                }
-            });
         }
         return 1;
     }

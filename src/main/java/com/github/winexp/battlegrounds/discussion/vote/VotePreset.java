@@ -41,7 +41,18 @@ public record VotePreset(Identifier identifier, Optional<Text> name, Optional<Te
                     Duration.withSeconds(30),
                     true
             ),
-            Optional.empty()
+            Optional.of(new VoteCallback() {
+                @Override
+                public void onPlayerVoted(VoteInstance voteInstance, ServerPlayerEntity player, boolean result) {
+                }
+
+                @Override
+                public void onClosed(VoteInstance voteInstance, CloseReason closeReason) {
+                    ServerPlayerEntity player = (ServerPlayerEntity) voteInstance.getParameter("player");
+                    if (!Variables.gameManager.getGameStage().isGaming() || !Variables.gameManager.isParticipant(player)) return;
+                    Variables.gameManager.spawnPlayer(player, 0);
+                }
+            })
     );
 
     public String getTranslationKey(String suffix) {
