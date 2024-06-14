@@ -21,7 +21,7 @@ public final class ModClientConfigurationNetworkHandler {
         PacketSender sender = context.responseSender();
         ModVersion serverModVersion = payload.modVersion();
         if (Constants.MOD_VERSION.protocolVersion() != serverModVersion.protocolVersion()) {
-            sender.disconnect(Text.translatable(
+            sender.disconnect(Text.stringifiedTranslatable(
                             "disconnect.battlegrounds.config.mod_info.wrong",
                             Constants.MOD_VERSION,
                             serverModVersion

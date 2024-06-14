@@ -22,8 +22,6 @@
   "advancements.battlegrounds.wine_shop.description": "进入酒窖",
   "advancements.battlegrounds.wine_shop.title": "好酒也怕巷子深",
 
-  "commands.battlegrounds.randomtp.delay.feedback": "随机传送正在冷却，剩余 %d 秒。",
-  "commands.battlegrounds.randomtp.feedback": "正在尝试随机传送...",
   "commands.battlegrounds.reload.feedback": "已重载配置文件",
   "commands.battlegrounds.stop.feedback": "已停止所有任务",
 
@@ -44,32 +42,6 @@
   "entity.battlegrounds.channeling_arrow": "引雷箭",
   "entity.battlegrounds.flash_bang": "闪光震撼弹",
   "entity.battlegrounds.molotov": "燃烧瓶",
-
-  "game.battlegrounds.already.broadcast": "所有玩家都已加入游戏，即将开始游戏！",
-  "game.battlegrounds.border.reduce.broadcast": "正在缩小竞技场！",
-  "game.battlegrounds.deathmatch.start.broadcast": "您已进入死亡竞赛模式！",
-  "game.battlegrounds.delete_world.broadcast": "游戏即将开始，将在 %d 秒内重启服务器。",
-  "game.battlegrounds.info_bossbar.resizing": "距离缩圈完成还有 %s 秒",
-  "game.battlegrounds.info_bossbar.timeout": "距离游戏超时还有 %s 秒",
-  "game.battlegrounds.info_bossbar.waiting": "距离下一个圈还有 %d 秒",
-  "game.battlegrounds.join.broadcast": "%s 加入了游戏！(%d/%d)",
-  "game.battlegrounds.join.spectator.broadcast": "%s 加入了游戏！(观战)",
-  "game.battlegrounds.pvp.enable.broadcast": "PVP 已启用！",
-  "game.battlegrounds.server.stop": "服务器正在重启以重置地图",
-  "game.battlegrounds.tie": "游戏因超时而平局！",
-  "game.battlegrounds.won.broadcast": "游戏结束！%s 是最后的赢家！",
-
-  "gui.battlegrounds.vote.accept": "赞成",
-  "gui.battlegrounds.vote.closed.toast.subtitle": "可打开投票界面查看",
-  "gui.battlegrounds.vote.closed.toast.title": "%s 投票因 %s 而关闭！",
-  "gui.battlegrounds.vote.deny": "反对",
-  "gui.battlegrounds.vote.opened.toast.subtitle": "可打开投票界面查看",
-  "gui.battlegrounds.vote.opened.toast.title": "%s 投票正在进行！",
-  "gui.battlegrounds.vote.player_voted.toast.subtitle": "可打开投票界面查看",
-  "gui.battlegrounds.vote.player_voted.toast.title": "%s 给 %s 投票投了 %s！",
-  "gui.battlegrounds.vote.refresh": "刷新",
-  "gui.battlegrounds.vote.time_left": "剩余 %d 秒关闭投票",
-  "gui.battlegrounds.vote.title": "投票界面",
 
   "item.battlegrounds.advanced_precision_core": "高级精密核心",
   "item.battlegrounds.beef_noodle_soup": "铁牛牛肉面",
@@ -100,9 +72,6 @@
 
   "itemGroup.battlegrounds.root": "Battlegrounds",
 
-  "key.battlegrounds.vote_screen": "打开投票界面",
-  "key.categories.battlegrounds": "Battlegrounds",
-
   "soak.battlegrounds.tooltip.immerse": "浸药：",
   "soak.battlegrounds.tooltip.leach": "浸毒：",
   "soak.battlegrounds.tooltip.remaining": "剩余 %d 秒",
@@ -110,17 +79,5 @@
   "subtitles.battlegrounds.entity.flash_bang.explode": "闪光弹：爆炸",
   "subtitles.battlegrounds.entity.prop.generic.trigger": "投掷物：触发",
   "subtitles.battlegrounds.entity.prop.generic.rebound": "投掷物：反弹",
-  "subtitles.battlegrounds.player.tube_fall": "钢管：落地",
-
-  "vote.battlegrounds.closed.reason.accepted": "通过",
-  "vote.battlegrounds.closed.reason.denied": "被拒绝",
-  "vote.battlegrounds.closed.reason.timeout": "超时",
-  "vote.battlegrounds.closed.reason.manual": "手动",
-  "vote.battlegrounds.duplicate.feedback": "已有投票正在进行！",
-  "vote.battlegrounds.game.not_gaming": "现在没有正在进行的游戏！",
-  "vote.battlegrounds.initiator": "由 %s 发起",
-  "vote.battlegrounds.initiator.@": "命令方块",
-  "vote.battlegrounds.initiator.Server": "服务器",
-  "vote.battlegrounds.presets.start_game.description": "开始游戏的投票，需全玩家通过",
-  "vote.battlegrounds.presets.start_game.title": "§a开始游戏"
+  "subtitles.battlegrounds.player.tube_fall": "钢管：落地"
 }

@@ -33,6 +33,8 @@ public abstract class ScheduledTask extends AbstractTask {
         }
     }
 
+    public abstract void run() throws CancellationException;
+
     public int getDelayTicks() {
         if (this.isCancelled()) return -1;
         else return this.delay;

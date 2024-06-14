@@ -11,11 +11,11 @@ public record RupertsTearTeleportPayloadC2S(Hand hand, Vec3d teleportPos) implem
     public static final PacketCodec<RegistryByteBuf, RupertsTearTeleportPayloadC2S> PACKET_CODEC = CustomPayload.codecOf(RupertsTearTeleportPayloadC2S::write, RupertsTearTeleportPayloadC2S::new);
 
     public RupertsTearTeleportPayloadC2S(RegistryByteBuf buf) {
-        this(Hand.valueOf(buf.readString()), buf.readVec3d());
+        this(Hand.values()[buf.readShort()], buf.readVec3d());
     }
 
     public void write(RegistryByteBuf buf) {
-        buf.writeString(hand.name());
+        buf.writeShort(this.hand.ordinal());
         buf.writeVec3d(this.teleportPos);
     }
 

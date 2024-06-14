@@ -12,7 +12,7 @@ public class MyHolySwordItem extends LegendarySwordItem {
         super(toolMaterial, settings);
     }
 
-    // TODO: 我滴圣剑 Tooltip
+    // TODO: Tooltip
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         super.appendTooltip(stack, context, tooltip, type);

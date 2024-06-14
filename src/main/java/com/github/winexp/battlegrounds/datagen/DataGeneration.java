@@ -21,7 +21,6 @@ public class DataGeneration implements DataGeneratorEntrypoint {
         pack.addProvider(ModBlockModelGenerator::new);
         pack.addProvider(ModItemModelGenerator::new);
         pack.addProvider(ModRecipeGenerator::new);
-        pack.addProvider(ModGamePropertiesGenerator::new);
     }
 
     @Override

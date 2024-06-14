@@ -1,30 +1,21 @@
 package com.github.winexp.battlegrounds.client;
 
 import com.github.winexp.battlegrounds.client.gui.screen.SoakScreen;
-import com.github.winexp.battlegrounds.client.gui.screen.vote.VoteScreen;
 import com.github.winexp.battlegrounds.client.network.ModClientConfigurationNetworkHandler;
 import com.github.winexp.battlegrounds.client.network.ModClientPlayNetworkHandler;
 import com.github.winexp.battlegrounds.client.render.entity.ChannelingArrowEntityRenderer;
-import com.github.winexp.battlegrounds.client.toast.vote.PlayerVotedToast;
-import com.github.winexp.battlegrounds.client.toast.vote.VoteClosedToast;
-import com.github.winexp.battlegrounds.client.toast.vote.VoteOpenedToast;
 import com.github.winexp.battlegrounds.client.util.ClientConstants;
 import com.github.winexp.battlegrounds.entity.EntityTypes;
-import com.github.winexp.battlegrounds.event.ClientVoteEvents;
 import com.github.winexp.battlegrounds.item.Items;
 import com.github.winexp.battlegrounds.screen.ScreenHandlerType;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.sound.SoundEvents;
 
 @Environment(EnvType.CLIENT)
 public class BattlegroundsClient implements ClientModInitializer {
@@ -45,25 +36,6 @@ public class BattlegroundsClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        // 注册事件
-        ClientVoteEvents.OPENED.register(voteInstance -> {
-            MinecraftClient client = MinecraftClient.getInstance();
-            client.getToastManager().add(new VoteOpenedToast(voteInstance));
-            client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0F));
-            VoteScreen.onVoteOpened(client, voteInstance);
-        });
-        ClientVoteEvents.CLOSED.register((voteInstance, reason) -> {
-            MinecraftClient client = MinecraftClient.getInstance();
-            client.getToastManager().add(new VoteClosedToast(voteInstance, reason));
-            client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0F));
-            VoteScreen.onVoteClosed(client, voteInstance);
-        });
-        ClientVoteEvents.PLAYER_VOTED.register((playerName, voteInfo, result) -> {
-            MinecraftClient client = MinecraftClient.getInstance();
-            client.getToastManager().add(new PlayerVotedToast(playerName, voteInfo, result));
-            client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0F));
-        });
-        ClientTickEvents.END_CLIENT_TICK.register(VoteScreen::globalTick);
         // 注册实体渲染器
         registerRenderer();
         registerHandledScreen();

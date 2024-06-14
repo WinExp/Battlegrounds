@@ -1,4 +1,4 @@
-package com.github.winexp.battlegrounds.client.toast.vote;
+package com.github.winexp.battlegrounds.client.toast;
 
 import com.github.winexp.battlegrounds.util.time.Duration;
 import com.google.common.collect.ImmutableList;

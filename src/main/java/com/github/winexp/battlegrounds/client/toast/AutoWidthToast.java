@@ -1,4 +1,4 @@
-package com.github.winexp.battlegrounds.client.toast.vote;
+package com.github.winexp.battlegrounds.client.toast;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;

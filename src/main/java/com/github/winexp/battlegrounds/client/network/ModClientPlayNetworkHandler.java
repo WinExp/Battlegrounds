@@ -1,13 +1,10 @@
 package com.github.winexp.battlegrounds.client.network;
 
-import com.github.winexp.battlegrounds.client.gui.screen.vote.VoteScreen;
 import com.github.winexp.battlegrounds.client.render.FlashRenderer;
 import com.github.winexp.battlegrounds.client.util.ClientConstants;
 import com.github.winexp.battlegrounds.client.util.ClientVariables;
-import com.github.winexp.battlegrounds.event.ClientVoteEvents;
 import com.github.winexp.battlegrounds.network.payload.s2c.play.FlashPayloadS2C;
 import com.github.winexp.battlegrounds.network.payload.s2c.play.config.ModGameConfigPayloadS2C;
-import com.github.winexp.battlegrounds.network.payload.s2c.play.vote.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -22,11 +19,6 @@ public final class ModClientPlayNetworkHandler {
     public static void register() {
         ClientPlayConnectionEvents.DISCONNECT.register(ModClientPlayNetworkHandler::onDisconnect);
         ClientPlayNetworking.registerGlobalReceiver(ModGameConfigPayloadS2C.ID, ModClientPlayNetworkHandler::onModGameConfigReceived);
-        ClientPlayNetworking.registerGlobalReceiver(SyncVoteInfosPayloadS2C.ID, ModClientPlayNetworkHandler::onSyncVoteInfos);
-        ClientPlayNetworking.registerGlobalReceiver(UpdateVoteInfoPayloadS2C.ID, ModClientPlayNetworkHandler::onUpdateVoteInfo);
-        ClientPlayNetworking.registerGlobalReceiver(VoteOpenedPayloadS2C.ID, ModClientPlayNetworkHandler::onVoteOpened);
-        ClientPlayNetworking.registerGlobalReceiver(VoteClosedPayloadS2C.ID, ModClientPlayNetworkHandler::onVoteClosed);
-        ClientPlayNetworking.registerGlobalReceiver(PlayerVotedPayloadS2C.ID, ModClientPlayNetworkHandler::onPlayerVoted);
         ClientPlayNetworking.registerGlobalReceiver(FlashPayloadS2C.ID, ModClientPlayNetworkHandler::onFlash);
     }
 
@@ -36,26 +28,6 @@ public final class ModClientPlayNetworkHandler {
 
     private static void onModGameConfigReceived(ModGameConfigPayloadS2C packet, ClientPlayNetworking.Context context) {
         ClientVariables.gameConfig = packet.config();
-    }
-
-    private static void onSyncVoteInfos(SyncVoteInfosPayloadS2C packet, ClientPlayNetworking.Context context) {
-        VoteScreen.onVoteInfosReceived(context.client(), packet);
-    }
-
-    private static void onUpdateVoteInfo(UpdateVoteInfoPayloadS2C packet, ClientPlayNetworking.Context context) {
-        VoteScreen.onUpdateVoteInfo(context.client(), packet);
-    }
-
-    private static void onVoteOpened(VoteOpenedPayloadS2C packet, ClientPlayNetworking.Context context) {
-        ClientVoteEvents.OPENED.invoker().onOpened(packet.voteInstance());
-    }
-
-    private static void onVoteClosed(VoteClosedPayloadS2C packet, ClientPlayNetworking.Context context) {
-        ClientVoteEvents.CLOSED.invoker().onClosed(packet.voteInstance(), packet.closeReason());
-    }
-
-    private static void onPlayerVoted(PlayerVotedPayloadS2C packet, ClientPlayNetworking.Context context) {
-        ClientVoteEvents.PLAYER_VOTED.invoker().onPlayerVoted(packet.playerName(), packet.voteInstance(), packet.result());
     }
 
     private static void onFlash(FlashPayloadS2C packet, ClientPlayNetworking.Context context) {

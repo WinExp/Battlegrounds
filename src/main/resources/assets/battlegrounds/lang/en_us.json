@@ -22,8 +22,6 @@
   "advancements.battlegrounds.wine_shop.description": "Entering the wine shop",
   "advancements.battlegrounds.wine_shop.title": "Even good wine fears the depth of the alley",
 
-  "commands.battlegrounds.randomtp.delay.feedback": "Random Teleportation is on cooldown with %d seconds remaining.",
-  "commands.battlegrounds.randomtp.feedback": "Trying to randomly teleport...",
   "commands.battlegrounds.reload.feedback": "Reloaded configs.",
   "commands.battlegrounds.stop.feedback": "All tasks have been discontinued.",
 
@@ -44,32 +42,6 @@
   "entity.battlegrounds.channeling_arrow": "Channeling Arrow",
   "entity.battlegrounds.flash_bang": "Flash Bang",
   "entity.battlegrounds.molotov": "Molotov",
-
-  "game.battlegrounds.already.broadcast": "All players have joined the server and are about to start the game!",
-  "game.battlegrounds.border.reduce.broadcast": "The arena is shrinking!",
-  "game.battlegrounds.deathmatch.start.broadcast": "You are in Deathmatch mode!",
-  "game.battlegrounds.delete_world.broadcast": "The game is about to start and will restart the server in %d seconds.",
-  "game.battlegrounds.info_bossbar.resizing": "%s seconds to completion of reduction.",
-  "game.battlegrounds.info_bossbar.timeout": "%s seconds to game timeout",
-  "game.battlegrounds.info_bossbar.waiting": "%d seconds to next lap",
-  "game.battlegrounds.join.broadcast": "%s joined the game! (%d/%d)",
-  "game.battlegrounds.join.spectator.broadcast": "%s joined to the game! (Spectator)",
-  "game.battlegrounds.pvp.enable.broadcast": "PVP has been enabled!",
-  "game.battlegrounds.server.stop": "The server is restarting to reset the map",
-  "game.battlegrounds.tie": "The game is tied due to a timeout!",
-  "game.battlegrounds.won.broadcast": "Game over! %s is the final winner!",
-
-  "gui.battlegrounds.vote.accept": "Accept",
-  "gui.battlegrounds.vote.closed.toast.subtitle": "You can open the voting screen to view",
-  "gui.battlegrounds.vote.closed.toast.title": "%s vote is closed because of %s!",
-  "gui.battlegrounds.vote.deny": "Deny",
-  "gui.battlegrounds.vote.opened.toast.subtitle": "You can open the voting screen to view",
-  "gui.battlegrounds.vote.opened.toast.title": "%s vote is ongoing!",
-  "gui.battlegrounds.vote.player_voted.toast.subtitle": "You can open the voting screen to view",
-  "gui.battlegrounds.vote.player_voted.toast.title": "%s voted %s for %s!",
-  "gui.battlegrounds.vote.refresh": "Refresh",
-  "gui.battlegrounds.vote.time_left": "%d seconds remaining to close the vote",
-  "gui.battlegrounds.vote.title": "Vote Screen",
 
   "item.battlegrounds.advanced_precision_core": "Advanced Precision Core",
   "item.battlegrounds.beef_noodle_soup": "Beef Noodle Soup",
@@ -100,9 +72,6 @@
 
   "itemGroup.battlegrounds.root": "Battlegrounds",
 
-  "key.battlegrounds.vote_screen": "Voting Screen",
-  "key.categories.battlegrounds": "Battlegrounds",
-
   "soak.battlegrounds.tooltip.immerse": "Immerse:",
   "soak.battlegrounds.tooltip.leach": "Leach:",
   "soak.battlegrounds.tooltip.remaining": "%d seconds remaining",
@@ -110,17 +79,5 @@
   "subtitles.battlegrounds.entity.flash_bang.explode": "Flash Bang: Explode",
   "subtitles.battlegrounds.entity.prop.generic.trigger": "Thrown Entity: Trigger",
   "subtitles.battlegrounds.entity.prop.generic.rebound": "Thrown Entity: Rebound",
-  "subtitles.battlegrounds.player.tube_fall": "Tube: Landing",
-
-  "vote.battlegrounds.closed.reason.accepted": "Accepted",
-  "vote.battlegrounds.closed.reason.denied": "Denied",
-  "vote.battlegrounds.closed.reason.timeout": "Timeout",
-  "vote.battlegrounds.closed.reason.manual": "Manual",
-  "vote.battlegrounds.duplicate.feedback": "There is already a vote in progress!",
-  "vote.battlegrounds.game.not_gaming": "There are no ongoing games right now!",
-  "vote.battlegrounds.initiator": "Initiated by %s",
-  "vote.battlegrounds.initiator.@": "Command block",
-  "vote.battlegrounds.initiator.Server": "Server",
-  "vote.battlegrounds.presets.start_game.description": "The vote to start the game, needs to be passed by all players.",
-  "vote.battlegrounds.presets.start_game.title": "§aStart Game"
+  "subtitles.battlegrounds.player.tube_fall": "Tube: Landing"
 }
