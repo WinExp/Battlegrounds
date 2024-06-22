@@ -71,7 +71,7 @@ public abstract class AbstractThrownPropEntity extends ThrownItemEntity {
             HitResult.Type type = this.lastHitResult.getType();
             if (type == HitResult.Type.BLOCK) {
                 BlockHitResult blockHitResult = (BlockHitResult) this.lastHitResult;
-                if (blockHitResult != null && !this.isRemoved()) {
+                if (blockHitResult != null && this.isAlive()) {
                     Direction side = blockHitResult.getSide();
                     Vec3d velocity = this.computeBlockReboundVelocity(this.getVelocity(), side);
                     Vec3d pos = blockHitResult.getPos();

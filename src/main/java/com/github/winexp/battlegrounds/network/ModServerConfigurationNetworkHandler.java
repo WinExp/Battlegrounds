@@ -29,8 +29,8 @@ public final class ModServerConfigurationNetworkHandler {
         }
     }
 
-    private static void onModInfoReceived(ModVersionPayloadC2S packet, ServerConfigurationNetworking.Context context) {
-        ModVersion playerModVersion = packet.modVersion();
+    private static void onModInfoReceived(ModVersionPayloadC2S payload, ServerConfigurationNetworking.Context context) {
+        ModVersion playerModVersion = payload.modVersion();
         ServerConfigurationNetworkHandler handler = context.networkHandler();
         if (playerModVersion.protocolVersion() != Constants.MOD_VERSION.protocolVersion()) {
             handler.disconnect(Text.stringifiedTranslatable(

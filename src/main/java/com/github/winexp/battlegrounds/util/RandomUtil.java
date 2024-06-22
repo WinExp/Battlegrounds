@@ -9,8 +9,6 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 
 public class RandomUtil {
     public static float nextFloatBetween(Random random, float begin, float end) {
@@ -38,8 +36,6 @@ public class RandomUtil {
         return getSecureLocation(world, box);
     }
 
-    @NotNull
-    @Contract("_, _ -> new")
     public static BlockPos getSecureLocation(World world, BlockBox box) {
         Random random = world.getRandom();
         int maxY = box.getMaxY();

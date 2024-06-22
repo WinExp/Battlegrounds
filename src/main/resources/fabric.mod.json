@@ -20,6 +20,9 @@
     ],
     "main": [
       "com.github.winexp.battlegrounds.Battlegrounds"
+    ],
+    "modmenu": [
+      "com.github.winexp.battlegrounds.ModMenuApiImpl"
     ]
   },
   "mixins": [
@@ -29,6 +32,7 @@
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": "*",
-    "minecraft": ">=1.20.5"
+    "minecraft": ">=1.20.5 <=1.20.6",
+    "yet_another_config_lib_v3": "*"
   }
 }

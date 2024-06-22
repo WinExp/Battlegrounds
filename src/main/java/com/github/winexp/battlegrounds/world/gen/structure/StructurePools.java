@@ -1,13 +1,16 @@
 package com.github.winexp.battlegrounds.world.gen.structure;
 
+import com.github.winexp.battlegrounds.world.gen.structure.processor.StructureProcessorLists;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.registry.Registerable;
+import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.structure.pool.StructurePool;
 import net.minecraft.structure.pool.StructurePoolElement;
+import net.minecraft.structure.processor.StructureProcessorList;
 import net.minecraft.util.Identifier;
 
 public class StructurePools extends net.minecraft.structure.pool.StructurePools {
@@ -29,6 +32,7 @@ public class StructurePools extends net.minecraft.structure.pool.StructurePools 
     public static void register(Registerable<StructurePool> structurePoolsRegisterable) {
         RegistryEntry<StructurePool> emptyEntry = structurePoolsRegisterable.getRegistryLookup(RegistryKeys.TEMPLATE_POOL)
                 .getOrThrow(StructurePools.EMPTY);
+        RegistryEntryLookup<StructureProcessorList> structureProcessorListsRegistryEntryLookup = structurePoolsRegisterable.getRegistryLookup(RegistryKeys.PROCESSOR_LIST);
         structurePoolsRegisterable.register(StructurePools.ANCIENT_RUINS, new StructurePool(emptyEntry, ImmutableList.of(
                 Pair.of(StructurePoolElement.ofSingle("battlegrounds:ancient_ruin_land"), 1),
                 Pair.of(StructurePoolElement.ofSingle("battlegrounds:ancient_ruin_ocean"), 1)
@@ -49,13 +53,13 @@ public class StructurePools extends net.minecraft.structure.pool.StructurePools 
                 Pair.of(StructurePoolElement.ofSingle("battlegrounds:library"), 1)
         ), StructurePool.Projection.RIGID));
         structurePoolsRegisterable.register(StructurePools.MEDIEVAL_FORTRESS, new StructurePool(emptyEntry, ImmutableList.of(
-                Pair.of(StructurePoolElement.ofSingle("battlegrounds:medieval_fortress"), 1)
+                Pair.of(StructurePoolElement.ofProcessedSingle("battlegrounds:medieval_fortress", structureProcessorListsRegistryEntryLookup.getOrThrow(StructureProcessorLists.MEDIEVAL_FORTRESS)), 1)
         ), StructurePool.Projection.RIGID));
         structurePoolsRegisterable.register(StructurePools.MEDIEVAL_LIBRARY, new StructurePool(emptyEntry, ImmutableList.of(
-                Pair.of(StructurePoolElement.ofSingle("battlegrounds:medieval_library"), 1)
+                Pair.of(StructurePoolElement.ofProcessedSingle("battlegrounds:medieval_library", structureProcessorListsRegistryEntryLookup.getOrThrow(StructureProcessorLists.MEDIEVAL_LIBRARY)), 1)
         ), StructurePool.Projection.RIGID));
         structurePoolsRegisterable.register(StructurePools.RELIC_OF_FANTASY, new StructurePool(emptyEntry, ImmutableList.of(
-                Pair.of(StructurePoolElement.ofSingle("battlegrounds:relic_of_fantasy"), 1)
+                Pair.of(StructurePoolElement.ofProcessedSingle("battlegrounds:relic_of_fantasy", structureProcessorListsRegistryEntryLookup.getOrThrow(StructureProcessorLists.RELIC_OF_FANTASY)), 1)
         ), StructurePool.Projection.RIGID));
         structurePoolsRegisterable.register(StructurePools.WINE_SHOP, new StructurePool(emptyEntry, ImmutableList.of(
                 Pair.of(StructurePoolElement.ofSingle("battlegrounds:wine_shop"), 1)

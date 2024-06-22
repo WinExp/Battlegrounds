@@ -19,16 +19,16 @@ import net.minecraft.world.gen.structure.Structure;
 import java.util.Map;
 
 public class Structures extends net.minecraft.world.gen.structure.Structures {
-    public static RegistryKey<Structure> ANCIENT_RUINS = of("ancient_ruins");
-    public static RegistryKey<Structure> CANOPIES = of("canopies");
-    public static RegistryKey<Structure> DESERT_HUT = of("desert_hut");
-    public static RegistryKey<Structure> IZAKAYA = of("izakaya");
-    public static RegistryKey<Structure> KIOSK = of("kiosk");
-    public static RegistryKey<Structure> LIBRARY = of("library");
-    public static RegistryKey<Structure> MEDIEVAL_FORTRESS = of("medieval_fortress");
-    public static RegistryKey<Structure> MEDIEVAL_LIBRARY = of("medieval_library");
-    public static RegistryKey<Structure> RELIC_OF_FANTASY = of("relic_of_fantasy");
-    public static RegistryKey<Structure> WINE_SHOP = of("wine_shop");
+    public static final RegistryKey<Structure> ANCIENT_RUINS = of("ancient_ruins");
+    public static final RegistryKey<Structure> CANOPIES = of("canopies");
+    public static final RegistryKey<Structure> DESERT_HUT = of("desert_hut");
+    public static final RegistryKey<Structure> IZAKAYA = of("izakaya");
+    public static final RegistryKey<Structure> KIOSK = of("kiosk");
+    public static final RegistryKey<Structure> LIBRARY = of("library");
+    public static final RegistryKey<Structure> MEDIEVAL_FORTRESS = of("medieval_fortress");
+    public static final RegistryKey<Structure> MEDIEVAL_LIBRARY = of("medieval_library");
+    public static final RegistryKey<Structure> RELIC_OF_FANTASY = of("relic_of_fantasy");
+    public static final RegistryKey<Structure> WINE_SHOP = of("wine_shop");
 
     private static RegistryKey<Structure> of(String id) {
         return RegistryKey.of(RegistryKeys.STRUCTURE, new Identifier("battlegrounds", id));

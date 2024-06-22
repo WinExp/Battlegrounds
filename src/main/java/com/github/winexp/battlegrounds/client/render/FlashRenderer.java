@@ -107,7 +107,7 @@ public class FlashRenderer implements HudRenderCallback {
             int width = context.getScaledWindowWidth();
             int height = context.getScaledWindowHeight();
             int alpha = (int) (strength * 255);
-            int color = ColorHelper.Argb.getArgb(alpha, 255, 255, 255);
+            int color = ColorHelper.Argb.withAlpha(alpha, -1);
             context.fill(RenderLayer.getGuiOverlay(), 0, 0, width, height, color);
         }
     }

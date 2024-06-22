@@ -16,7 +16,7 @@ import net.minecraft.util.Identifier;
 public class ItemGroups extends net.minecraft.item.ItemGroups {
     public static final ItemGroup ROOT_ITEM_GROUP = register("root_item_group", FabricItemGroup.builder()
             .icon(() -> new ItemStack(Items.PVP_PRO_SWORD))
-            .displayName(Text.translatable("itemGroup.battlegrounds.root"))
+            .displayName(Text.translatable("battlegrounds.name"))
             .entries((context, entries) -> {
                 entries.add(Items.PVP_PRO_SWORD);
                 entries.add(Items.SEVEN_ELEVEN_SWORD);

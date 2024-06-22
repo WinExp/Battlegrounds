@@ -12,9 +12,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class TaskScheduler {
     public static final TaskScheduler INSTANCE = new TaskScheduler();
 
-    private final List<AbstractTask> tasks = new CopyOnWriteArrayList<>();
+    private final List<Task> tasks = new CopyOnWriteArrayList<>();
 
-    public TaskScheduler() {
+    private TaskScheduler() {
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
             ClientTickEvents.START_CLIENT_TICK.register(client -> this.startTick());
             ClientTickEvents.END_CLIENT_TICK.register(client -> this.endTick());
@@ -25,39 +25,41 @@ public class TaskScheduler {
     }
 
     private void startTick() {
-        for (AbstractTask task : this.tasks) {
-            if (task.getExecuteStage() != AbstractTask.ExecuteStage.BEGIN) continue;
-            this.tryExecute(task);
+        for (Task task : this.tasks) {
+            if (task.getExecuteStage() != Task.ExecuteStage.BEGIN) continue;
+            if (!this.tryExecute(task)) this.tasks.remove(task);
         }
     }
 
     private void endTick() {
-        for (AbstractTask task : this.tasks) {
-            if (task.getExecuteStage() != AbstractTask.ExecuteStage.END) continue;
-            this.tryExecute(task);
+        for (Task task : this.tasks) {
+            if (task.getExecuteStage() != Task.ExecuteStage.END) continue;
+            if (!this.tryExecute(task)) this.tasks.remove(task);
         }
     }
 
-    private void tryExecute(AbstractTask task) {
-        if (task.isCancelled()) this.tasks.remove(task);
+    private boolean tryExecute(Task task) {
+        if (task.isExecutable()) return false;
         try {
             task.tick();
+            return true;
         } catch (CancellationException e) {
             task.cancel();
+            return false;
         }
     }
 
-    public boolean isRunning(AbstractTask task) {
-        return this.tasks.contains(task) && !task.isCancelled();
+    public boolean isScheduled(Task task) {
+        return this.tasks.contains(task) && !task.isExecutable();
     }
 
-    public void schedule(AbstractTask task) {
+    public void schedule(Task task) {
         if (this.tasks.contains(task)) return;
         this.tasks.add(task);
     }
 
     public void cancelAllTasks() {
-        for (AbstractTask task : this.tasks) {
+        for (Task task : this.tasks) {
             task.cancel();
         }
     }

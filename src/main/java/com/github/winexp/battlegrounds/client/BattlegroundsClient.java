@@ -1,5 +1,6 @@
 package com.github.winexp.battlegrounds.client;
 
+import com.github.winexp.battlegrounds.client.config.ClientRootConfig;
 import com.github.winexp.battlegrounds.client.gui.screen.SoakScreen;
 import com.github.winexp.battlegrounds.client.network.ModClientConfigurationNetworkHandler;
 import com.github.winexp.battlegrounds.client.network.ModClientPlayNetworkHandler;
@@ -34,8 +35,14 @@ public class BattlegroundsClient implements ClientModInitializer {
         HandledScreens.register(ScreenHandlerType.SOAK, SoakScreen::new);
     }
 
+    private static void loadConfigs() {
+        ClientRootConfig.HANDLER.load();
+    }
+
     @Override
     public void onInitializeClient() {
+        // 加载配置
+        loadConfigs();
         // 注册实体渲染器
         registerRenderer();
         registerHandledScreen();

@@ -22,6 +22,8 @@
   "advancements.battlegrounds.wine_shop.description": "Entering the wine shop",
   "advancements.battlegrounds.wine_shop.title": "Even good wine fears the depth of the alley",
 
+  "battlegrounds.name": "Battlegrounds",
+
   "commands.battlegrounds.reload.feedback": "Reloaded configs.",
   "commands.battlegrounds.stop.feedback": "All tasks have been discontinued.",
 
@@ -42,6 +44,9 @@
   "entity.battlegrounds.channeling_arrow": "Channeling Arrow",
   "entity.battlegrounds.flash_bang": "Flash Bang",
   "entity.battlegrounds.molotov": "Molotov",
+
+  "gui.battlegrounds.vote.remaining": "%d seconds remaining",
+  "gui.battlegrounds.vote.title": "Vote Screen",
 
   "item.battlegrounds.advanced_precision_core": "Advanced Precision Core",
   "item.battlegrounds.beef_noodle_soup": "Beef Noodle Soup",
@@ -70,7 +75,7 @@
   "item.battlegrounds.six_flavoured_dihuang_pill": "Six-flavoured Dihuang Pill",
   "item.battlegrounds.six_flavoured_dihuang_pill.tooltip": "Six-flavoured Dihuang Pill, 8 Seconds for Real Men, Ultimate Speed and Hardness",
 
-  "itemGroup.battlegrounds.root": "Battlegrounds",
+  "key.battlegrounds.vote_screen": "Open the vote screen",
 
   "soak.battlegrounds.tooltip.immerse": "Immerse:",
   "soak.battlegrounds.tooltip.leach": "Leach:",
@@ -79,5 +84,28 @@
   "subtitles.battlegrounds.entity.flash_bang.explode": "Flash Bang: Explode",
   "subtitles.battlegrounds.entity.prop.generic.trigger": "Thrown Entity: Trigger",
   "subtitles.battlegrounds.entity.prop.generic.rebound": "Thrown Entity: Rebound",
-  "subtitles.battlegrounds.player.tube_fall": "Tube: Landing"
+  "subtitles.battlegrounds.player.tube_fall": "Tube: Landing",
+
+  "vote.action.accept": "Accept",
+  "vote.action.decline": "Decline",
+  "vote.close_reason.accepted": "Accepted",
+  "vote.close_reason.expired": "Expired",
+  "vote.close_reason.terminated": "Terminated",
+  "vote.close_reason.manual": "Manual",
+  "vote.toast.closed.subtitle": "Close Reason: %s",
+  "vote.toast.closed.title": "Vote %s is closed!",
+  "vote.toast.opened.title": "Vote %s is opened!",
+
+  "yacl3.config.battlegrounds:client_root_config.title": "Client Config",
+  "yacl3.config.battlegrounds:client_root_config.category.vote": "Vote",
+  "yacl3.config.battlegrounds:client_root_config.category.vote.group.notification": "Notification",
+  "yacl3.config.battlegrounds:client_root_config.showVoteOpenedNotification": "Show Vote Notifications",
+  "yacl3.config.battlegrounds:client_root_config.showVoteOpenedNotification.desc": "Whether or not to show vote notification when votes are opened. Can be useful to improve FPS in case the poll is too long.",
+  "yacl3.config.battlegrounds:client_root_config.showVoteClosedNotification": "Show Vote Notifications",
+  "yacl3.config.battlegrounds:client_root_config.showVoteClosedNotification.desc": "Whether or not to show vote notification when votes are closed. Can be useful to improve FPS in case the poll is too long.",
+  "yacl3.config.battlegrounds:client_root_config.category.vote.group.sound": "Sound",
+  "yacl3.config.battlegrounds:client_root_config.playVoteOpenedSounds": "Play Vote Opened Sound",
+  "yacl3.config.battlegrounds:client_root_config.playVoteOpenedSounds.desc": "Whether or not to play sound effects when votes are opened.",
+  "yacl3.config.battlegrounds:client_root_config.playVoteClosedSounds": "Play Vote Closed Sound",
+  "yacl3.config.battlegrounds:client_root_config.playVoteClosedSounds.desc": "Whether or not to play sound effects when votes are closed."
 }

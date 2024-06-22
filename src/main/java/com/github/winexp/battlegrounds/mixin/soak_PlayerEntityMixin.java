@@ -19,10 +19,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(PlayerEntity.class)
 public abstract class soak_PlayerEntityMixin {
     @Shadow
-    public abstract float getAttackCooldownProgress(float baseTime);
+    public abstract ItemStack getEquippedStack(EquipmentSlot slot);
 
     @Shadow
-    public abstract ItemStack getEquippedStack(EquipmentSlot slot);
+    public abstract float getAttackCooldownProgress(float baseTime);
 
     @Unique
     private float lastAttackCooldown;

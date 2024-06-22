@@ -39,6 +39,12 @@ public class RupertsTearBlockOutlineRenderer implements WorldRenderEvents.Before
         this.prevPos = VEC3D_NaN;
     }
 
+    private static boolean isAvailable(PlayerEntity player) {
+        return (player.getEquippedStack(EquipmentSlot.MAINHAND).isOf(Items.RUPERTS_TEAR)
+                || player.getEquippedStack(EquipmentSlot.OFFHAND).isOf(Items.RUPERTS_TEAR))
+                && !player.getItemCooldownManager().isCoolingDown(Items.RUPERTS_TEAR);
+    }
+
     @Override
     public boolean beforeBlockOutline(WorldRenderContext context, HitResult hitResult) {
         BlockHitResult crosshairBlockTarget = (hitResult == null || hitResult.getType() != HitResult.Type.BLOCK) ? BlockHitResult.createMissed(null, null, null) : (BlockHitResult) hitResult;
@@ -51,10 +57,7 @@ public class RupertsTearBlockOutlineRenderer implements WorldRenderEvents.Before
         Entity entity = camera.getFocusedEntity();
         float tickDelta = context.tickDelta();
         if (entity instanceof PlayerEntity player
-                && world != null
-                && (player.getEquippedStack(EquipmentSlot.MAINHAND).isOf(Items.RUPERTS_TEAR)
-                || player.getEquippedStack(EquipmentSlot.OFFHAND).isOf(Items.RUPERTS_TEAR))
-                && !player.getItemCooldownManager().isCoolingDown(Items.RUPERTS_TEAR)) {
+                && isAvailable(player)) {
             Vec3d begin = entity.getCameraPosVec(tickDelta);
             Vec3d rotation = entity.getRotationVec(tickDelta);
             Vec3d end = begin.add(rotation.multiply(RupertsTearItem.MAX_DISTANCE));
@@ -88,7 +91,7 @@ public class RupertsTearBlockOutlineRenderer implements WorldRenderEvents.Before
                     (int) Math.round(lerpZ)
             );
             BlockState blockState = world.getBlockState(roundedPos);
-            this.drawCuboidShapeOutline(Objects.requireNonNull(matrices), vertexConsumer, blockState.getOutlineShape(world, roundedPos, ShapeContext.of(entity)), lerpX - cameraPos.x, lerpY - cameraPos.y, lerpZ - cameraPos.z, colorR, colorG, colorB, colorA);
+            drawCuboidShapeOutline(Objects.requireNonNull(matrices), vertexConsumer, blockState.getOutlineShape(world, roundedPos, ShapeContext.of(entity)), lerpX - cameraPos.x, lerpY - cameraPos.y, lerpZ - cameraPos.z, colorR, colorG, colorB, colorA);
             if (currentTime - this.prevTime >= LERP_DURATION) {
                 this.prevPos = new Vec3d(lerpX, lerpY, lerpZ);
                 this.prevTime = System.nanoTime();
@@ -113,7 +116,7 @@ public class RupertsTearBlockOutlineRenderer implements WorldRenderEvents.Before
         return result;
     }
 
-    private void drawCuboidShapeOutline(MatrixStack matrices, VertexConsumer vertexConsumer, VoxelShape shape, double offsetX, double offsetY, double offsetZ, float red, float green, float blue, float alpha) {
+    private static void drawCuboidShapeOutline(MatrixStack matrices, VertexConsumer vertexConsumer, VoxelShape shape, double offsetX, double offsetY, double offsetZ, float red, float green, float blue, float alpha) {
         MatrixStack.Entry entry = matrices.peek();
         shape.forEachEdge((minX, minY, minZ, maxX, maxY, maxZ) -> {
             float k = (float) (maxX - minX);

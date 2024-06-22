@@ -11,16 +11,16 @@ import net.minecraft.world.gen.chunk.placement.SpreadType;
 import net.minecraft.world.gen.structure.Structure;
 
 public class StructureSets implements net.minecraft.structure.StructureSets {
-    public static RegistryKey<StructureSet> ANCIENT_RUINS = of("ancient_ruins");
-    public static RegistryKey<StructureSet> CANOPIES = of("canopies");
-    public static RegistryKey<StructureSet> DESERT_HUT = of("desert_hut");
-    public static RegistryKey<StructureSet> IZAKAYA = of("izakaya");
-    public static RegistryKey<StructureSet> KIOSK = of("kiosk");
-    public static RegistryKey<StructureSet> LIBRARY = of("library");
-    public static RegistryKey<StructureSet> MEDIEVAL_FORTRESS = of("medieval_fortress");
-    public static RegistryKey<StructureSet> MEDIEVAL_LIBRARY = of("medieval_library");
-    public static RegistryKey<StructureSet> RELIC_OF_FANTASY = of("relic_of_fantasy");
-    public static RegistryKey<StructureSet> WINE_SHOP = of("wine_shop");
+    public static final RegistryKey<StructureSet> ANCIENT_RUINS = of("ancient_ruins");
+    public static final RegistryKey<StructureSet> CANOPIES = of("canopies");
+    public static final RegistryKey<StructureSet> DESERT_HUT = of("desert_hut");
+    public static final RegistryKey<StructureSet> IZAKAYA = of("izakaya");
+    public static final RegistryKey<StructureSet> KIOSK = of("kiosk");
+    public static final RegistryKey<StructureSet> LIBRARY = of("library");
+    public static final RegistryKey<StructureSet> MEDIEVAL_FORTRESS = of("medieval_fortress");
+    public static final RegistryKey<StructureSet> MEDIEVAL_LIBRARY = of("medieval_library");
+    public static final RegistryKey<StructureSet> RELIC_OF_FANTASY = of("relic_of_fantasy");
+    public static final RegistryKey<StructureSet> WINE_SHOP = of("wine_shop");
 
     private static RegistryKey<StructureSet> of(String id) {
         return RegistryKey.of(RegistryKeys.STRUCTURE_SET, new Identifier("battlegrounds", id));

@@ -47,7 +47,7 @@ public class ButchersAxeItem extends AxeItem {
         stack.damage(1, attacker, EquipmentSlot.MAINHAND);
         if (!target.getWorld().isClient) {
             for (StatusEffectInstance effectInstance : penaltyEffects) {
-                target.addStatusEffect(new StatusEffectInstance(effectInstance));
+                attacker.addStatusEffect(new StatusEffectInstance(effectInstance));
             }
             target.playSound(SoundEvents.PLAYER_TUBE_FALL, 2.0F, 1.0F);
         }

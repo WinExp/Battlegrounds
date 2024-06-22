@@ -22,6 +22,8 @@
   "advancements.battlegrounds.wine_shop.description": "进入酒窖",
   "advancements.battlegrounds.wine_shop.title": "好酒也怕巷子深",
 
+  "battlegrounds.name": "Battlegrounds",
+
   "commands.battlegrounds.reload.feedback": "已重载配置文件",
   "commands.battlegrounds.stop.feedback": "已停止所有任务",
 
@@ -42,6 +44,9 @@
   "entity.battlegrounds.channeling_arrow": "引雷箭",
   "entity.battlegrounds.flash_bang": "闪光震撼弹",
   "entity.battlegrounds.molotov": "燃烧瓶",
+
+  "gui.battlegrounds.vote.remaining": "剩余 %d 秒",
+  "gui.battlegrounds.vote.title": "投票",
 
   "item.battlegrounds.advanced_precision_core": "高级精密核心",
   "item.battlegrounds.beef_noodle_soup": "铁牛牛肉面",
@@ -70,7 +75,7 @@
   "item.battlegrounds.six_flavoured_dihuang_pill": "六味地黄丸",
   "item.battlegrounds.six_flavoured_dihuang_pill.tooltip": "六味地黄丸，8 秒真男人，极致的速度与硬度",
 
-  "itemGroup.battlegrounds.root": "Battlegrounds",
+  "key.battlegrounds.vote_screen": "打开投票界面",
 
   "soak.battlegrounds.tooltip.immerse": "浸药：",
   "soak.battlegrounds.tooltip.leach": "浸毒：",
@@ -79,5 +84,28 @@
   "subtitles.battlegrounds.entity.flash_bang.explode": "闪光弹：爆炸",
   "subtitles.battlegrounds.entity.prop.generic.trigger": "投掷物：触发",
   "subtitles.battlegrounds.entity.prop.generic.rebound": "投掷物：反弹",
-  "subtitles.battlegrounds.player.tube_fall": "钢管：落地"
+  "subtitles.battlegrounds.player.tube_fall": "钢管：落地",
+
+  "vote.action.accept": "同意",
+  "vote.action.decline": "拒绝",
+  "vote.close_reason.accepted": "通过",
+  "vote.close_reason.terminated": "终止",
+  "vote.close_reason.expired": "过期",
+  "vote.close_reason.manual": "手动",
+  "vote.toast.closed.subtitle": "关闭原因：%s",
+  "vote.toast.closed.title": "投票 %s 已关闭！",
+  "vote.toast.opened.title": "投票 %s 已开始！",
+
+  "yacl3.config.battlegrounds:client_root_config.title": "客户端配置",
+  "yacl3.config.battlegrounds:client_root_config.category.vote": "投票",
+  "yacl3.config.battlegrounds:client_root_config.category.vote.group.notification": "通知",
+  "yacl3.config.battlegrounds:client_root_config.showVoteOpenedNotification": "显示投票开启通知",
+  "yacl3.config.battlegrounds:client_root_config.showVoteOpenedNotification.desc": "是否显示投票开启通知。在投票内容过长的情况下可对 FPS 有一定提升。",
+  "yacl3.config.battlegrounds:client_root_config.showVoteClosedNotification": "显示投票关闭通知",
+  "yacl3.config.battlegrounds:client_root_config.showVoteClosedNotification.desc": "是否显示投票关闭通知。在投票内容过长的情况下可对 FPS 有一定提升。",
+  "yacl3.config.battlegrounds:client_root_config.category.vote.group.sound": "音效",
+  "yacl3.config.battlegrounds:client_root_config.playVoteOpenedSounds": "投票开启音效",
+  "yacl3.config.battlegrounds:client_root_config.playVoteOpenedSounds.desc": "当投票开启时是否播放音效。",
+  "yacl3.config.battlegrounds:client_root_config.playVoteClosedSounds": "投票关闭音效",
+  "yacl3.config.battlegrounds:client_root_config.playVoteClosedSounds.desc": "当投票关闭时是否播放音效。"
 }

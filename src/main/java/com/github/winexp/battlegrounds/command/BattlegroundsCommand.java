@@ -1,12 +1,15 @@
 package com.github.winexp.battlegrounds.command;
 
 import com.github.winexp.battlegrounds.Battlegrounds;
+import com.github.winexp.battlegrounds.discussion.vote.Vote;
+import com.github.winexp.battlegrounds.discussion.vote.VotePresets;
 import com.github.winexp.battlegrounds.entity.projectile.thrown.FlashBangEntity;
 import com.github.winexp.battlegrounds.util.*;
+import com.github.winexp.battlegrounds.util.time.Duration;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.*;
 import net.minecraft.server.command.CommandManager;
@@ -17,29 +20,38 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-import static net.minecraft.server.command.CommandManager.argument;
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.server.command.CommandManager.*;
 
-public class BattlegroundsCommand {
-    public static void registerRoot(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
+public class BattlegroundsCommand implements CommandRegistrationCallback {
+    private Vote startGameVote = Vote.EMPTY;
+
+    public void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
         var cRoot = literal("battlegrounds");
+        var cStart = literal("start").executes(this::executeStart);
+        var cStop = literal("stop").executes(this::executeStop);
+        var cFlash = literal("flash").requires(source -> source.hasPermissionLevel(2)).executes(context -> executeFlash(context, true))
+                .then(argument("pos", Vec3ArgumentType.vec3()).executes(context -> executeFlash(context, false)));
         var cReload = literal("reload").requires(source ->
-                source.hasPermissionLevel(2)).executes(BattlegroundsCommand::executeReload);
-        var cFlash = registerSummonFlash();
-        var cNode = dispatcher.register(cRoot.then(cReload).then(cFlash));
+                source.hasPermissionLevel(2)).executes(this::executeReload);
+        var cNode = dispatcher.register(cRoot.then(cStart).then(cStop).then(cFlash).then(cReload));
         // 命令缩写
         var cRoot_redir = literal("bg").redirect(cNode);
         dispatcher.register(cRoot_redir);
     }
 
-    private static ArgumentBuilder<ServerCommandSource, ?> registerSummonFlash() {
-        var cSummon = literal("flash").requires(source ->
-                source.hasPermissionLevel(2)).executes(context -> executeFlash(context, true));
-        var aPos = argument("pos", Vec3ArgumentType.vec3()).executes(context -> executeFlash(context, false));
-        return cSummon.then(aPos);
+    private int executeStart(CommandContext<ServerCommandSource> context) {
+        //if (this.startGameVote.isOpened()) throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument().create();
+        this.startGameVote = new Vote(VotePresets.START_GAME);
+        this.startGameVote.open(context.getSource().getServer().getPlayerManager().getPlayerList().stream().map(PlayerUtil::getAuthUUID).toList(),
+                Duration.ofSeconds(60));
+        return 1;
     }
 
-    private static int executeFlash(CommandContext<ServerCommandSource> context, boolean isSelf) throws CommandSyntaxException {
+    private int executeStop(CommandContext<ServerCommandSource> context) {
+        return 1;
+    }
+
+    private int executeFlash(CommandContext<ServerCommandSource> context, boolean isSelf) throws CommandSyntaxException {
         if (isSelf && context.getSource().isExecutedByPlayer()) {
             ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
             World world = player.getWorld();
@@ -55,7 +67,7 @@ public class BattlegroundsCommand {
         return 1;
     }
 
-    private static int executeReload(CommandContext<ServerCommandSource> context) {
+    private int executeReload(CommandContext<ServerCommandSource> context) {
         Battlegrounds.INSTANCE.reload();
         context.getSource().sendFeedback(() -> Text.translatable("commands.battlegrounds.reload.feedback")
                 .formatted(Formatting.GREEN), true);
