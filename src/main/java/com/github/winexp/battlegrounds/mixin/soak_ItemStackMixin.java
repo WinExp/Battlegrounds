@@ -53,7 +53,7 @@ public abstract class soak_ItemStackMixin {
                 RegistryEntry<StatusEffect> effect = mapEntry.getKey();
                 SoakComponent.EffectEntry entry = mapEntry.getValue();
                 livingEntity.addStatusEffect(entry.toStatusEffectInstance(effect));
-                if (entry.originParameters().duration() == StatusEffectInstance.INFINITE) {
+                if (entry.originParameters().duration() != StatusEffectInstance.INFINITE) {
                     entry.durationDecrement().add(0.0057);
                 }
                 if (!entry.isValid()) {

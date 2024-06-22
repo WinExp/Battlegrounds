@@ -13,10 +13,10 @@ import java.util.HashMap;
 
 public class ModRegistries {
     private static final HashMap<Identifier, Runnable> INITIALIZERS = new HashMap<>();
-    public static final Registry<VoteMode> VOTE_MODE = registerDefaulted(ModRegistryKeys.VOTE_MODE, registry -> VoteModes.bootstrap());
-    public static final Registry<VotePreset> VOTE_PRESET = registerDefaulted(ModRegistryKeys.VOTE_PRESET, registry -> VotePresets.bootstrap());
+    public static final Registry<VoteMode> VOTE_MODE = register(ModRegistryKeys.VOTE_MODE, registry -> VoteModes.bootstrap());
+    public static final Registry<VotePreset> VOTE_PRESET = register(ModRegistryKeys.VOTE_PRESET, registry -> VotePresets.bootstrap());
 
-    private static <T> Registry<T> registerDefaulted(RegistryKey<Registry<T>> registryKey, Initializer<T> initializer) {
+    private static <T> Registry<T> register(RegistryKey<Registry<T>> registryKey, Initializer<T> initializer) {
         Registry<T> registry = FabricRegistryBuilder.createSimple(registryKey).buildAndRegister();
         INITIALIZERS.put(registryKey.getValue(), () -> initializer.initialize(registry));
         return registry;
